@@ -22,7 +22,7 @@ cp backend/.env.dist backend/.env
 # Start the application
 ./scripts/start.sh
 
-# The application is available at http://localhost
+# The application is available at http://veaf.localhost
 ```
 
 ```bash
@@ -39,7 +39,7 @@ cp backend/.env.dist backend/.env
 docker compose up
 ```
 
-Backend at `http://localhost:8000` (Swagger: `http://localhost:8000/api/docs`), frontend at `http://localhost:5173`.
+Application at `http://veaf.localhost` (Swagger: `http://veaf.localhost/api/docs`). Nginx reverse proxy routes `/api/*` to the backend and `/` to the frontend.
 
 ### Python dependency management (uv)
 
