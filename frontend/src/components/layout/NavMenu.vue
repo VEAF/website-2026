@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MenuItem } from '@/types/api'
 
-const props = defineProps<{
+defineProps<{
   items: MenuItem[]
   mobile?: boolean
 }>()
