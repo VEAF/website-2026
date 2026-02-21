@@ -5,6 +5,9 @@
 @layer base {
   body {
     @apply font-sans text-gray-900 antialiased;
+    background-image: url('/img/background-01-blur.jpg');
+    background-attachment: fixed;
+    background-size: cover;
   }
 
   a {
