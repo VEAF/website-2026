@@ -1,0 +1,63 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://veaf:password@postgres:5432/veaf
+      - JWT_SECRET=dev-secret-key
+      - API_DCSSERVERBOT_URL=http://dcs.veaf.org:9876
+      - API_TEAMSPEAK_URL=serverquery://ts.veaf.org:10011/?server_port=9987
+      - APP_URL=http://veaf.localhost
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+
+  nginx:
+    image: nginx:alpine
+    environment:
+      - VIRTUAL_HOST=veaf.localhost
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - default
+      - webproxy
+    depends_on:
+      - backend
+      - frontend
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: veaf
+      POSTGRES_USER: veaf
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veaf"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  uploads:
+
+networks:
+  webproxy:
+    external: true

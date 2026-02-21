@@ -1,0 +1,68 @@
+"""Factory-boy factories for test data creation."""
+
+from datetime import datetime, timezone
+
+import factory
+
+from app.auth.password import hash_password
+from app.models.calendar import CalendarEvent, Choice, Flight, Slot, Vote
+from app.models.content import File, MenuItem, Page, PageBlock, Url
+from app.models.dcs import Player, Server
+from app.models.module import Module, ModuleRole, ModuleSystem
+from app.models.recruitment import RecruitmentEvent
+from app.models.user import User, UserModule
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    email = factory.Sequence(lambda n: f"user{n}@veaf.org")
+    nickname = factory.Sequence(lambda n: f"Pilot{n}")
+    password = factory.LazyFunction(lambda: hash_password("password123"))
+    roles = "ROLE_USER"
+    status = User.STATUS_MEMBER
+    sim_dcs = True
+    sim_bms = False
+    created_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    updated_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+
+
+class AdminFactory(UserFactory):
+    roles = "ROLE_USER,ROLE_ADMIN"
+
+
+class ModuleFactory(factory.Factory):
+    class Meta:
+        model = Module
+
+    name = factory.Sequence(lambda n: f"M{n:02d}")
+    long_name = factory.Sequence(lambda n: f"Module {n}")
+    code = factory.Sequence(lambda n: f"MOD{n:03d}")
+    type = Module.TYPE_AIRCRAFT
+    landing_page = False
+    landing_page_number = 0
+
+
+class ServerFactory(factory.Factory):
+    class Meta:
+        model = Server
+
+    name = factory.Sequence(lambda n: f"Server {n}")
+    code = factory.Sequence(lambda n: f"srv{n}")
+    atc = False
+    gci = False
+
+
+class EventFactory(factory.Factory):
+    class Meta:
+        model = CalendarEvent
+
+    title = factory.Sequence(lambda n: f"Event {n}")
+    start_date = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    end_date = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    type = CalendarEvent.EVENT_TYPE_TRAINING
+    sim_dcs = True
+    registration = True
+    created_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    updated_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
