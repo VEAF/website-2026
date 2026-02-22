@@ -18,7 +18,7 @@ onMounted(async () => {
     <h1 class="text-2xl font-bold mb-6">Administration</h1>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <RouterLink to="/admin/users" class="card text-center hover:shadow-md transition-shadow">
-        <div class="text-3xl font-bold text-veaf-600 mb-2">-</div>
+        <div class="text-3xl font-bold text-veaf-600 mb-2">{{ stats?.users ?? '-' }}</div>
         <div class="text-sm text-gray-600">Utilisateurs</div>
       </RouterLink>
       <RouterLink to="/admin/modules" class="card text-center hover:shadow-md transition-shadow">

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PageBlockOut(BaseModel):
@@ -22,7 +22,7 @@ class PageOut(BaseModel):
     restriction: int
     created_at: datetime | None = None
     updated_at: datetime | None = None
-    blocks: list[PageBlockOut] = []
+    blocks: list[PageBlockOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -40,7 +40,7 @@ class MenuItemOut(BaseModel):
     restriction: int
     url_slug: str | None = None
     page_path: str | None = None
-    items: list["MenuItemOut"] = []
+    items: list["MenuItemOut"] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 

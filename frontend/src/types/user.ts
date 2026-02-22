@@ -37,3 +37,39 @@ export interface UserUpdate {
   sim_dcs?: boolean
   sim_bms?: boolean
 }
+
+// --- Admin types ---
+
+export interface AdminUser {
+  id: number
+  email: string
+  nickname: string
+  roles: string[]
+  status: number
+  status_as_string: string | null
+  sim_dcs: boolean
+  sim_bms: boolean
+  discord: string | null
+  forum: string | null
+  need_presentation: boolean
+  cadet_flights: number
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface AdminUserUpdate {
+  email: string
+  nickname: string
+  roles: string[]
+  status: number
+  discord: string | null
+  forum: string | null
+  sim_dcs: boolean
+  sim_bms: boolean
+  need_presentation: boolean
+}
+
+export interface AdminUserListResponse {
+  items: AdminUser[]
+  total: number
+}

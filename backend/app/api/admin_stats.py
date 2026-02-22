@@ -13,6 +13,7 @@ router = APIRouter(prefix="/admin/stats", tags=["admin-stats"])
 
 class AdminStats(BaseModel):
     modules: int = 0
+    users: int = 0
 
 
 @router.get("", response_model=AdminStats)
@@ -23,4 +24,7 @@ async def get_stats(
     result = await db.execute(select(func.count()).select_from(Module))
     modules_count = result.scalar_one()
 
-    return AdminStats(modules=modules_count)
+    result = await db.execute(select(func.count()).select_from(User))
+    users_count = result.scalar_one()
+
+    return AdminStats(modules=modules_count, users=users_count)

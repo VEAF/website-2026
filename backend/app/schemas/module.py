@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ModuleRoleOut(BaseModel):
@@ -32,8 +32,8 @@ class ModuleOut(BaseModel):
     period_as_string: str | None = None
     image_uuid: str | None = None
     image_header_uuid: str | None = None
-    roles: list[ModuleRoleOut] = []
-    systems: list[ModuleSystemOut] = []
+    roles: list[ModuleRoleOut] = Field(default_factory=list)
+    systems: list[ModuleSystemOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -73,8 +73,8 @@ class ModuleCreate(BaseModel):
     landing_page: bool = False
     landing_page_number: int | None = None
     period: int | None = None
-    role_ids: list[int] = []
-    system_ids: list[int] = []
+    role_ids: list[int] = Field(default_factory=list)
+    system_ids: list[int] = Field(default_factory=list)
 
 
 class ModuleUpdate(BaseModel):
@@ -85,5 +85,5 @@ class ModuleUpdate(BaseModel):
     landing_page: bool = False
     landing_page_number: int | None = None
     period: int | None = None
-    role_ids: list[int] = []
-    system_ids: list[int] = []
+    role_ids: list[int] = Field(default_factory=list)
+    system_ids: list[int] = Field(default_factory=list)

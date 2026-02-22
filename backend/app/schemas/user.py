@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserModuleOut(BaseModel):
@@ -33,10 +33,10 @@ class UserPublic(BaseModel):
 
 class UserMe(UserPublic):
     email: EmailStr
-    roles: list[str] = []
+    roles: list[str] = Field(default_factory=list)
     need_presentation: bool
     cadet_flights: int
-    modules: list[UserModuleOut] = []
+    modules: list[UserModuleOut] = Field(default_factory=list)
 
 
 class UserUpdate(BaseModel):
@@ -45,3 +45,42 @@ class UserUpdate(BaseModel):
     forum: str | None = None
     sim_dcs: bool | None = None
     sim_bms: bool | None = None
+
+
+# --- Admin schemas ---
+
+
+class AdminUserOut(BaseModel):
+    id: int
+    email: EmailStr
+    nickname: str
+    roles: list[str] = Field(default_factory=list)
+    status: int
+    status_as_string: str | None = None
+    sim_dcs: bool
+    sim_bms: bool
+    discord: str | None = None
+    forum: str | None = None
+    need_presentation: bool
+    cadet_flights: int
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class AdminUserUpdate(BaseModel):
+    email: EmailStr
+    nickname: str
+    roles: list[str] = Field(default_factory=list)
+    status: int
+    discord: str | None = None
+    forum: str | None = None
+    sim_dcs: bool = False
+    sim_bms: bool = False
+    need_presentation: bool = False
+
+
+class AdminUserListOut(BaseModel):
+    items: list[AdminUserOut]
+    total: int

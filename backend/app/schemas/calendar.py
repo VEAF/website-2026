@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class VoteOut(BaseModel):
@@ -44,7 +44,7 @@ class FlightOut(BaseModel):
     aircraft_id: int
     aircraft_name: str | None = None
     nb_slots: int
-    slots: list[SlotOut] = []
+    slots: list[SlotOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -67,7 +67,7 @@ class EventListOut(BaseModel):
 
 class EventDetailOut(EventListOut):
     description: str | None = None
-    restrictions: list[int] = []
+    restrictions: list[int] = Field(default_factory=list)
     ato: bool
     debrief: str | None = None
     repeat_event: int
@@ -77,10 +77,10 @@ class EventDetailOut(EventListOut):
     server_id: int | None = None
     image_uuid: str | None = None
     owner_id: int
-    module_ids: list[int] = []
-    votes: list[VoteOut] = []
-    choices: list[ChoiceOut] = []
-    flights: list[FlightOut] = []
+    module_ids: list[int] = Field(default_factory=list)
+    votes: list[VoteOut] = Field(default_factory=list)
+    choices: list[ChoiceOut] = Field(default_factory=list)
+    flights: list[FlightOut] = Field(default_factory=list)
 
 
 class EventCreate(BaseModel):
@@ -91,13 +91,13 @@ class EventCreate(BaseModel):
     sim_dcs: bool = False
     sim_bms: bool = False
     description: str | None = None
-    restrictions: list[int] = []
+    restrictions: list[int] = Field(default_factory=list)
     registration: bool = False
     ato: bool = False
     repeat_event: int = 0
     map_id: int | None = None
     server_id: int | None = None
-    module_ids: list[int] = []
+    module_ids: list[int] = Field(default_factory=list)
 
 
 class EventUpdate(EventCreate):
