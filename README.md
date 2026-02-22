@@ -41,6 +41,14 @@ docker compose up
 
 Application at `http://veaf.localhost` (Swagger: `http://veaf.localhost/api/docs`). Nginx reverse proxy routes `/api/*` to the backend and `/` to the frontend.
 
+### Fixtures
+
+```bash
+./scripts/dev/fixtures.sh            # Reset DB + load fixtures
+```
+
+Compte admin par défaut : `mitch@localhost.dev` / `test1234`
+
 ### Python dependency management (uv)
 
 The `scripts/uv.sh` script runs `uv` in the backend container (`exec` if the container is running, `run --rm` otherwise).
