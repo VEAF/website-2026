@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import {
   getModules,
   getRoles,
@@ -71,7 +71,32 @@ const modulePeriods = [
   { value: 3, label: 'MODERN' },
 ]
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+const codeManuallyEdited = ref(false)
+
+watch(
+  () => moduleForm.value.name,
+  (name) => {
+    if (!editingModuleId.value && !codeManuallyEdited.value) {
+      moduleForm.value.code = slugify(name)
+    }
+  },
+)
+
+function onCodeInput() {
+  codeManuallyEdited.value = true
+}
+
 function openNewModule() {
+  codeManuallyEdited.value = false
   editingModuleId.value = null
   moduleForm.value = {
     type: 2,
@@ -325,6 +350,7 @@ onMounted(loadAll)
                 class="input"
                 maxlength="16"
                 required
+                @input="onCodeInput"
               />
             </div>
           </div>
