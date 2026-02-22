@@ -1,5 +1,16 @@
 <script setup lang="ts">
-// TODO: Implement admin dashboard with statistics in Phase 4
+import { ref, onMounted } from 'vue'
+import { getAdminStats, type AdminStats } from '@/api/admin'
+
+const stats = ref<AdminStats | null>(null)
+
+onMounted(async () => {
+  try {
+    stats.value = await getAdminStats()
+  } catch {
+    // silently fail — dashboard still usable with "-"
+  }
+})
 </script>
 
 <template>
@@ -11,7 +22,7 @@
         <div class="text-sm text-gray-600">Utilisateurs</div>
       </RouterLink>
       <RouterLink to="/admin/modules" class="card text-center hover:shadow-md transition-shadow">
-        <div class="text-3xl font-bold text-veaf-600 mb-2">-</div>
+        <div class="text-3xl font-bold text-veaf-600 mb-2">{{ stats?.modules ?? '-' }}</div>
         <div class="text-sm text-gray-600">Modules</div>
       </RouterLink>
       <RouterLink to="/admin/calendar" class="card text-center hover:shadow-md transition-shadow">

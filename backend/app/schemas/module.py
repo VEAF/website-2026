@@ -36,3 +36,54 @@ class ModuleOut(BaseModel):
     systems: list[ModuleSystemOut] = []
 
     model_config = {"from_attributes": True}
+
+
+# --- Input schemas ---
+
+
+class ModuleRoleCreate(BaseModel):
+    name: str
+    code: str
+    position: int
+
+
+class ModuleRoleUpdate(BaseModel):
+    name: str
+    code: str
+    position: int
+
+
+class ModuleSystemCreate(BaseModel):
+    code: str
+    name: str
+    position: int = 0
+
+
+class ModuleSystemUpdate(BaseModel):
+    code: str
+    name: str
+    position: int = 0
+
+
+class ModuleCreate(BaseModel):
+    type: int
+    name: str
+    long_name: str
+    code: str
+    landing_page: bool = False
+    landing_page_number: int | None = None
+    period: int | None = None
+    role_ids: list[int] = []
+    system_ids: list[int] = []
+
+
+class ModuleUpdate(BaseModel):
+    type: int
+    name: str
+    long_name: str
+    code: str
+    landing_page: bool = False
+    landing_page_number: int | None = None
+    period: int | None = None
+    role_ids: list[int] = []
+    system_ids: list[int] = []

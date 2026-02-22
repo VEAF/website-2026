@@ -28,3 +28,35 @@ export interface Module {
   roles: ModuleRole[]
   systems: ModuleSystem[]
 }
+
+// --- Input types ---
+
+export interface ModuleCreate {
+  type: number
+  name: string
+  long_name: string
+  code: string
+  landing_page?: boolean
+  landing_page_number?: number | null
+  period?: number | null
+  role_ids?: number[]
+  system_ids?: number[]
+}
+
+export type ModuleUpdate = ModuleCreate
+
+export interface ModuleRoleCreate {
+  name: string
+  code: string
+  position: number
+}
+
+export type ModuleRoleUpdate = ModuleRoleCreate
+
+export interface ModuleSystemCreate {
+  code: string
+  name: string
+  position: number
+}
+
+export type ModuleSystemUpdate = ModuleSystemCreate
