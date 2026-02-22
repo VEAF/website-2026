@@ -40,6 +40,18 @@ async def list_modules(type: int | None = None, db: AsyncSession = Depends(get_d
     ]
 
 
+@router.get("/roles", response_model=list[ModuleRoleOut])
+async def list_roles(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(ModuleRole).order_by(ModuleRole.position))
+    return [ModuleRoleOut.model_validate(r) for r in result.scalars().all()]
+
+
+@router.get("/systems", response_model=list[ModuleSystemOut])
+async def list_systems(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(ModuleSystem).order_by(ModuleSystem.position))
+    return [ModuleSystemOut.model_validate(s) for s in result.scalars().all()]
+
+
 @router.get("/{module_id}", response_model=ModuleOut)
 async def get_module(module_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -62,15 +74,3 @@ async def get_module(module_id: int, db: AsyncSession = Depends(get_db)):
         roles=[ModuleRoleOut.model_validate(r) for r in m.roles],
         systems=[ModuleSystemOut.model_validate(s) for s in m.systems],
     )
-
-
-@router.get("/roles", response_model=list[ModuleRoleOut])
-async def list_roles(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(ModuleRole).order_by(ModuleRole.position))
-    return [ModuleRoleOut.model_validate(r) for r in result.scalars().all()]
-
-
-@router.get("/systems", response_model=list[ModuleSystemOut])
-async def list_systems(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(ModuleSystem).order_by(ModuleSystem.position))
-    return [ModuleSystemOut.model_validate(s) for s in result.scalars().all()]

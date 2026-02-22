@@ -44,6 +44,24 @@ class ModuleFactory(factory.Factory):
     landing_page_number = 0
 
 
+class ModuleRoleFactory(factory.Factory):
+    class Meta:
+        model = ModuleRole
+
+    name = factory.Sequence(lambda n: f"Role{n}")
+    code = factory.Sequence(lambda n: f"role{n}")
+    position = factory.Sequence(lambda n: n)
+
+
+class ModuleSystemFactory(factory.Factory):
+    class Meta:
+        model = ModuleSystem
+
+    code = factory.Sequence(lambda n: f"sys{n}")
+    name = factory.Sequence(lambda n: f"System{n}")
+    position = factory.Sequence(lambda n: n)
+
+
 class ServerFactory(factory.Factory):
     class Meta:
         model = Server
