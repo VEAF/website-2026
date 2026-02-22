@@ -44,6 +44,30 @@ export async function updateModule(id: number, payload: ModuleUpdate): Promise<M
   return data
 }
 
+export async function uploadModuleImage(moduleId: number, file: File): Promise<Module> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await apiClient.put<Module>(`/admin/modules/${moduleId}/image`, formData)
+  return data
+}
+
+export async function deleteModuleImage(moduleId: number): Promise<Module> {
+  const { data } = await apiClient.delete<Module>(`/admin/modules/${moduleId}/image`)
+  return data
+}
+
+export async function uploadModuleImageHeader(moduleId: number, file: File): Promise<Module> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await apiClient.put<Module>(`/admin/modules/${moduleId}/image-header`, formData)
+  return data
+}
+
+export async function deleteModuleImageHeader(moduleId: number): Promise<Module> {
+  const { data } = await apiClient.delete<Module>(`/admin/modules/${moduleId}/image-header`)
+  return data
+}
+
 // --- Admin ModuleRole endpoints ---
 
 export async function createRole(payload: ModuleRoleCreate): Promise<ModuleRole> {

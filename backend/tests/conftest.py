@@ -1,9 +1,11 @@
+import os
 from collections.abc import AsyncGenerator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.config import settings
 from app.database import Base, get_db
 from app.main import app
 
@@ -40,3 +42,12 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
         yield c
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def tmp_upload_dir(tmp_path):
+    original = settings.UPLOAD_DIR
+    settings.UPLOAD_DIR = str(tmp_path / "uploads")
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    yield settings.UPLOAD_DIR
+    settings.UPLOAD_DIR = original

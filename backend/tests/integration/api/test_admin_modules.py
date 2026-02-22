@@ -497,3 +497,196 @@ async def test_delete_system_not_found(client: AsyncClient, db_session: AsyncSes
 
     # THEN
     assert response.status_code == 404
+
+
+# =============================================================================
+# Module Image Upload/Delete
+# =============================================================================
+
+FAKE_JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 100  # Minimal JPEG-like bytes
+
+
+async def _create_module(db: AsyncSession) -> Module:
+    """Create and return a module."""
+    module = ModuleFactory.build()
+    db.add(module)
+    await db.commit()
+    await db.refresh(module)
+    return module
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # WHEN
+    response = await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("photo.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_uuid"] is not None
+    assert data["image_header_uuid"] is None
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_header_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # WHEN
+    response = await client.put(
+        f"/api/admin/modules/{module.id}/image-header",
+        files={"file": ("banner.png", FAKE_JPEG, "image/png")},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_header_uuid"] is not None
+    assert data["image_uuid"] is None
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_replaces_previous(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # Upload first image
+    resp1 = await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("first.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+    first_uuid = resp1.json()["image_uuid"]
+
+    # WHEN - upload second image
+    resp2 = await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("second.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # THEN
+    assert resp2.status_code == 200
+    second_uuid = resp2.json()["image_uuid"]
+    assert second_uuid is not None
+    assert second_uuid != first_uuid
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_invalid_mime_type(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # WHEN
+    response = await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("doc.pdf", b"%PDF-1.4", "application/pdf")},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_not_found(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.put(
+        "/api/admin/modules/9999/image",
+        files={"file": ("photo.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_upload_module_image_unauthorized(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_user(db_session)
+    module = await _create_module(db_session)
+
+    # WHEN
+    response = await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("photo.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_delete_module_image_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # Upload an image first
+    await client.put(
+        f"/api/admin/modules/{module.id}/image",
+        files={"file": ("photo.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # WHEN
+    response = await client.delete(f"/api/admin/modules/{module.id}/image", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_uuid"] is None
+
+
+@pytest.mark.asyncio
+async def test_delete_module_image_header_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # Upload a header image first
+    await client.put(
+        f"/api/admin/modules/{module.id}/image-header",
+        files={"file": ("banner.jpg", FAKE_JPEG, "image/jpeg")},
+        headers=headers,
+    )
+
+    # WHEN
+    response = await client.delete(f"/api/admin/modules/{module.id}/image-header", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_header_uuid"] is None
+
+
+@pytest.mark.asyncio
+async def test_delete_module_image_no_image(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN - module with no image
+    _, headers = await _create_admin(db_session)
+    module = await _create_module(db_session)
+
+    # WHEN
+    response = await client.delete(f"/api/admin/modules/{module.id}/image", headers=headers)
+
+    # THEN - idempotent, returns 200
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_uuid"] is None

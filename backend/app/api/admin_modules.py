@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+import os
+from datetime import datetime
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth.dependencies import require_admin
+from app.config import settings
 from app.database import get_db
+from app.models.content import File
 from app.models.module import Module, ModuleRole, ModuleSystem
 from app.models.user import User
 from app.schemas.module import (
@@ -21,6 +27,16 @@ from app.schemas.module import (
 )
 
 router = APIRouter(prefix="/admin/modules", tags=["admin-modules"])
+
+ALLOWED_IMAGE_MIMES = {"image/jpg", "image/jpeg", "image/png"}
+MAX_IMAGE_SIZE = 20 * 1024 * 1024  # 20 MB
+
+
+def _delete_file_from_disk(file: File) -> None:
+    """Remove a file from disk storage. Silently ignores missing files."""
+    file_path = os.path.join(settings.UPLOAD_DIR, file.uuid[0], file.uuid[1], f"{file.uuid}.{file.extension}")
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 
 async def _build_module_out(module_id: int, db: AsyncSession) -> ModuleOut:
@@ -140,6 +156,131 @@ async def update_module(
         )
 
     return await _build_module_out(module.id, db)
+
+
+# --- Module image endpoints ---
+
+
+async def _upload_module_image(
+    module_id: int,
+    file: UploadFile,
+    field: str,
+    user: User,
+    db: AsyncSession,
+) -> ModuleOut:
+    """Upload an image and attach it to a module field ('image' or 'image_header')."""
+    if file.content_type not in ALLOWED_IMAGE_MIMES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Format accepté : uniquement les images jpg et png",
+        )
+
+    content = await file.read()
+    if len(content) > MAX_IMAGE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La taille du fichier ne doit pas dépasser 20 Mo",
+        )
+
+    relationship = Module.image if field == "image" else Module.image_header
+    result = await db.execute(
+        select(Module).where(Module.id == module_id).options(selectinload(relationship))
+    )
+    module = result.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Module non trouvé")
+
+    # Clean up old file
+    old_file = getattr(module, field)
+    if old_file is not None:
+        _delete_file_from_disk(old_file)
+        setattr(module, field, None)
+        await db.delete(old_file)
+
+    # Save new file to disk
+    file_uuid = str(uuid4())
+    extension = os.path.splitext(file.filename or "")[1].lstrip(".")
+    dir_path = os.path.join(settings.UPLOAD_DIR, file_uuid[0], file_uuid[1])
+    os.makedirs(dir_path, exist_ok=True)
+    file_path = os.path.join(dir_path, f"{file_uuid}.{extension}")
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    db_file = File(
+        uuid=file_uuid,
+        mime_type=file.content_type or "application/octet-stream",
+        size=len(content),
+        extension=extension,
+        original_name=file.filename,
+        type=File.type_from_mime(file.content_type or ""),
+        owner_id=user.id,
+        created_at=datetime.utcnow(),
+    )
+    db.add(db_file)
+    await db.flush()
+
+    setattr(module, field, db_file)
+    await db.commit()
+
+    return await _build_module_out(module.id, db)
+
+
+async def _delete_module_image(module_id: int, field: str, db: AsyncSession) -> ModuleOut:
+    """Remove an image from a module field ('image' or 'image_header')."""
+    relationship = Module.image if field == "image" else Module.image_header
+    result = await db.execute(
+        select(Module).where(Module.id == module_id).options(selectinload(relationship))
+    )
+    module = result.scalar_one_or_none()
+    if module is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Module non trouvé")
+
+    old_file = getattr(module, field)
+    if old_file is not None:
+        _delete_file_from_disk(old_file)
+        setattr(module, field, None)
+        await db.delete(old_file)
+
+    await db.commit()
+    return await _build_module_out(module.id, db)
+
+
+@router.put("/{module_id}/image", response_model=ModuleOut)
+async def upload_module_image(
+    module_id: int,
+    file: UploadFile,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _upload_module_image(module_id, file, "image", user, db)
+
+
+@router.delete("/{module_id}/image", response_model=ModuleOut)
+async def delete_module_image(
+    module_id: int,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _delete_module_image(module_id, "image", db)
+
+
+@router.put("/{module_id}/image-header", response_model=ModuleOut)
+async def upload_module_image_header(
+    module_id: int,
+    file: UploadFile,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _upload_module_image(module_id, file, "image_header", user, db)
+
+
+@router.delete("/{module_id}/image-header", response_model=ModuleOut)
+async def delete_module_image_header(
+    module_id: int,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _delete_module_image(module_id, "image_header", db)
 
 
 # --- ModuleRole endpoints ---
