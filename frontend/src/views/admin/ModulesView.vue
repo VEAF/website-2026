@@ -6,6 +6,10 @@ import {
   getSystems,
   createModule,
   updateModule,
+  uploadModuleImage,
+  deleteModuleImage,
+  uploadModuleImageHeader,
+  deleteModuleImageHeader,
   createRole,
   updateRole,
   deleteRole,
@@ -56,6 +60,10 @@ const moduleForm = ref({
   system_ids: [] as number[],
 })
 
+const imageUploading = ref(false)
+const currentImageUuid = ref<string | null>(null)
+const currentImageHeaderUuid = ref<string | null>(null)
+
 const moduleTypes = [
   { value: 0, label: 'Aucun' },
   { value: 1, label: 'Carte' },
@@ -98,6 +106,8 @@ function onCodeInput() {
 function openNewModule() {
   codeManuallyEdited.value = false
   editingModuleId.value = null
+  currentImageUuid.value = null
+  currentImageHeaderUuid.value = null
   moduleForm.value = {
     type: 2,
     name: '',
@@ -114,6 +124,8 @@ function openNewModule() {
 
 function openEditModule(m: Module) {
   editingModuleId.value = m.id
+  currentImageUuid.value = m.image_uuid
+  currentImageHeaderUuid.value = m.image_header_uuid
   moduleForm.value = {
     type: m.type,
     name: m.name,
@@ -144,6 +156,62 @@ async function handleModuleSubmit() {
     showError(e)
   } finally {
     loading.value = false
+  }
+}
+
+// --- Module image handlers ---
+
+async function handleImageUpload(event: Event, type: 'image' | 'image-header') {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file || !editingModuleId.value) return
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!allowedTypes.includes(file.type)) {
+    showError(new Error('Format accepté : uniquement les images jpg et png'))
+    input.value = ''
+    return
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    showError(new Error('La taille du fichier ne doit pas dépasser 20 Mo'))
+    input.value = ''
+    return
+  }
+
+  imageUploading.value = true
+  try {
+    const uploadFn = type === 'image' ? uploadModuleImage : uploadModuleImageHeader
+    const updated = await uploadFn(editingModuleId.value, file)
+    currentImageUuid.value = updated.image_uuid
+    currentImageHeaderUuid.value = updated.image_header_uuid
+    modules.value = await getModules()
+    showSuccess(type === 'image' ? 'Image uploadée avec succès' : 'Image header uploadée avec succès')
+  } catch (e) {
+    showError(e)
+  } finally {
+    imageUploading.value = false
+    input.value = ''
+  }
+}
+
+async function handleImageDelete(type: 'image' | 'image-header') {
+  if (!editingModuleId.value) return
+
+  const label = type === 'image' ? "l'image" : "l'image header"
+  if (!confirm(`Supprimer ${label} ?`)) return
+
+  imageUploading.value = true
+  try {
+    const deleteFn = type === 'image' ? deleteModuleImage : deleteModuleImageHeader
+    const updated = await deleteFn(editingModuleId.value)
+    currentImageUuid.value = updated.image_uuid
+    currentImageHeaderUuid.value = updated.image_header_uuid
+    modules.value = await getModules()
+    showSuccess(type === 'image' ? 'Image supprimée avec succès' : 'Image header supprimée avec succès')
+  } catch (e) {
+    showError(e)
+  } finally {
+    imageUploading.value = false
   }
 }
 
@@ -421,6 +489,69 @@ onMounted(loadAll)
             </div>
           </div>
 
+          <!-- Images (only when editing an existing module) -->
+          <div v-if="editingModuleId" class="space-y-4 border-t pt-4">
+            <h4 class="text-sm font-semibold text-gray-700">Images</h4>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Image (16:9) -->
+              <div>
+                <label class="label">Image (format 16/9)</label>
+                <div v-if="currentImageUuid" class="mb-2">
+                  <img
+                    :src="`/api/files/${currentImageUuid}`"
+                    alt="Image du module"
+                    class="max-w-full max-h-40 rounded border border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    class="mt-1 text-red-600 hover:text-red-800 text-sm"
+                    :disabled="imageUploading"
+                    @click="handleImageDelete('image')"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  class="input"
+                  :disabled="imageUploading"
+                  @change="handleImageUpload($event, 'image')"
+                />
+                <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo</p>
+              </div>
+
+              <!-- Image Header (5:1) -->
+              <div>
+                <label class="label">Image header (format 5:1)</label>
+                <div v-if="currentImageHeaderUuid" class="mb-2">
+                  <img
+                    :src="`/api/files/${currentImageHeaderUuid}`"
+                    alt="Image header du module"
+                    class="max-w-full max-h-40 rounded border border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    class="mt-1 text-red-600 hover:text-red-800 text-sm"
+                    :disabled="imageUploading"
+                    @click="handleImageDelete('image-header')"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  class="input"
+                  :disabled="imageUploading"
+                  @change="handleImageUpload($event, 'image-header')"
+                />
+                <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo, ratio 5:1 conseillé</p>
+              </div>
+            </div>
+          </div>
+
           <div class="flex justify-end space-x-3">
             <button type="button" class="btn-secondary" @click="showModuleForm = false">
               Annuler
@@ -438,6 +569,7 @@ onMounted(loadAll)
           <thead>
             <tr class="border-b text-left">
               <th class="p-2">Type</th>
+              <th class="p-2">Image</th>
               <th class="p-2">Code</th>
               <th class="p-2">Nom</th>
               <th class="p-2">Nom complet</th>
@@ -449,7 +581,7 @@ onMounted(loadAll)
           </thead>
           <tbody>
             <tr v-if="!modules.length">
-              <td colspan="8" class="p-4 text-center text-gray-500">Aucun module</td>
+              <td colspan="9" class="p-4 text-center text-gray-500">Aucun module</td>
             </tr>
             <tr
               v-for="m in modules"
@@ -457,6 +589,15 @@ onMounted(loadAll)
               class="border-b hover:bg-gray-50"
             >
               <td class="p-2">{{ m.type_as_string }}</td>
+              <td class="p-2">
+                <img
+                  v-if="m.image_uuid"
+                  :src="`/api/files/${m.image_uuid}`"
+                  :alt="m.code"
+                  class="w-10 h-10 object-cover rounded"
+                />
+                <span v-else class="text-gray-400 text-xs">-</span>
+              </td>
               <td class="p-2 font-mono">{{ m.code }}</td>
               <td class="p-2">{{ m.name }}</td>
               <td class="p-2">{{ m.long_name }}</td>
