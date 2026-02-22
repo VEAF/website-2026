@@ -18,6 +18,9 @@ import {
   deleteSystem,
 } from '@/api/modules'
 import type { Module, ModuleRole, ModuleSystem } from '@/types/module'
+import { useConfirm } from '@/composables/useConfirm'
+
+const { confirm } = useConfirm()
 
 type Tab = 'modules' | 'roles' | 'systems'
 
@@ -198,7 +201,7 @@ async function handleImageDelete(type: 'image' | 'image-header') {
   if (!editingModuleId.value) return
 
   const label = type === 'image' ? "l'image" : "l'image header"
-  if (!confirm(`Supprimer ${label} ?`)) return
+  if (!(await confirm(`Supprimer ${label} ?`))) return
 
   imageUploading.value = true
   try {
@@ -252,7 +255,7 @@ async function handleRoleSubmit() {
 }
 
 async function handleDeleteRole(r: ModuleRole) {
-  if (!confirm(`Supprimer le rôle "${r.name}" ?`)) return
+  if (!(await confirm(`Supprimer le rôle "${r.name}" ?`))) return
   loading.value = true
   try {
     await deleteRole(r.id)
@@ -302,7 +305,7 @@ async function handleSystemSubmit() {
 }
 
 async function handleDeleteSystem(s: ModuleSystem) {
-  if (!confirm(`Supprimer le système "${s.name}" ?`)) return
+  if (!(await confirm(`Supprimer le système "${s.name}" ?`))) return
   loading.value = true
   try {
     await deleteSystem(s.id)

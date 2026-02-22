@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getEvent, voteEvent, deleteEvent } from '@/api/calendar'
 import type { EventDetail } from '@/types/calendar'
+import { useConfirm } from '@/composables/useConfirm'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +12,7 @@ const auth = useAuthStore()
 const event = ref<EventDetail | null>(null)
 const loading = ref(true)
 
+const { confirm } = useConfirm()
 const id = Number(route.params.id)
 
 onMounted(async () => {
@@ -28,7 +30,7 @@ async function handleVote(vote: boolean | null) {
 }
 
 async function handleDelete() {
-  if (!event.value || !confirm('Supprimer cet événement ?')) return
+  if (!event.value || !(await confirm('Supprimer cet événement ?'))) return
   await deleteEvent(event.value.id)
   router.push('/calendar')
 }
