@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     port: 5173,
     hmr: {
-      host: 'veaf.localhost',
+      host: process.env.VIRTUAL_HOST || 'localhost',
       clientPort: 80,
     },
     watch: {
