@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserModuleOut(BaseModel):
@@ -33,10 +33,10 @@ class UserPublic(BaseModel):
 
 class UserMe(UserPublic):
     email: EmailStr
-    roles: list[str] = []
+    roles: list[str] = Field(default_factory=list)
     need_presentation: bool
     cadet_flights: int
-    modules: list[UserModuleOut] = []
+    modules: list[UserModuleOut] = Field(default_factory=list)
 
 
 class UserUpdate(BaseModel):
@@ -54,7 +54,7 @@ class AdminUserOut(BaseModel):
     id: int
     email: EmailStr
     nickname: str
-    roles: list[str] = []
+    roles: list[str] = Field(default_factory=list)
     status: int
     status_as_string: str | None = None
     sim_dcs: bool
@@ -72,7 +72,7 @@ class AdminUserOut(BaseModel):
 class AdminUserUpdate(BaseModel):
     email: EmailStr
     nickname: str
-    roles: list[str] = []
+    roles: list[str] = Field(default_factory=list)
     status: int
     discord: str | None = None
     forum: str | None = None
