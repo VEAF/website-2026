@@ -90,11 +90,15 @@ npm run lint                         # ESLint
 **Layers**:
 - `src/api/` — Axios client (`client.ts`) with automatic JWT injection and 401 refresh. Endpoint modules: auth, users, calendar, modules, pages, servers
 - `src/stores/` — Pinia Composition API stores: `auth`, `calendar`, `menu`, `servers`
+- `src/composables/` — Vue composables (e.g. `useConfirm` for confirmation modals)
+- `src/components/ui/` — Shared UI components (e.g. `ConfirmModal`)
 - `src/router/index.ts` — 18 public routes + 9 admin routes. Guards: `requiresAuth`, `requiresAdmin` via route meta
 - `src/types/` — TypeScript interfaces for API responses
 - `src/views/` — Page components (public + `admin/` subfolder)
 - `src/components/layout/` — AppHeader, AppFooter, NavMenu
 - `src/assets/css/main.css` — Tailwind layers with custom `.btn-*`, `.input`, `.card` components
+
+**Confirmation modals**: Use the `useConfirm()` composable which returns `confirm(msg): Promise<boolean>`. The `ConfirmModal` component is mounted once in `App.vue`. Never use native `window.confirm()`.
 
 **Tailwind**: Custom `veaf-*` color palette (blue gradient, primary: #5c7cfa). Config in `tailwind.config.js`.
 

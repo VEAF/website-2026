@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
+import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 
 const auth = useAuthStore()
 const menu = useMenuStore()
@@ -24,4 +25,5 @@ onMounted(async () => {
     </main>
     <AppFooter />
   </div>
+  <ConfirmModal />
 </template>
