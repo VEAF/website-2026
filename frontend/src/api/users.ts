@@ -1,5 +1,13 @@
 import apiClient from './client'
-import type { AdminUser, AdminUserListResponse, AdminUserUpdate, UserMe, UserPublic, UserUpdate } from '@/types/user'
+import type {
+  AdminUser,
+  AdminUserListResponse,
+  AdminUserUpdate,
+  UserMe,
+  UserModuleUpdateResponse,
+  UserPublic,
+  UserUpdate,
+} from '@/types/user'
 
 export async function getMe(): Promise<UserMe> {
   const { data } = await apiClient.get<UserMe>('/users/me')
@@ -8,6 +16,28 @@ export async function getMe(): Promise<UserMe> {
 
 export async function updateMe(updates: UserUpdate): Promise<UserPublic> {
   const { data } = await apiClient.put<UserPublic>('/users/me', updates)
+  return data
+}
+
+export async function updateMyModuleLevel(
+  moduleId: number,
+  level: number,
+): Promise<UserModuleUpdateResponse> {
+  const { data } = await apiClient.put<UserModuleUpdateResponse>(
+    `/users/me/modules/${moduleId}/level`,
+    { level },
+  )
+  return data
+}
+
+export async function updateMyModuleActive(
+  moduleId: number,
+  active: boolean,
+): Promise<UserModuleUpdateResponse> {
+  const { data } = await apiClient.put<UserModuleUpdateResponse>(
+    `/users/me/modules/${moduleId}/active`,
+    { active },
+  )
   return data
 }
 

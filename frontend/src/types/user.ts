@@ -30,6 +30,14 @@ export interface UserMe extends UserPublic {
   modules: UserModule[]
 }
 
+export interface UserModuleUpdateResponse {
+  module_id: number
+  active: boolean
+  level: number
+  level_as_string: string | null
+  deleted: boolean
+}
+
 export interface UserUpdate {
   nickname?: string
   discord?: string
