@@ -40,7 +40,6 @@ class UserMe(UserPublic):
 
 
 class UserUpdate(BaseModel):
-    nickname: str | None = None
     discord: str | None = None
     forum: str | None = None
     sim_dcs: bool | None = None

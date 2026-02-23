@@ -404,7 +404,6 @@ function isLevelDisabled(moduleType: number, level: number): boolean {
       v-if="auth.user"
       :visible="showEditModal"
       :initial-data="{
-        nickname: auth.user.nickname,
         discord: auth.user.discord || '',
         forum: auth.user.forum || '',
         sim_dcs: auth.user.sim_dcs,

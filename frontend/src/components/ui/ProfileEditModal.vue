@@ -5,7 +5,6 @@ import type { UserUpdate } from '@/types/user'
 const props = defineProps<{
   visible: boolean
   initialData: {
-    nickname: string
     discord: string
     forum: string
     sim_dcs: boolean
@@ -68,11 +67,6 @@ function onKeydown(e: KeyboardEvent) {
           </h3>
 
           <form @submit.prevent="onSubmit" class="space-y-4">
-            <div>
-              <label class="label">Pseudo</label>
-              <input v-model="form.nickname" type="text" class="input" required minlength="3" />
-            </div>
-
             <div>
               <label class="label">Discord</label>
               <input v-model="form.discord" type="text" class="input" />

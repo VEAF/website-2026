@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -62,13 +62,6 @@ async def get_me(user: User = Depends(get_current_user), db: AsyncSession = Depe
 
 @router.put("/me", response_model=UserPublic)
 async def update_me(data: UserUpdate, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    if data.nickname is not None:
-        # Check uniqueness
-        existing = await db.execute(select(User).where(User.nickname == data.nickname, User.id != user.id))
-        if existing.scalar_one_or_none():
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nickname already taken")
-        user.nickname = data.nickname
-
     if data.discord is not None:
         user.discord = data.discord
     if data.forum is not None:
@@ -78,7 +71,7 @@ async def update_me(data: UserUpdate, user: User = Depends(get_current_user), db
     if data.sim_bms is not None:
         user.sim_bms = data.sim_bms
 
-    user.updated_at = datetime.now(timezone.utc)
+    user.updated_at = datetime.utcnow()
     await db.commit()
     await db.refresh(user)
 

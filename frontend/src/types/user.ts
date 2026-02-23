@@ -39,7 +39,6 @@ export interface UserModuleUpdateResponse {
 }
 
 export interface UserUpdate {
-  nickname?: string
   discord?: string
   forum?: string
   sim_dcs?: boolean
