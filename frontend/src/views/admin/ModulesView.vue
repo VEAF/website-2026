@@ -19,8 +19,10 @@ import {
 } from '@/api/modules'
 import type { Module, ModuleRole, ModuleSystem } from '@/types/module'
 import { useConfirm } from '@/composables/useConfirm'
+import { useToast } from '@/composables/useToast'
 
 const { confirm } = useConfirm()
+const toast = useToast()
 
 type Tab = 'modules' | 'roles' | 'systems'
 
@@ -31,22 +33,6 @@ const modules = ref<Module[]>([])
 const roles = ref<ModuleRole[]>([])
 const systems = ref<ModuleSystem[]>([])
 const loading = ref(false)
-
-// Feedback
-const error = ref<string | null>(null)
-const success = ref<string | null>(null)
-
-function showSuccess(msg: string) {
-  success.value = msg
-  error.value = null
-  setTimeout(() => (success.value = null), 3000)
-}
-
-function showError(err: unknown) {
-  const msg = err instanceof Error ? err.message : 'Une erreur est survenue'
-  error.value = msg
-  success.value = null
-}
 
 // --- Module form ---
 const showModuleForm = ref(false)
@@ -148,15 +134,15 @@ async function handleModuleSubmit() {
   try {
     if (editingModuleId.value) {
       await updateModule(editingModuleId.value, moduleForm.value)
-      showSuccess('Module modifié avec succès')
+      toast.success('Module modifié avec succès')
     } else {
       await createModule(moduleForm.value)
-      showSuccess('Module créé avec succès')
+      toast.success('Module créé avec succès')
     }
     showModuleForm.value = false
     modules.value = await getModules()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -171,12 +157,12 @@ async function handleImageUpload(event: Event, type: 'image' | 'image-header') {
 
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
   if (!allowedTypes.includes(file.type)) {
-    showError(new Error('Format accepté : uniquement les images jpg et png'))
+    toast.error(new Error('Format accepté : uniquement les images jpg et png'))
     input.value = ''
     return
   }
   if (file.size > 20 * 1024 * 1024) {
-    showError(new Error('La taille du fichier ne doit pas dépasser 20 Mo'))
+    toast.error(new Error('La taille du fichier ne doit pas dépasser 20 Mo'))
     input.value = ''
     return
   }
@@ -188,9 +174,9 @@ async function handleImageUpload(event: Event, type: 'image' | 'image-header') {
     currentImageUuid.value = updated.image_uuid
     currentImageHeaderUuid.value = updated.image_header_uuid
     modules.value = await getModules()
-    showSuccess(type === 'image' ? 'Image uploadée avec succès' : 'Image header uploadée avec succès')
+    toast.success(type === 'image' ? 'Image uploadée avec succès' : 'Image header uploadée avec succès')
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     imageUploading.value = false
     input.value = ''
@@ -210,9 +196,9 @@ async function handleImageDelete(type: 'image' | 'image-header') {
     currentImageUuid.value = updated.image_uuid
     currentImageHeaderUuid.value = updated.image_header_uuid
     modules.value = await getModules()
-    showSuccess(type === 'image' ? 'Image supprimée avec succès' : 'Image header supprimée avec succès')
+    toast.success(type === 'image' ? 'Image supprimée avec succès' : 'Image header supprimée avec succès')
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     imageUploading.value = false
   }
@@ -240,15 +226,15 @@ async function handleRoleSubmit() {
   try {
     if (editingRoleId.value) {
       await updateRole(editingRoleId.value, roleForm.value)
-      showSuccess('Rôle modifié avec succès')
+      toast.success('Rôle modifié avec succès')
     } else {
       await createRole(roleForm.value)
-      showSuccess('Rôle créé avec succès')
+      toast.success('Rôle créé avec succès')
     }
     showRoleForm.value = false
     roles.value = await getRoles()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -259,10 +245,10 @@ async function handleDeleteRole(r: ModuleRole) {
   loading.value = true
   try {
     await deleteRole(r.id)
-    showSuccess('Rôle supprimé avec succès')
+    toast.success('Rôle supprimé avec succès')
     roles.value = await getRoles()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -290,15 +276,15 @@ async function handleSystemSubmit() {
   try {
     if (editingSystemId.value) {
       await updateSystem(editingSystemId.value, systemForm.value)
-      showSuccess('Système modifié avec succès')
+      toast.success('Système modifié avec succès')
     } else {
       await createSystem(systemForm.value)
-      showSuccess('Système créé avec succès')
+      toast.success('Système créé avec succès')
     }
     showSystemForm.value = false
     systems.value = await getSystems()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -309,10 +295,10 @@ async function handleDeleteSystem(s: ModuleSystem) {
   loading.value = true
   try {
     await deleteSystem(s.id)
-    showSuccess('Système supprimé avec succès')
+    toast.success('Système supprimé avec succès')
     systems.value = await getSystems()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -327,7 +313,7 @@ async function loadAll() {
     roles.value = r
     systems.value = s
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -359,14 +345,6 @@ onMounted(loadAll)
       >
         {{ tab.label }}
       </button>
-    </div>
-
-    <!-- Feedback -->
-    <div v-if="success" class="bg-green-50 text-green-700 p-3 rounded-md text-sm mb-4">
-      {{ success }}
-    </div>
-    <div v-if="error" class="bg-red-50 text-red-700 p-3 rounded-md text-sm mb-4">
-      {{ error }}
     </div>
 
     <!-- ==================== MODULES TAB ==================== -->

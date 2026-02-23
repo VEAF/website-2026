@@ -2,10 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { updateMe } from '@/api/users'
+import { useToast } from '@/composables/useToast'
 
 const auth = useAuthStore()
+const toast = useToast()
 const saving = ref(false)
-const success = ref(false)
 
 const form = ref({
   nickname: '',
@@ -30,11 +31,10 @@ onMounted(async () => {
 
 async function handleSave() {
   saving.value = true
-  success.value = false
   try {
     await updateMe(form.value)
     await auth.fetchUser()
-    success.value = true
+    toast.success('Profil mis à jour')
   } finally {
     saving.value = false
   }
@@ -46,8 +46,6 @@ async function handleSave() {
     <h1 class="text-2xl font-bold mb-6">Mon profil</h1>
 
     <form @submit.prevent="handleSave" class="card space-y-4">
-      <div v-if="success" class="bg-green-50 text-green-600 p-3 rounded-md text-sm">Profil mis à jour</div>
-
       <div>
         <label class="label">Pseudo</label>
         <input v-model="form.nickname" type="text" class="input" required minlength="3" />

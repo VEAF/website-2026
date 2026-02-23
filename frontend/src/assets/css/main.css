@@ -50,3 +50,63 @@
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
 }
+
+/* Toast notification overrides */
+.Vue-Toastification__toast.veaf-toast {
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border: 1px solid;
+}
+
+.Vue-Toastification__toast--success.veaf-toast {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.Vue-Toastification__toast--error.veaf-toast {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.Vue-Toastification__toast--info.veaf-toast {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.Vue-Toastification__toast--warning.veaf-toast {
+  background-color: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.Vue-Toastification__progress-bar {
+  height: 0.25rem;
+}
+
+.Vue-Toastification__toast--success .Vue-Toastification__progress-bar {
+  background-color: #22c55e;
+}
+
+.Vue-Toastification__toast--error .Vue-Toastification__progress-bar {
+  background-color: #ef4444;
+}
+
+.Vue-Toastification__toast--info .Vue-Toastification__progress-bar {
+  background-color: #3b82f6;
+}
+
+.Vue-Toastification__toast--warning .Vue-Toastification__progress-bar {
+  background-color: #f59e0b;
+}
+
+.Vue-Toastification__close-button {
+  color: #9ca3af;
+}
+
+.Vue-Toastification__close-button:hover {
+  color: #4b5563;
+}

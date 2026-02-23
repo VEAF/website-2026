@@ -2,27 +2,26 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 
 const auth = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const email = ref('')
 const nickname = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
-const error = ref('')
 const loading = ref(false)
 
 async function handleRegister() {
-  error.value = ''
-
   if (password.value !== passwordConfirm.value) {
-    error.value = 'Les mots de passe ne correspondent pas'
+    toast.error('Les mots de passe ne correspondent pas')
     return
   }
 
   if (password.value.length < 6) {
-    error.value = 'Le mot de passe doit faire au moins 6 caractères'
+    toast.error('Le mot de passe doit faire au moins 6 caractères')
     return
   }
 
@@ -30,8 +29,8 @@ async function handleRegister() {
   try {
     await auth.register(email.value, password.value, nickname.value)
     router.push('/')
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || "Erreur lors de l'inscription"
+  } catch (e: unknown) {
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -42,8 +41,6 @@ async function handleRegister() {
   <div class="max-w-md mx-auto mt-16">
     <div class="card">
       <h1 class="text-2xl font-bold text-center mb-6">Inscription</h1>
-
-      <div v-if="error" class="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">{{ error }}</div>
 
       <form @submit.prevent="handleRegister" class="space-y-4">
         <div>

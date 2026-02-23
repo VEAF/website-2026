@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { resetPassword } from '@/api/auth'
+import { useToast } from '@/composables/useToast'
 
+const toast = useToast()
 const email = ref('')
 const success = ref(false)
-const error = ref('')
 const loading = ref(false)
 
 async function handleReset() {
-  error.value = ''
   loading.value = true
   try {
     await resetPassword(email.value)
     success.value = true
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Erreur'
+  } catch (e: unknown) {
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -29,8 +29,6 @@ async function handleReset() {
       <div v-if="success" class="bg-green-50 text-green-600 p-3 rounded-md mb-4 text-sm">
         Si cette adresse email existe, un lien de réinitialisation a été envoyé.
       </div>
-
-      <div v-if="error" class="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">{{ error }}</div>
 
       <form v-if="!success" @submit.prevent="handleReset" class="space-y-4">
         <div>

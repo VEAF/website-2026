@@ -2,25 +2,25 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
 
 const email = ref('')
 const password = ref('')
-const error = ref('')
 const loading = ref(false)
 
 async function handleLogin() {
-  error.value = ''
   loading.value = true
   try {
     await auth.login(email.value, password.value)
     const redirect = route.query.redirect as string
     router.push(redirect || '/')
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Erreur de connexion'
+  } catch (e: unknown) {
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -31,8 +31,6 @@ async function handleLogin() {
   <div class="max-w-md mx-auto mt-16">
     <div class="card">
       <h1 class="text-2xl font-bold text-center mb-6">Connexion</h1>
-
-      <div v-if="error" class="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">{{ error }}</div>
 
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
