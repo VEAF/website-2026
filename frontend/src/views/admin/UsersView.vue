@@ -2,27 +2,14 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getAdminUsers, updateAdminUser } from '@/api/users'
 import type { AdminUser, AdminUserUpdate } from '@/types/user'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 // Data
 const users = ref<AdminUser[]>([])
 const total = ref(0)
 const loading = ref(false)
-
-// Feedback
-const error = ref<string | null>(null)
-const success = ref<string | null>(null)
-
-function showSuccess(msg: string) {
-  success.value = msg
-  error.value = null
-  setTimeout(() => (success.value = null), 3000)
-}
-
-function showError(err: unknown) {
-  const msg = err instanceof Error ? err.message : 'Une erreur est survenue'
-  error.value = msg
-  success.value = null
-}
 
 // Search and filters
 const searchInput = ref('')
@@ -90,7 +77,7 @@ async function loadUsers() {
     users.value = result.items
     total.value = result.total
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -117,11 +104,11 @@ async function handleEditSubmit() {
   loading.value = true
   try {
     await updateAdminUser(editingUserId.value, editForm.value)
-    showSuccess('Utilisateur modifié avec succès')
+    toast.success('Utilisateur modifié avec succès')
     showEditForm.value = false
     await loadUsers()
   } catch (e) {
-    showError(e)
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -157,14 +144,6 @@ onMounted(loadUsers)
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-6">Gestion des utilisateurs</h1>
-
-    <!-- Feedback -->
-    <div v-if="success" class="bg-green-50 text-green-700 p-3 rounded-md text-sm mb-4">
-      {{ success }}
-    </div>
-    <div v-if="error" class="bg-red-50 text-red-700 p-3 rounded-md text-sm mb-4">
-      {{ error }}
-    </div>
 
     <!-- Search & Filter -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
