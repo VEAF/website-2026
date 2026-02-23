@@ -44,7 +44,7 @@ async function handleLogin() {
         </div>
 
         <button type="submit" class="btn-primary w-full" :disabled="loading">
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
+          <i class="fa-solid fa-right-to-bracket mr-1"></i>{{ loading ? 'Connexion...' : 'Se connecter' }}
         </button>
       </form>
 

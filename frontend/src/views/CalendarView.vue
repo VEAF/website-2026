@@ -49,14 +49,14 @@ function formatDate(d: string) {
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Calendrier</h1>
-      <RouterLink v-if="auth.isMember" to="/calendar/new" class="btn-primary">Créer un événement</RouterLink>
+      <RouterLink v-if="auth.isMember" to="/calendar/new" class="btn-primary"><i class="fa-solid fa-plus mr-1"></i>Créer un événement</RouterLink>
     </div>
 
     <!-- Month navigation -->
     <div class="flex items-center justify-center space-x-4 mb-6">
-      <button @click="prevMonth" class="btn-secondary">&laquo; Précédent</button>
+      <button @click="prevMonth" class="btn-secondary"><i class="fa-solid fa-chevron-left mr-1"></i>Précédent</button>
       <span class="text-lg font-semibold capitalize">{{ monthLabel }}</span>
-      <button @click="nextMonth" class="btn-secondary">Suivant &raquo;</button>
+      <button @click="nextMonth" class="btn-secondary">Suivant<i class="fa-solid fa-chevron-right ml-1"></i></button>
     </div>
 
     <!-- Events list -->

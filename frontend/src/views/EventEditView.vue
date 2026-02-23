@@ -126,9 +126,9 @@ async function handleSubmit() {
       </div>
 
       <div class="flex justify-end space-x-3">
-        <button type="button" @click="router.back()" class="btn-secondary">Annuler</button>
+        <button type="button" @click="router.back()" class="btn-secondary"><i class="fa-solid fa-xmark mr-1"></i>Annuler</button>
         <button type="submit" class="btn-primary" :disabled="loading">
-          {{ loading ? 'Sauvegarde...' : isEdit ? 'Modifier' : 'Créer' }}
+          <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Sauvegarde...' : isEdit ? 'Modifier' : 'Créer' }}
         </button>
       </div>
     </form>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { watch, nextTick, ref } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
-import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 
 const { visible, message, handleResponse } = useConfirm()
 
@@ -52,7 +51,7 @@ function onKeydown(e: KeyboardEvent) {
         >
           <div class="flex items-start space-x-4">
             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-              <ExclamationTriangleIcon class="w-6 h-6 text-red-600" />
+              <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
             </div>
 
             <div class="flex-1">
@@ -67,14 +66,14 @@ function onKeydown(e: KeyboardEvent) {
 
           <div class="mt-6 flex justify-end space-x-3">
             <button class="btn-secondary" @click="handleResponse(false)">
-              Annuler
+              <i class="fa-solid fa-xmark mr-1"></i>Annuler
             </button>
             <button
               ref="confirmButtonRef"
               class="btn-danger"
               @click="handleResponse(true)"
             >
-              Supprimer
+              <i class="fa-solid fa-trash mr-1"></i>Supprimer
             </button>
           </div>
         </div>

@@ -37,7 +37,7 @@ async function handleReset() {
         </div>
 
         <button type="submit" class="btn-primary w-full" :disabled="loading">
-          {{ loading ? 'Envoi...' : 'Envoyer le lien' }}
+          <i class="fa-solid fa-paper-plane mr-1"></i>{{ loading ? 'Envoi...' : 'Envoyer le lien' }}
         </button>
       </form>
 

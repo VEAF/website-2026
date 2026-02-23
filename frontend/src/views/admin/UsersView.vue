@@ -147,13 +147,16 @@ onMounted(loadUsers)
 
     <!-- Search & Filter -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
-      <input
-        :value="searchInput"
-        type="text"
-        class="input flex-1"
-        placeholder="Rechercher par pseudo ou email..."
-        @input="searchInput = ($event.target as HTMLInputElement).value; onSearchInput()"
-      />
+      <div class="relative flex-1">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+        <input
+          :value="searchInput"
+          type="text"
+          class="input pl-9 w-full"
+          placeholder="Rechercher par pseudo ou email..."
+          @input="searchInput = ($event.target as HTMLInputElement).value; onSearchInput()"
+        />
+      </div>
       <select
         :value="statusFilter ?? ''"
         class="input w-full sm:w-48"
@@ -238,10 +241,10 @@ onMounted(loadUsers)
 
         <div class="flex justify-end space-x-3">
           <button type="button" class="btn-secondary" @click="showEditForm = false">
-            Annuler
+            <i class="fa-solid fa-xmark mr-1"></i>Annuler
           </button>
           <button type="submit" class="btn-primary" :disabled="loading">
-            {{ loading ? 'Enregistrement...' : 'Modifier' }}
+            <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Enregistrement...' : 'Modifier' }}
           </button>
         </div>
       </form>
@@ -295,7 +298,7 @@ onMounted(loadUsers)
                 class="text-veaf-600 hover:text-veaf-800 text-sm"
                 @click="openEditUser(u)"
               >
-                Modifier
+                <i class="fa-solid fa-pen mr-1"></i>Modifier
               </button>
             </td>
           </tr>
@@ -314,7 +317,7 @@ onMounted(loadUsers)
           :disabled="currentPage <= 1"
           @click="goToPage(currentPage - 1)"
         >
-          Précédent
+          <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
         </button>
         <span class="text-sm text-gray-600">
           Page {{ currentPage }} sur {{ totalPages }}
@@ -324,7 +327,7 @@ onMounted(loadUsers)
           :disabled="currentPage >= totalPages"
           @click="goToPage(currentPage + 1)"
         >
-          Suivant
+          Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
         </button>
       </div>
     </div>
