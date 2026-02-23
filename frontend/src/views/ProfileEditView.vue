@@ -73,7 +73,7 @@ async function handleSave() {
       </div>
 
       <button type="submit" class="btn-primary" :disabled="saving">
-        {{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}
+        <i class="fa-solid fa-floppy-disk mr-1"></i>{{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}
       </button>
     </form>
   </div>

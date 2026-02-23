@@ -11,12 +11,12 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
     "axios": "^1.7.0",
     "pinia": "^2.2.0",
     "vue": "^3.5.0",
     "vue-router": "^4.4.0",
-    "vue-toastification": "^2.0.0-rc.5",
-    "@heroicons/vue": "^2.2.0"
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.0",

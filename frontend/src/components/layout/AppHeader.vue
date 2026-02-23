@@ -34,26 +34,23 @@ async function handleLogout() {
         <div class="flex items-center space-x-4">
           <template v-if="auth.isAuthenticated">
             <RouterLink to="/profile" class="text-gray-300 hover:text-white text-sm">
-              {{ auth.user?.nickname }}
+              <i class="fa-solid fa-user mr-1"></i>{{ auth.user?.nickname }}
             </RouterLink>
             <RouterLink v-if="auth.isAdmin" to="/admin" class="text-yellow-400 hover:text-yellow-300 text-sm">
-              Admin
+              <i class="fa-solid fa-gear mr-1"></i>Admin
             </RouterLink>
             <button @click="handleLogout" class="text-gray-400 hover:text-white text-sm">
-              Déconnexion
+              <i class="fa-solid fa-right-from-bracket mr-1"></i>Déconnexion
             </button>
           </template>
           <template v-else>
-            <RouterLink to="/login" class="text-gray-300 hover:text-white text-sm">Connexion</RouterLink>
+            <RouterLink to="/login" class="text-gray-300 hover:text-white text-sm"><i class="fa-solid fa-right-to-bracket mr-1"></i>Connexion</RouterLink>
             <RouterLink to="/register" class="btn-primary text-sm !py-1">Inscription</RouterLink>
           </template>
 
           <!-- Mobile menu button -->
           <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-gray-400 hover:text-white">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'" class="text-xl"></i>
           </button>
         </div>
       </div>

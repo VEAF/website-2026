@@ -54,8 +54,8 @@ function formatDate(d: string) {
           <h1 class="text-2xl font-bold mt-2">{{ event.title }}</h1>
         </div>
         <div v-if="auth.user && (auth.user.id === event.owner_id || auth.isAdmin)" class="flex space-x-2">
-          <RouterLink :to="`/calendar/${event.id}/edit`" class="btn-secondary text-sm">Modifier</RouterLink>
-          <button @click="handleDelete" class="btn-danger text-sm">Supprimer</button>
+          <RouterLink :to="`/calendar/${event.id}/edit`" class="btn-secondary text-sm"><i class="fa-solid fa-pen mr-1"></i>Modifier</RouterLink>
+          <button @click="handleDelete" class="btn-danger text-sm"><i class="fa-solid fa-trash mr-1"></i>Supprimer</button>
         </div>
       </div>
 
@@ -76,9 +76,9 @@ function formatDate(d: string) {
       <div v-if="event.registration && auth.isAuthenticated" class="mb-6">
         <h2 class="text-lg font-semibold mb-3">Vote</h2>
         <div class="flex space-x-3">
-          <button @click="handleVote(true)" class="btn-success">Oui</button>
-          <button @click="handleVote(null)" class="btn-secondary">Peut-être</button>
-          <button @click="handleVote(false)" class="btn-danger">Non</button>
+          <button @click="handleVote(true)" class="btn-success"><i class="fa-solid fa-check mr-1"></i>Oui</button>
+          <button @click="handleVote(null)" class="btn-secondary"><i class="fa-solid fa-question mr-1"></i>Peut-être</button>
+          <button @click="handleVote(false)" class="btn-danger"><i class="fa-solid fa-xmark mr-1"></i>Non</button>
         </div>
       </div>
 

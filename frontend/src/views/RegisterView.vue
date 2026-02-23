@@ -64,7 +64,7 @@ async function handleRegister() {
         </div>
 
         <button type="submit" class="btn-primary w-full" :disabled="loading">
-          {{ loading ? 'Inscription...' : "S'inscrire" }}
+          <i class="fa-solid fa-user-plus mr-1"></i>{{ loading ? 'Inscription...' : "S'inscrire" }}
         </button>
       </form>
 

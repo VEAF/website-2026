@@ -44,9 +44,7 @@ function getItemLink(item: MenuItem): string | null {
         <button class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md">
           <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
           {{ item.label }}
-          <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+          <i class="fa-solid fa-chevron-down ml-1 text-xs"></i>
         </button>
         <div class="absolute left-0 mt-1 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
           <template v-for="child in item.items" :key="child.id">

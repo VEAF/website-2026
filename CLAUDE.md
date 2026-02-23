@@ -100,6 +100,13 @@ npm run lint                         # ESLint
 
 **Confirmation modals**: Use the `useConfirm()` composable which returns `confirm(msg): Promise<boolean>`. The `ConfirmModal` component is mounted once in `App.vue`. Never use native `window.confirm()`.
 
+**Icons (FontAwesome 6 Free)**: Installed via `@fortawesome/fontawesome-free` (CSS approach). Imported globally in `main.ts` as `import '@fortawesome/fontawesome-free/css/all.min.css'`. Use `<i>` tags with FA6 long-form classes:
+- Solid: `<i class="fa-solid fa-icon-name mr-1"></i>` before button text
+- Brands: `<i class="fa-brands fa-discord"></i>` (or shorthand `fab`)
+- Spacing: `mr-1` before text, `ml-1` after text. Sizing: use Tailwind classes (`text-xs`, `text-xl`) not FA sizing classes.
+- DB menu icons are stored as CSS class strings (e.g. `"fa fa-newspaper"`, `"fab fa-discord"`). FA6 `all.min.css` includes V4/V5 shims so these work without migration.
+- Do NOT use `@heroicons/vue` or inline SVG icons — use FontAwesome consistently.
+
 **Tailwind**: Custom `veaf-*` color palette (blue gradient, primary: #5c7cfa). Config in `tailwind.config.js`.
 
 **Vite**: `@` alias maps to `src/`. Dev proxy: `/api` → backend (via nginx at `http://veaf.localhost`).

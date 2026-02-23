@@ -351,7 +351,7 @@ onMounted(loadAll)
     <div v-if="currentTab === 'modules'">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Modules</h2>
-        <button class="btn-primary" @click="openNewModule">Ajouter un module</button>
+        <button class="btn-primary" @click="openNewModule"><i class="fa-solid fa-plus mr-1"></i>Ajouter un module</button>
       </div>
 
       <!-- Module form -->
@@ -490,7 +490,7 @@ onMounted(loadAll)
                     :disabled="imageUploading"
                     @click="handleImageDelete('image')"
                   >
-                    Supprimer
+                    <i class="fa-solid fa-trash mr-1"></i>Supprimer
                   </button>
                 </div>
                 <input
@@ -518,7 +518,7 @@ onMounted(loadAll)
                     :disabled="imageUploading"
                     @click="handleImageDelete('image-header')"
                   >
-                    Supprimer
+                    <i class="fa-solid fa-trash mr-1"></i>Supprimer
                   </button>
                 </div>
                 <input
@@ -535,10 +535,10 @@ onMounted(loadAll)
 
           <div class="flex justify-end space-x-3">
             <button type="button" class="btn-secondary" @click="showModuleForm = false">
-              Annuler
+              <i class="fa-solid fa-xmark mr-1"></i>Annuler
             </button>
             <button type="submit" class="btn-primary" :disabled="loading">
-              {{ loading ? 'Enregistrement...' : editingModuleId ? 'Modifier' : 'Créer' }}
+              <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Enregistrement...' : editingModuleId ? 'Modifier' : 'Créer' }}
             </button>
           </div>
         </form>
@@ -590,7 +590,7 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditModule(m)"
                 >
-                  Modifier
+                  <i class="fa-solid fa-pen mr-1"></i>Modifier
                 </button>
               </td>
             </tr>
@@ -603,7 +603,7 @@ onMounted(loadAll)
     <div v-if="currentTab === 'roles'">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Rôles</h2>
-        <button class="btn-primary" @click="openNewRole">Ajouter un rôle</button>
+        <button class="btn-primary" @click="openNewRole"><i class="fa-solid fa-plus mr-1"></i>Ajouter un rôle</button>
       </div>
 
       <!-- Role form -->
@@ -628,10 +628,10 @@ onMounted(loadAll)
           </div>
           <div class="flex justify-end space-x-3">
             <button type="button" class="btn-secondary" @click="showRoleForm = false">
-              Annuler
+              <i class="fa-solid fa-xmark mr-1"></i>Annuler
             </button>
             <button type="submit" class="btn-primary" :disabled="loading">
-              {{ loading ? 'Enregistrement...' : editingRoleId ? 'Modifier' : 'Créer' }}
+              <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Enregistrement...' : editingRoleId ? 'Modifier' : 'Créer' }}
             </button>
           </div>
         </form>
@@ -661,13 +661,13 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditRole(r)"
                 >
-                  Modifier
+                  <i class="fa-solid fa-pen mr-1"></i>Modifier
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"
                   @click="handleDeleteRole(r)"
                 >
-                  Supprimer
+                  <i class="fa-solid fa-trash mr-1"></i>Supprimer
                 </button>
               </td>
             </tr>
@@ -680,7 +680,7 @@ onMounted(loadAll)
     <div v-if="currentTab === 'systems'">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Systèmes</h2>
-        <button class="btn-primary" @click="openNewSystem">Ajouter un système</button>
+        <button class="btn-primary" @click="openNewSystem"><i class="fa-solid fa-plus mr-1"></i>Ajouter un système</button>
       </div>
 
       <!-- System form -->
@@ -705,10 +705,10 @@ onMounted(loadAll)
           </div>
           <div class="flex justify-end space-x-3">
             <button type="button" class="btn-secondary" @click="showSystemForm = false">
-              Annuler
+              <i class="fa-solid fa-xmark mr-1"></i>Annuler
             </button>
             <button type="submit" class="btn-primary" :disabled="loading">
-              {{ loading ? 'Enregistrement...' : editingSystemId ? 'Modifier' : 'Créer' }}
+              <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Enregistrement...' : editingSystemId ? 'Modifier' : 'Créer' }}
             </button>
           </div>
         </form>
@@ -738,13 +738,13 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditSystem(s)"
                 >
-                  Modifier
+                  <i class="fa-solid fa-pen mr-1"></i>Modifier
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"
                   @click="handleDeleteSystem(s)"
                 >
-                  Supprimer
+                  <i class="fa-solid fa-trash mr-1"></i>Supprimer
                 </button>
               </td>
             </tr>
