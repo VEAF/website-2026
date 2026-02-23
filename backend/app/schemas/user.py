@@ -40,11 +40,29 @@ class UserMe(UserPublic):
 
 
 class UserUpdate(BaseModel):
-    nickname: str | None = None
     discord: str | None = None
     forum: str | None = None
     sim_dcs: bool | None = None
     sim_bms: bool | None = None
+
+
+# --- Profile module update schemas ---
+
+
+class UserModuleLevelUpdate(BaseModel):
+    level: int = Field(ge=0, le=3)
+
+
+class UserModuleActiveUpdate(BaseModel):
+    active: bool
+
+
+class UserModuleUpdateResponse(BaseModel):
+    module_id: int
+    active: bool
+    level: int
+    level_as_string: str | None = None
+    deleted: bool = False
 
 
 # --- Admin schemas ---

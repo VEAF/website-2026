@@ -37,6 +37,10 @@
     @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
   }
 
+  .btn-warning {
+    @apply btn bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-400;
+  }
+
   .input {
     @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm
            focus:border-veaf-500 focus:outline-none focus:ring-1 focus:ring-veaf-500;
