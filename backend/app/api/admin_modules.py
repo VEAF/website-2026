@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
@@ -89,13 +89,14 @@ async def create_module(
         period=data.period,
     )
 
-    if data.role_ids:
-        result = await db.execute(select(ModuleRole).where(ModuleRole.id.in_(data.role_ids)))
-        module.roles = list(result.scalars().all())
+    with db.no_autoflush:
+        if data.role_ids:
+            result = await db.execute(select(ModuleRole).where(ModuleRole.id.in_(data.role_ids)))
+            module.roles = list(result.scalars().all())
 
-    if data.system_ids:
-        result = await db.execute(select(ModuleSystem).where(ModuleSystem.id.in_(data.system_ids)))
-        module.systems = list(result.scalars().all())
+        if data.system_ids:
+            result = await db.execute(select(ModuleSystem).where(ModuleSystem.id.in_(data.system_ids)))
+            module.systems = list(result.scalars().all())
 
     try:
         db.add(module)
@@ -214,7 +215,7 @@ async def _upload_module_image(
         original_name=file.filename,
         type=File.type_from_mime(file.content_type or ""),
         owner_id=user.id,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
     db.add(db_file)
     await db.flush()

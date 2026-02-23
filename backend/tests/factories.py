@@ -12,6 +12,10 @@ from app.models.module import Module, ModuleRole, ModuleSystem
 from app.models.recruitment import RecruitmentEvent
 from app.models.user import User, UserModule
 
+# Pre-hashed "password123" — computed once at import time to avoid
+# repeated bcrypt hashing (~200ms each) in every test.
+_HASHED_PASSWORD = hash_password("password123")
+
 
 class UserFactory(factory.Factory):
     class Meta:
@@ -19,7 +23,7 @@ class UserFactory(factory.Factory):
 
     email = factory.Sequence(lambda n: f"user{n}@veaf.org")
     nickname = factory.Sequence(lambda n: f"Pilot{n}")
-    password = factory.LazyFunction(lambda: hash_password("password123"))
+    password = _HASHED_PASSWORD
     roles = "ROLE_USER"
     status = User.STATUS_MEMBER
     sim_dcs = True

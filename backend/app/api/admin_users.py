@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, or_, select
@@ -101,7 +101,7 @@ async def update_user(
     target.sim_dcs = data.sim_dcs
     target.sim_bms = data.sim_bms
     target.need_presentation = data.need_presentation
-    target.updated_at = datetime.utcnow()
+    target.updated_at = datetime.now(UTC)
 
     try:
         await db.commit()
