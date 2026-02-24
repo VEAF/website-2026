@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { getDcsBotServers } from '@/api/servers'
 import type { DcsBotPage } from '@/types/api'
 
@@ -105,7 +106,14 @@ function formatAvgPlaytime(seconds: number): string {
               :key="server.name"
               class="border-b hover:bg-gray-50"
             >
-              <td class="py-2 px-3 font-medium">{{ shortName(server.name) }}</td>
+              <td class="py-2 px-3 font-medium">
+                <RouterLink
+                  :to="{ name: 'server-detail', params: { serverName: server.name } }"
+                  class="text-veaf-600 hover:text-veaf-800 hover:underline"
+                >
+                  {{ shortName(server.name) }}
+                </RouterLink>
+              </td>
               <td class="py-2 px-3">
                 <span
                   :class="statusBadgeClass(server.status)"
