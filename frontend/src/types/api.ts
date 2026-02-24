@@ -49,6 +49,13 @@ export interface Server {
 
 // DCSServerBot types
 
+export interface SunState {
+  state: string
+  icon: string
+  color: string
+  tooltip: string
+}
+
 export interface MissionInfo {
   name: string
   uptime: number
@@ -58,6 +65,9 @@ export interface MissionInfo {
   blue_slots_used: number | null
   red_slots: number | null
   red_slots_used: number | null
+  sun_state: SunState | null
+  mission_time: string | null
+  mission_date_time: string | null
 }
 
 export interface PlayerEntry {

@@ -232,7 +232,18 @@ function visNm(m: number): string {
                 <th class="text-left py-1.5 pr-4 text-gray-600 w-40">
                   <i class="fa-solid fa-sun mr-1"></i> Heure mission
                 </th>
-                <td>{{ pageData.server.mission.date_time }}</td>
+                <td>
+                  <span :title="pageData.server.mission.mission_date_time ?? undefined">
+                    {{ pageData.server.mission.mission_time ?? pageData.server.mission.date_time }}
+                  </span>
+                  <i
+                    v-if="pageData.server.mission.sun_state"
+                    :class="pageData.server.mission.sun_state.icon"
+                    :style="{ color: pageData.server.mission.sun_state.color }"
+                    :title="pageData.server.mission.sun_state.tooltip"
+                    class="ml-2"
+                  ></i>
+                </td>
               </tr>
               <tr>
                 <th class="text-left py-1.5 pr-4 text-gray-600 w-40">

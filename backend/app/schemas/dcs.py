@@ -16,6 +16,13 @@ class ServerOut(BaseModel):
 # --- DCSServerBot API response schemas ---
 
 
+class SunStateOut(BaseModel):
+    state: str  # day|night|dawn|dusk
+    icon: str  # FontAwesome CSS class
+    color: str  # hex color
+    tooltip: str  # French label
+
+
 class MissionInfoOut(BaseModel):
     name: str
     uptime: int
@@ -25,6 +32,9 @@ class MissionInfoOut(BaseModel):
     blue_slots_used: int | None = None
     red_slots: int | None = None
     red_slots_used: int | None = None
+    sun_state: SunStateOut | None = None
+    mission_time: str | None = None  # "HH:MM"
+    mission_date_time: str | None = None  # "DD/MM/YYYY HH:MM"
 
 
 class PlayerEntryOut(BaseModel):

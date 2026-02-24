@@ -131,7 +131,16 @@ function formatAvgPlaytime(seconds: number): string {
               </td>
               <td class="py-2 px-3">
                 <template v-if="server.mission?.date_time">
-                  {{ server.mission.date_time }}
+                  <i
+                    v-if="server.mission.sun_state"
+                    :class="server.mission.sun_state.icon"
+                    :style="{ color: server.mission.sun_state.color }"
+                    :title="server.mission.sun_state.tooltip"
+                    class="mr-1"
+                  ></i>
+                  <span :title="server.mission.mission_date_time ?? undefined">
+                    {{ server.mission.mission_time ?? server.mission.date_time }}
+                  </span>
                 </template>
                 <template v-else>-</template>
               </td>
