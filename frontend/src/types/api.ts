@@ -54,6 +54,10 @@ export interface MissionInfo {
   uptime: number
   date_time: string | null
   theatre: string
+  blue_slots: number | null
+  blue_slots_used: number | null
+  red_slots: number | null
+  red_slots_used: number | null
 }
 
 export interface PlayerEntry {
@@ -85,6 +89,77 @@ export interface DcsBotStats {
 export interface DcsBotPage {
   servers: DcsBotServer[]
   stats: DcsBotStats | null
+}
+
+// DCSServerBot server detail types
+
+export interface WeatherInfo {
+  temperature: number | null
+  wind_speed: number | null
+  wind_direction: number | null
+  pressure: number | null
+  visibility: number | null
+  clouds_base: number | null
+  clouds_density: number | null
+  precipitation: number | null
+  fog_enabled: boolean | null
+  fog_visibility: number | null
+  dust_enabled: boolean | null
+  dust_visibility: number | null
+}
+
+export interface DcsBotServerDetail {
+  name: string
+  status: string
+  num_players: number
+  address: string | null
+  password: string | null
+  restart_time: string | null
+  mission: MissionInfo | null
+  players: PlayerEntry[]
+  weather: WeatherInfo | null
+}
+
+export interface TopTheatre {
+  theatre: string
+  playtime_hours: number
+}
+
+export interface TopMission {
+  mission_name: string
+  playtime_hours: number
+}
+
+export interface TopModule {
+  module: string
+  playtime_hours: number
+}
+
+export interface DcsBotAttendance {
+  current_players: number
+  unique_players_24h: number
+  total_playtime_hours_24h: number
+  discord_members_24h: number
+  unique_players_7d: number
+  total_playtime_hours_7d: number
+  discord_members_7d: number
+  unique_players_30d: number
+  total_playtime_hours_30d: number
+  discord_members_30d: number
+  total_sorties: number | null
+  total_kills: number | null
+  total_deaths: number | null
+  total_pvp_kills: number | null
+  total_pvp_deaths: number | null
+  top_theatres: TopTheatre[]
+  top_missions: TopMission[]
+  top_modules: TopModule[]
+}
+
+export interface DcsBotServerDetailPage {
+  server: DcsBotServerDetail
+  stats: DcsBotStats | null
+  attendance: DcsBotAttendance | null
 }
 
 export interface HeaderData {

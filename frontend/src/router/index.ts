@@ -60,6 +60,12 @@ const router = createRouter({
       component: () => import('@/views/ServersView.vue'),
     },
     {
+      path: '/servers/:serverName',
+      name: 'server-detail',
+      component: () => import('@/views/ServerDetailView.vue'),
+      props: true,
+    },
+    {
       path: '/user/:id',
       name: 'user-profile',
       component: () => import('@/views/UserProfileView.vue'),
