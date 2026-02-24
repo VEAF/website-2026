@@ -57,6 +57,10 @@ function formatMissionName(name: string): string {
   return name.replace(/_/g, ' ')
 }
 
+function shortMissionName(name: string): string {
+  return formatMissionName(name).replace(/\s+ICAO\s+\S+$/i, '')
+}
+
 function formatUptime(seconds: number): string {
   return Math.round(seconds / 60) + 'min'
 }
@@ -127,7 +131,7 @@ function formatAvgPlaytime(seconds: number): string {
                 {{ server.mission ? server.mission.theatre : '-' }}
               </td>
               <td class="py-2 px-3" :title="server.mission ? formatMissionName(server.mission.name) : undefined">
-                {{ server.mission ? formatMissionName(server.mission.name) : '-' }}
+                {{ server.mission ? shortMissionName(server.mission.name) : '-' }}
               </td>
               <td class="py-2 px-3">
                 <template v-if="server.mission?.date_time">

@@ -79,6 +79,10 @@ function formatMissionName(name: string): string {
   return name.replace(/_/g, ' ')
 }
 
+function shortMissionName(name: string): string {
+  return formatMissionName(name).replace(/\s+ICAO\s+\S+$/i, '')
+}
+
 function formatUptime(seconds: number): string {
   return Math.round(seconds / 60) + 'min'
 }
@@ -219,7 +223,7 @@ function visNm(m: number): string {
                   <i class="fa-solid fa-file-lines mr-1"></i> Nom
                 </th>
                 <td :title="formatMissionName(pageData.server.mission.name)">
-                  {{ formatMissionName(pageData.server.mission.name) }}
+                  {{ shortMissionName(pageData.server.mission.name) }}
                 </td>
               </tr>
               <tr>
