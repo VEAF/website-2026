@@ -81,6 +81,8 @@ npm run lint                         # ESLint
 
 **Config**: `backend/.env` (copy from `.env.dist`). Key vars: `DATABASE_URL`, `JWT_SECRET`, `APP_URL`, `UPLOAD_DIR`.
 
+**Pydantic schemas**: In Pydantic models, never use a mutable default value like `list` or `dict` directly. Use `default_factory=list` (via `Field(default_factory=list)`) instead.
+
 **Ruff**: line-length=120, target Python 3.12.
 
 ### Frontend (`frontend/`)

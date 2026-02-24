@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TSClientOut(BaseModel):
@@ -11,7 +11,7 @@ class TSChannelOut(BaseModel):
     cid: int
     pid: int
     name: str
-    clients: list[TSClientOut] = []
+    clients: list[TSClientOut] = Field(default_factory=list)
 
 
 class TSStatusOut(BaseModel):
