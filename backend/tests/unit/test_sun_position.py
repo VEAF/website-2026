@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from app.services.sun_position import (
+    _DEFAULT_SUN_STATE,
     calculate_sun_elevation,
     get_sun_state,
     get_theatre_latitude,
@@ -206,8 +207,10 @@ def test_elevation_kola_summer_midnight():
 
 def test_sun_state_day_at_noon():
     # GIVEN noon in Caucasus in summer
+    dt = datetime(2025, 6, 21, 12, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-06-21 12:00", "Caucasus")
+    state = get_sun_state(dt, "Caucasus")
 
     # THEN it's day
     assert state["state"] == "day"
@@ -218,8 +221,10 @@ def test_sun_state_day_at_noon():
 
 def test_sun_state_night_at_midnight():
     # GIVEN midnight in Caucasus in winter
+    dt = datetime(2025, 12, 21, 0, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-12-21 00:00", "Caucasus")
+    state = get_sun_state(dt, "Caucasus")
 
     # THEN it's night
     assert state["state"] == "night"
@@ -230,8 +235,10 @@ def test_sun_state_night_at_midnight():
 
 def test_sun_state_dawn_early_morning():
     # GIVEN early morning in Caucasus in summer (around civil twilight)
+    dt = datetime(2025, 6, 21, 4, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-06-21 04:00", "Caucasus")
+    state = get_sun_state(dt, "Caucasus")
 
     # THEN it's dawn (sun between -18 and -6, before noon)
     assert state["state"] in ("dawn", "day")  # Could be day at high latitudes in summer
@@ -243,8 +250,10 @@ def test_sun_state_dawn_early_morning():
 
 def test_sun_state_dusk_evening():
     # GIVEN late evening in Caucasus in winter (after sunset ~17:20)
+    dt = datetime(2025, 12, 21, 18, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-12-21 18:00", "Caucasus")
+    state = get_sun_state(dt, "Caucasus")
 
     # THEN it's dusk (sun between -18 and -6, after noon)
     assert state["state"] in ("dusk", "night")
@@ -254,47 +263,30 @@ def test_sun_state_dusk_evening():
         assert state["tooltip"] == "Crépuscule"
 
 
-def test_sun_state_null_datetime():
-    # GIVEN null date_time
-    # WHEN computing sun state
-    state = get_sun_state(None, "Caucasus")
-
-    # THEN it returns default day state
-    assert state["state"] == "day"
-    assert state["icon"] == "fa-solid fa-sun"
-
-
-def test_sun_state_invalid_datetime():
-    # GIVEN invalid date_time string
-    # WHEN computing sun state
-    state = get_sun_state("invalid", "Caucasus")
-
-    # THEN it returns default day state
-    assert state["state"] == "day"
+def test_sun_state_default_state():
+    # GIVEN the default sun state constant
+    # THEN it returns day state
+    assert _DEFAULT_SUN_STATE["state"] == "day"
+    assert _DEFAULT_SUN_STATE["icon"] == "fa-solid fa-sun"
 
 
 def test_sun_state_persian_gulf_night():
     # GIVEN midnight in Persian Gulf
+    dt = datetime(2025, 6, 21, 0, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-06-21 00:00", "PersianGulf")
+    state = get_sun_state(dt, "PersianGulf")
 
     # THEN it's night
     assert state["state"] == "night"
 
 
-def test_sun_state_different_date_format():
-    # GIVEN datetime with seconds format
-    # WHEN computing sun state
-    state = get_sun_state("2025-06-21 12:00:00", "Caucasus")
-
-    # THEN it correctly computes day
-    assert state["state"] == "day"
-
-
 def test_sun_state_kola_midnight_sun():
     # GIVEN Kola peninsula at midnight in summer (midnight sun)
+    dt = datetime(2025, 6, 21, 0, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-06-21 00:00", "Kola")
+    state = get_sun_state(dt, "Kola")
 
     # THEN it's dawn or day (midnight sun region)
     assert state["state"] in ("dawn", "day")
@@ -302,8 +294,10 @@ def test_sun_state_kola_midnight_sun():
 
 def test_sun_state_unknown_theatre():
     # GIVEN an unknown theater at noon
+    dt = datetime(2025, 6, 21, 12, 0)
+
     # WHEN computing sun state
-    state = get_sun_state("2025-06-21 12:00", "UnknownMap")
+    state = get_sun_state(dt, "UnknownMap")
 
     # THEN it uses default latitude and returns day at noon
     assert state["state"] == "day"

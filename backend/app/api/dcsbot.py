@@ -18,7 +18,7 @@ from app.schemas.dcs import (
     WeatherInfoOut,
 )
 from app.services import dcsbot as dcsbot_service
-from app.services.sun_position import get_sun_state, parse_mission_datetime
+from app.services.sun_position import _DEFAULT_SUN_STATE, get_sun_state, parse_mission_datetime
 
 router = APIRouter(prefix="/dcsbot", tags=["dcsbot"])
 
@@ -29,12 +29,13 @@ def _enrich_mission(mission_raw: dict | None) -> MissionInfoOut | None:
         return None
     mission = MissionInfoOut(**mission_raw)
     if mission.date_time:
-        sun = get_sun_state(mission.date_time, mission.theatre)
-        mission.sun_state = SunStateOut(**sun)
         dt = parse_mission_datetime(mission.date_time)
         if dt:
+            mission.sun_state = SunStateOut(**get_sun_state(dt, mission.theatre))
             mission.mission_time = dt.strftime("%H:%M")
             mission.mission_date_time = dt.strftime("%d/%m/%Y %H:%M")
+        else:
+            mission.sun_state = SunStateOut(**_DEFAULT_SUN_STATE)
     return mission
 
 

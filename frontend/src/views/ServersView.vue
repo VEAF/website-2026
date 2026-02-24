@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getDcsBotServers } from '@/api/servers'
+import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotPage } from '@/types/api'
 
 const pageData = ref<DcsBotPage | null>(null)
@@ -51,14 +52,6 @@ function statusIcon(status: string): string {
     default:
       return 'fa-solid fa-question'
   }
-}
-
-function formatMissionName(name: string): string {
-  return name.replace(/_/g, ' ')
-}
-
-function shortMissionName(name: string): string {
-  return formatMissionName(name).replace(/\s+ICAO\s+\S+$/i, '')
 }
 
 function formatUptime(seconds: number): string {

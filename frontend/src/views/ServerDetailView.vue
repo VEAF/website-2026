@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getDcsBotServer } from '@/api/servers'
+import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotServerDetailPage } from '@/types/api'
 
 const POLL_INTERVAL = 60_000
@@ -73,14 +74,6 @@ function sideBadgeClass(side: string | null): string {
     case 'red': return 'bg-red-100 text-red-800'
     default: return 'bg-gray-200 text-gray-600'
   }
-}
-
-function formatMissionName(name: string): string {
-  return name.replace(/_/g, ' ')
-}
-
-function shortMissionName(name: string): string {
-  return formatMissionName(name).replace(/\s+ICAO\s+\S+$/i, '')
 }
 
 function formatUptime(seconds: number): string {

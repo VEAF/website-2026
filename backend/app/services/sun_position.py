@@ -98,18 +98,11 @@ def calculate_sun_elevation(dt: datetime, latitude: float) -> float:
     return math.degrees(math.asin(sin_elevation))
 
 
-def get_sun_state(date_time: str | None, theatre: str) -> dict[str, str]:
+def get_sun_state(dt: datetime, theatre: str) -> dict[str, str]:
     """Compute sun state (day/night/dawn/dusk) for a mission datetime and theater.
 
     Returns dict with keys: state, icon, color, tooltip.
     """
-    if not date_time:
-        return {"state": "day", **SUN_STATES["day"]}
-
-    dt = parse_mission_datetime(date_time)
-    if dt is None:
-        return {"state": "day", **SUN_STATES["day"]}
-
     latitude = get_theatre_latitude(theatre)
     elevation = calculate_sun_elevation(dt, latitude)
 
@@ -121,3 +114,6 @@ def get_sun_state(date_time: str | None, theatre: str) -> dict[str, str]:
         state = "night"
 
     return {"state": state, **SUN_STATES[state]}
+
+
+_DEFAULT_SUN_STATE: dict[str, str] = {"state": "day", **SUN_STATES["day"]}
