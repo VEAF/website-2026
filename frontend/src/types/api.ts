@@ -47,6 +47,46 @@ export interface Server {
   gci: boolean
 }
 
+// DCSServerBot types
+
+export interface MissionInfo {
+  name: string
+  uptime: number
+  date_time: string | null
+  theatre: string
+}
+
+export interface PlayerEntry {
+  nick: string
+  side: string | null
+  unit_type: string | null
+  callsign: string | null
+}
+
+export interface DcsBotServer {
+  name: string
+  status: string
+  num_players: number
+  mission: MissionInfo | null
+  players: PlayerEntry[]
+}
+
+export interface DcsBotStats {
+  total_players: number
+  active_players: number
+  total_sorties: number
+  avg_playtime: number
+  total_kills: number
+  total_deaths: number
+  total_pvp_kills: number
+  total_pvp_deaths: number
+}
+
+export interface DcsBotPage {
+  servers: DcsBotServer[]
+  stats: DcsBotStats | null
+}
+
 export interface HeaderData {
   ts_client_count: number
   next_events: {

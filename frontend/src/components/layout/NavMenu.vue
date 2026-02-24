@@ -18,7 +18,7 @@ function getItemLink(item: MenuItem): string | null {
     case 6: // TYPE_OFFICE
       return '/office'
     case 7: // TYPE_SERVERS
-      return null // Dynamic
+      return '/servers'
     case 8: // TYPE_ROSTER
       return '/roster'
     case 9: // TYPE_CALENDAR
