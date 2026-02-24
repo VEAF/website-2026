@@ -13,6 +13,54 @@ class ServerOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# --- DCSServerBot API response schemas ---
+
+
+class MissionInfoOut(BaseModel):
+    name: str
+    uptime: int
+    date_time: str | None = None
+    theatre: str
+    blue_slots: int | None = None
+    blue_slots_used: int | None = None
+    red_slots: int | None = None
+    red_slots_used: int | None = None
+
+
+class PlayerEntryOut(BaseModel):
+    nick: str
+    side: str | None = None
+    unit_type: str | None = None
+    callsign: str | None = None
+
+
+class DcsBotServerOut(BaseModel):
+    name: str
+    status: str
+    num_players: int
+    mission: MissionInfoOut | None = None
+    players: list[PlayerEntryOut] = []
+
+
+class DcsBotStatsOut(BaseModel):
+    total_players: int
+    active_players: int
+    total_sorties: int
+    avg_playtime: int
+    total_kills: int
+    total_deaths: int
+    total_pvp_kills: int
+    total_pvp_deaths: int
+
+
+class DcsBotPageOut(BaseModel):
+    servers: list[DcsBotServerOut]
+    stats: DcsBotStatsOut | None = None
+
+
+# --- DB entity schemas ---
+
+
 class PlayerOut(BaseModel):
     id: int
     ucid: str
