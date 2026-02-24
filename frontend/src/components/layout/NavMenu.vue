@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { MenuItem } from '@/types/api'
+import { useHeaderStore } from '@/stores/header'
 
 defineProps<{
   items: MenuItem[]
   mobile?: boolean
 }>()
+
+const headerStore = useHeaderStore()
 
 function getItemLink(item: MenuItem): string | null {
   // Type-based routing
@@ -59,6 +62,46 @@ function getItemLink(item: MenuItem): string | null {
           </template>
         </div>
       </div>
+
+      <!-- Servers link with player count badge -->
+      <RouterLink
+        v-else-if="item.type === 7"
+        to="/servers"
+        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        :class="item.theme_classes"
+        :title="headerStore.connectedPlayers > 0 ? `${headerStore.connectedPlayers} joueur(s) connecté(s)` : undefined"
+      >
+        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
+        <template v-if="headerStore.connectedPlayers > 0">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+            {{ headerStore.connectedPlayers }}
+          </span>
+          <span class="ml-1">joueur(s)</span>
+        </template>
+        <template v-else>
+          {{ item.label }}
+        </template>
+      </RouterLink>
+
+      <!-- Calendar link with events count badge -->
+      <RouterLink
+        v-else-if="item.type === 9"
+        to="/calendar"
+        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        :class="item.theme_classes"
+        :title="headerStore.nextEventsCount > 0 ? `${headerStore.nextEventsCount} événement(s) dans les 7 prochains jours` : undefined"
+      >
+        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
+        <template v-if="headerStore.nextEventsCount > 0">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+            {{ headerStore.nextEventsCount }}
+          </span>
+          <span class="ml-1">événement(s)</span>
+        </template>
+        <template v-else>
+          {{ item.label }}
+        </template>
+      </RouterLink>
 
       <!-- Regular link -->
       <RouterLink
