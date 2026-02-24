@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getDcsBotServers } from '@/api/servers'
+import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotPage } from '@/types/api'
 
 const pageData = ref<DcsBotPage | null>(null)
@@ -51,10 +52,6 @@ function statusIcon(status: string): string {
     default:
       return 'fa-solid fa-question'
   }
-}
-
-function formatMissionName(name: string): string {
-  return name.replace(/_/g, ' ')
 }
 
 function formatUptime(seconds: number): string {
@@ -127,11 +124,20 @@ function formatAvgPlaytime(seconds: number): string {
                 {{ server.mission ? server.mission.theatre : '-' }}
               </td>
               <td class="py-2 px-3" :title="server.mission ? formatMissionName(server.mission.name) : undefined">
-                {{ server.mission ? formatMissionName(server.mission.name) : '-' }}
+                {{ server.mission ? shortMissionName(server.mission.name) : '-' }}
               </td>
               <td class="py-2 px-3">
                 <template v-if="server.mission?.date_time">
-                  {{ server.mission.date_time }}
+                  <i
+                    v-if="server.mission.sun_state"
+                    :class="server.mission.sun_state.icon"
+                    :style="{ color: server.mission.sun_state.color }"
+                    :title="server.mission.sun_state.tooltip"
+                    class="mr-1"
+                  ></i>
+                  <span :title="server.mission.mission_date_time ?? undefined">
+                    {{ server.mission.mission_time ?? server.mission.date_time }}
+                  </span>
                 </template>
                 <template v-else>-</template>
               </td>

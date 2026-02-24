@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getDcsBotServer } from '@/api/servers'
+import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotServerDetailPage } from '@/types/api'
 
 const POLL_INTERVAL = 60_000
@@ -73,10 +74,6 @@ function sideBadgeClass(side: string | null): string {
     case 'red': return 'bg-red-100 text-red-800'
     default: return 'bg-gray-200 text-gray-600'
   }
-}
-
-function formatMissionName(name: string): string {
-  return name.replace(/_/g, ' ')
 }
 
 function formatUptime(seconds: number): string {
@@ -219,7 +216,7 @@ function visNm(m: number): string {
                   <i class="fa-solid fa-file-lines mr-1"></i> Nom
                 </th>
                 <td :title="formatMissionName(pageData.server.mission.name)">
-                  {{ formatMissionName(pageData.server.mission.name) }}
+                  {{ shortMissionName(pageData.server.mission.name) }}
                 </td>
               </tr>
               <tr>
@@ -232,7 +229,18 @@ function visNm(m: number): string {
                 <th class="text-left py-1.5 pr-4 text-gray-600 w-40">
                   <i class="fa-solid fa-sun mr-1"></i> Heure mission
                 </th>
-                <td>{{ pageData.server.mission.date_time }}</td>
+                <td>
+                  <span :title="pageData.server.mission.mission_date_time ?? undefined">
+                    {{ pageData.server.mission.mission_time ?? pageData.server.mission.date_time }}
+                  </span>
+                  <i
+                    v-if="pageData.server.mission.sun_state"
+                    :class="pageData.server.mission.sun_state.icon"
+                    :style="{ color: pageData.server.mission.sun_state.color }"
+                    :title="pageData.server.mission.sun_state.tooltip"
+                    class="ml-2"
+                  ></i>
+                </td>
               </tr>
               <tr>
                 <th class="text-left py-1.5 pr-4 text-gray-600 w-40">

@@ -11,14 +11,32 @@ from app.schemas.dcs import (
     DcsBotStatsOut,
     MissionInfoOut,
     PlayerEntryOut,
+    SunStateOut,
     TopMissionOut,
     TopModuleOut,
     TopTheatreOut,
     WeatherInfoOut,
 )
 from app.services import dcsbot as dcsbot_service
+from app.services.sun_position import _DEFAULT_SUN_STATE, get_sun_state, parse_mission_datetime
 
 router = APIRouter(prefix="/dcsbot", tags=["dcsbot"])
+
+
+def _enrich_mission(mission_raw: dict | None) -> MissionInfoOut | None:
+    """Build MissionInfoOut with sun state and formatted time fields."""
+    if not mission_raw:
+        return None
+    mission = MissionInfoOut(**mission_raw)
+    if mission.date_time:
+        dt = parse_mission_datetime(mission.date_time)
+        if dt:
+            mission.sun_state = SunStateOut(**get_sun_state(dt, mission.theatre))
+            mission.mission_time = dt.strftime("%H:%M")
+            mission.mission_date_time = dt.strftime("%d/%m/%Y %H:%M")
+        else:
+            mission.sun_state = SunStateOut(**_DEFAULT_SUN_STATE)
+    return mission
 
 
 @router.get("/servers", response_model=DcsBotPageOut)
@@ -31,14 +49,13 @@ async def get_dcsbot_servers():
 
     items = []
     for s in servers_data:
-        mission_raw = s.get("mission")
         players_raw = s.get("players") or []
         items.append(
             DcsBotServerOut(
                 name=s.get("name", ""),
                 status=s.get("status", "Unknown"),
                 num_players=len(players_raw),
-                mission=MissionInfoOut(**mission_raw) if mission_raw else None,
+                mission=_enrich_mission(s.get("mission")),
                 players=[PlayerEntryOut(**p) for p in players_raw],
             )
         )
@@ -83,7 +100,6 @@ async def get_dcsbot_server(
         raise HTTPException(status_code=404, detail="Serveur non trouvé")
 
     s = servers_data[0]
-    mission_raw = s.get("mission")
     players_raw = s.get("players") or []
     weather_raw = s.get("weather")
 
@@ -99,7 +115,7 @@ async def get_dcsbot_server(
         address=s.get("address"),
         password=password,
         restart_time=str(s["restart_time"]) if s.get("restart_time") else None,
-        mission=MissionInfoOut(**mission_raw) if mission_raw else None,
+        mission=_enrich_mission(s.get("mission")),
         players=[PlayerEntryOut(**p) for p in players_raw],
         weather=WeatherInfoOut(**weather_raw) if weather_raw else None,
     )
