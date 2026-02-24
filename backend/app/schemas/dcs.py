@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ServerOut(BaseModel):
@@ -39,7 +39,7 @@ class DcsBotServerOut(BaseModel):
     status: str
     num_players: int
     mission: MissionInfoOut | None = None
-    players: list[PlayerEntryOut] = []
+    players: list[PlayerEntryOut] = Field(default_factory=list)
 
 
 class DcsBotStatsOut(BaseModel):

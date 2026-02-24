@@ -103,6 +103,26 @@ function getItemLink(item: MenuItem): string | null {
         </template>
       </RouterLink>
 
+      <!-- TeamSpeak link with client count badge -->
+      <RouterLink
+        v-else-if="item.type === 11"
+        to="/teamspeak"
+        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        :class="item.theme_classes"
+        :title="headerStore.tsClientCount > 0 ? `${headerStore.tsClientCount} client(s) connecté(s) sur TeamSpeak` : undefined"
+      >
+        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
+        <template v-if="headerStore.tsClientCount > 0">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+            {{ headerStore.tsClientCount }}
+          </span>
+          <span class="ml-1">client(s)</span>
+        </template>
+        <template v-else>
+          {{ item.label }}
+        </template>
+      </RouterLink>
+
       <!-- Regular link -->
       <RouterLink
         v-else-if="getItemLink(item)"

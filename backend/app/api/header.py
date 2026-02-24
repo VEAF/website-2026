@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models.calendar import CalendarEvent
 from app.schemas.header import HeaderDataOut, NextEventOut
 from app.services import dcsbot as dcsbot_service
+from app.services import teamspeak as ts_service
 
 router = APIRouter(prefix="/header", tags=["header"])
 
@@ -16,7 +17,7 @@ NEXT_EVENTS_DAYS = 7
 
 @router.get("", response_model=HeaderDataOut)
 async def get_header_data(db: AsyncSession = Depends(get_db)):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC).replace(tzinfo=None)
 
     # Connected DCS players (from cached DCSServerBot API)
     connected_players = 0
@@ -47,7 +48,7 @@ async def get_header_data(db: AsyncSession = Depends(get_db)):
     return HeaderDataOut(
         connected_players=connected_players,
         next_events_count=next_events_count,
-        ts_client_count=0,  # TODO: From TeamSpeak cache
+        ts_client_count=ts_service.get_client_count(),
         next_events=[
             NextEventOut(
                 id=e.id,

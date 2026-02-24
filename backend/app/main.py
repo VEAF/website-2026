@@ -9,9 +9,17 @@ from app.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: initialize APScheduler if needed
-    # from app.tasks.scheduler import start_scheduler
-    # start_scheduler()
+    # Startup: initialize APScheduler
+    from app.tasks.scheduler import start_scheduler
+
+    start_scheduler()
+
+    # Run initial TeamSpeak scan so cache is populated immediately
+    if settings.API_TEAMSPEAK_URL:
+        from app.services.teamspeak import scan_and_cache
+
+        await scan_and_cache()
+
     yield
     # Shutdown: cleanup
 
