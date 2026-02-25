@@ -31,8 +31,8 @@ const calendarEvents = computed(() =>
     title: e.title,
     start: e.start_date,
     end: e.end_date,
-    backgroundColor: e.type_color || '#999',
-    borderColor: e.type_color || '#999',
+    color: e.type_color || '#999',
+    display: 'list-item' as const,
     extendedProps: { eventId: e.id },
   }))
 )
