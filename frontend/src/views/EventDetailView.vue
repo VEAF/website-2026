@@ -41,9 +41,9 @@ function formatDate(d: string) {
 </script>
 
 <template>
-  <div v-if="loading" class="text-center py-12 text-gray-500">Chargement...</div>
+  <div v-if="loading" class="max-w-4xl mx-auto px-4 py-12 text-center text-gray-500">Chargement...</div>
 
-  <div v-else-if="event" class="max-w-4xl mx-auto">
+  <div v-else-if="event" class="max-w-4xl mx-auto px-4 py-6">
     <div class="card">
       <!-- Header -->
       <div class="flex items-start justify-between mb-4">
