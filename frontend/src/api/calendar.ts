@@ -7,6 +7,11 @@ export async function getEvents(month?: string): Promise<EventListItem[]> {
   return data
 }
 
+export async function getMyEvents(): Promise<EventListItem[]> {
+  const { data } = await apiClient.get<EventListItem[]>('/calendar/my-events')
+  return data
+}
+
 export async function getEvent(id: number): Promise<EventDetail> {
   const { data } = await apiClient.get<EventDetail>(`/calendar/events/${id}`)
   return data

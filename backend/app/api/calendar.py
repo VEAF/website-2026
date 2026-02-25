@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -44,6 +44,43 @@ async def list_events(month: str | None = None, db: AsyncSession = Depends(get_d
             pass
 
     query = query.options(selectinload(CalendarEvent.owner)).order_by(CalendarEvent.start_date)
+    result = await db.execute(query)
+    events = result.scalars().all()
+
+    return [
+        EventListOut(
+            id=e.id,
+            title=e.title,
+            start_date=e.start_date,
+            end_date=e.end_date,
+            type=e.type,
+            type_as_string=e.type_as_string,
+            type_color=e.type_color,
+            sim_dcs=e.sim_dcs,
+            sim_bms=e.sim_bms,
+            registration=e.registration,
+            owner_nickname=e.owner.nickname if e.owner else None,
+        )
+        for e in events
+    ]
+
+
+@router.get("/my-events", response_model=list[EventListOut])
+async def my_events(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    now = datetime.now(timezone.utc)
+    query = (
+        select(CalendarEvent)
+        .join(Vote, Vote.event_id == CalendarEvent.id)
+        .where(
+            CalendarEvent.deleted == False,  # noqa: E712
+            Vote.user_id == user.id,
+            or_(Vote.vote == True, Vote.vote.is_(None)),  # noqa: E712
+            CalendarEvent.start_date >= now,
+        )
+        .options(selectinload(CalendarEvent.owner))
+        .order_by(CalendarEvent.start_date)
+        .limit(5)
+    )
     result = await db.execute(query)
     events = result.scalars().all()
 

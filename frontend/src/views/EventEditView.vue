@@ -54,6 +54,10 @@ onMounted(async () => {
       server_id: event.server_id ?? undefined,
       module_ids: event.module_ids,
     }
+  } else if (route.query.date) {
+    const dateStr = route.query.date as string
+    form.value.start_date = `${dateStr}T21:00`
+    form.value.end_date = `${dateStr}T23:00`
   }
 })
 

@@ -27,6 +27,21 @@ scripts/npm.sh install               # Install frontend dependencies
 scripts/npm.sh add <package>         # Add frontend dependency
 ```
 
+### Running commands inside Docker containers
+
+Scripts in `scripts/` use `docker compose exec` (container running) or `docker compose run --rm` (container stopped).
+
+**Backend** (service `backend`):
+- `scripts/uv.sh <args>` — run `uv` (e.g. `scripts/uv.sh add httpx`, `scripts/uv.sh sync`)
+- `scripts/alembic.sh <args>` — run `uv run alembic` (e.g. `scripts/alembic.sh upgrade head`)
+- `scripts/python.sh <args>` — run `python` (e.g. `scripts/python.sh -m pytest`)
+- `scripts/console.sh <args>` — run `python -m app.console` (e.g. `scripts/console.sh database fixtures`)
+- Direct: `docker compose exec backend <command>`
+
+**Frontend** (service `frontend`):
+- `scripts/npm.sh <args>` — run `npm` (e.g. `scripts/npm.sh install`, `scripts/npm.sh add axios`)
+- Direct: `docker compose exec frontend <command>`
+
 ### Backend (without Docker)
 ```bash
 cd backend

@@ -114,3 +114,39 @@
 .Vue-Toastification__close-button:hover {
   color: #4b5563;
 }
+
+/* FullCalendar overrides — harmonize with VEAF Tailwind theme */
+.fc {
+  --fc-border-color: #e5e7eb;
+  --fc-button-bg-color: #5c7cfa;
+  --fc-button-border-color: #4c6ef5;
+  --fc-button-hover-bg-color: #4263eb;
+  --fc-button-hover-border-color: #3b5bdb;
+  --fc-button-active-bg-color: #4263eb;
+  --fc-button-active-border-color: #3b5bdb;
+  --fc-today-bg-color: #f0f4ff;
+  --fc-event-text-color: #ffffff;
+  font-size: 0.875rem;
+}
+
+.fc .fc-button {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.fc .fc-event {
+  cursor: pointer;
+  border-radius: 0.25rem;
+  padding: 1px 3px;
+}
+
+.fc .fc-daygrid-event-dot {
+  border-width: 5px;
+}
