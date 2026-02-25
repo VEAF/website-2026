@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
@@ -40,7 +40,7 @@ async def upload_file(file: UploadFile, user: User = Depends(get_current_user), 
         original_name=file.filename,
         type=File.type_from_mime(file.content_type or ""),
         owner_id=user.id,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.utcnow(),
     )
     db.add(db_file)
     await db.commit()

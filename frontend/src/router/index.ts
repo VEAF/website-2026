@@ -29,24 +29,26 @@ const router = createRouter({
       path: '/calendar',
       name: 'calendar',
       component: () => import('@/views/CalendarView.vue'),
+      meta: { fullWidth: true },
     },
     {
       path: '/calendar/new',
       name: 'event-create',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, fullWidth: true },
     },
     {
       path: '/calendar/:id',
       name: 'event-detail',
       component: () => import('@/views/EventDetailView.vue'),
+      meta: { fullWidth: true },
       props: true,
     },
     {
       path: '/calendar/:id/edit',
       name: 'event-edit',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, fullWidth: true },
       props: true,
     },
     {

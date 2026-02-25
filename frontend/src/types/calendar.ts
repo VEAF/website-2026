@@ -60,9 +60,13 @@ export interface EventDetail extends EventListItem {
   map_id: number | null
   map_name: string | null
   server_id: number | null
+  server_name: string | null
+  image_id: number | null
   image_uuid: string | null
   owner_id: number
   module_ids: number[]
+  module_names: string[]
+  restriction_labels: string[]
   votes: Vote[]
   choices: Choice[]
   flights: Flight[]
@@ -82,7 +86,12 @@ export interface EventCreate {
   repeat_event?: number
   map_id?: number
   server_id?: number
+  image_id?: number | null
   module_ids?: number[]
+}
+
+export interface EventUpdate extends EventCreate {
+  debrief?: string
 }
 
 export interface VoteCreate {
