@@ -118,6 +118,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
             selectinload(CalendarEvent.modules),
             selectinload(CalendarEvent.map),
             selectinload(CalendarEvent.image),
+            selectinload(CalendarEvent.server),
         )
     )
     event = result.scalar_one_or_none()
@@ -145,10 +146,13 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
         map_id=event.map_id,
         map_name=event.map.name if event.map else None,
         server_id=event.server_id,
+        server_name=event.server.name if event.server else None,
         image_id=event.image_id,
         image_uuid=event.image.uuid if event.image else None,
         owner_id=event.owner_id,
         module_ids=[m.id for m in event.modules],
+        module_names=[m.name for m in event.modules],
+        restriction_labels=[CalendarEvent.RESTRICTIONS.get(r, "inconnu") for r in event.get_restrictions_list()],
         votes=[
             VoteOut(
                 id=v.id, user_id=v.user_id, user_nickname=v.user.nickname,
