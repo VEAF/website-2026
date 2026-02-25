@@ -6,11 +6,20 @@ import type { EventListItem } from '@/types/calendar'
 export const useCalendarStore = defineStore('calendar', () => {
   const events = ref<EventListItem[]>([])
   const currentMonth = ref('')
+  const myEvents = ref<EventListItem[]>([])
 
   async function fetchEvents(month: string) {
     currentMonth.value = month
     events.value = await calendarApi.getEvents(month)
   }
 
-  return { events, currentMonth, fetchEvents }
+  async function fetchMyEvents() {
+    try {
+      myEvents.value = await calendarApi.getMyEvents()
+    } catch {
+      myEvents.value = []
+    }
+  }
+
+  return { events, currentMonth, myEvents, fetchEvents, fetchMyEvents }
 })

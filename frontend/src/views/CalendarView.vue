@@ -1,97 +1,173 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import FullCalendar from '@fullcalendar/vue3'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import frLocale from '@fullcalendar/core/locales/fr'
+import type { EventClickArg, DatesSetArg } from '@fullcalendar/core'
+import type { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarStore } from '@/stores/calendar'
 import { useAuthStore } from '@/stores/auth'
+import type { EventListItem } from '@/types/calendar'
 
+const router = useRouter()
 const calendar = useCalendarStore()
 const auth = useAuthStore()
 
-const now = new Date()
-const currentYear = ref(now.getFullYear())
-const currentMonth = ref(now.getMonth() + 1)
+const eventTypes = [
+  { label: 'Training', color: '#27AE60' },
+  { label: 'Mission', color: '#F1C40F' },
+  { label: 'OPEX', color: '#7D3C98' },
+  { label: 'Meeting', color: '#2980B9' },
+  { label: 'Maintenance', color: '#E74C3C' },
+  { label: 'ATC / GCI', color: '#EA9417' },
+]
 
-const monthStr = computed(() => `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}`)
-const monthLabel = computed(() => {
-  const date = new Date(currentYear.value, currentMonth.value - 1)
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
-})
+const calendarEvents = computed(() =>
+  calendar.events.map((e: EventListItem) => ({
+    id: String(e.id),
+    title: e.title,
+    start: e.start_date,
+    end: e.end_date,
+    backgroundColor: e.type_color || '#999',
+    borderColor: e.type_color || '#999',
+    extendedProps: { eventId: e.id },
+  }))
+)
 
-function prevMonth() {
-  if (currentMonth.value === 1) {
-    currentMonth.value = 12
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-  calendar.fetchEvents(monthStr.value)
+const calendarOptions = computed(() => ({
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: 'dayGridMonth' as const,
+  locale: frLocale,
+  headerToolbar: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+  },
+  eventTimeFormat: {
+    hour: '2-digit' as const,
+    minute: '2-digit' as const,
+    meridiem: false as const,
+  },
+  nowIndicator: true,
+  events: calendarEvents.value,
+  eventClick: handleEventClick,
+  dateClick: handleDateClick,
+  datesSet: handleDatesSet,
+  height: 'auto' as const,
+}))
+
+function handleEventClick(info: EventClickArg) {
+  info.jsEvent.preventDefault()
+  const eventId = info.event.extendedProps.eventId
+  router.push(`/calendar/${eventId}`)
 }
 
-function nextMonth() {
-  if (currentMonth.value === 12) {
-    currentMonth.value = 1
-    currentYear.value++
-  } else {
-    currentMonth.value++
+function handleDateClick(info: DateClickArg) {
+  if (!auth.isMember) return
+  router.push({
+    path: '/calendar/new',
+    query: { date: info.dateStr },
+  })
+}
+
+function handleDatesSet(info: DatesSetArg) {
+  const mid = new Date((info.start.getTime() + info.end.getTime()) / 2)
+  const month = `${mid.getFullYear()}-${String(mid.getMonth() + 1).padStart(2, '0')}`
+  if (month !== calendar.currentMonth) {
+    calendar.fetchEvents(month)
   }
-  calendar.fetchEvents(monthStr.value)
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString('fr-FR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function eventTimeBadge(event: EventListItem): { text: string; cssClass: string } {
+  const now = Date.now()
+  const start = new Date(event.start_date).getTime()
+  const end = new Date(event.end_date).getTime()
+
+  if (now < start) {
+    const days = Math.ceil((start - now) / (1000 * 60 * 60 * 24))
+    return { text: `dans ${days}j`, cssClass: 'bg-green-100 text-green-800' }
+  } else if (now < end) {
+    return { text: 'en cours !', cssClass: 'bg-yellow-100 text-yellow-800' }
+  } else {
+    return { text: 'terminé', cssClass: 'bg-red-100 text-red-800' }
+  }
 }
 
 onMounted(() => {
-  calendar.fetchEvents(monthStr.value)
-})
+  const now = new Date()
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  calendar.fetchEvents(month)
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
+  if (auth.isAuthenticated) {
+    calendar.fetchMyEvents()
+  }
+})
 </script>
 
 <template>
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Calendrier</h1>
-      <RouterLink v-if="auth.isMember" to="/calendar/new" class="btn-primary"><i class="fa-solid fa-plus mr-1"></i>Créer un événement</RouterLink>
+      <RouterLink v-if="auth.isMember" to="/calendar/new" class="btn-primary">
+        <i class="fa-solid fa-plus mr-1"></i>Créer un événement
+      </RouterLink>
     </div>
 
-    <!-- Month navigation -->
-    <div class="flex items-center justify-center space-x-4 mb-6">
-      <button @click="prevMonth" class="btn-secondary"><i class="fa-solid fa-chevron-left mr-1"></i>Précédent</button>
-      <span class="text-lg font-semibold capitalize">{{ monthLabel }}</span>
-      <button @click="nextMonth" class="btn-secondary">Suivant<i class="fa-solid fa-chevron-right ml-1"></i></button>
+    <div class="card mb-6">
+      <FullCalendar :options="calendarOptions" />
     </div>
 
-    <!-- Events list -->
-    <div v-if="calendar.events.length === 0" class="text-center text-gray-500 py-8">
-      Aucun événement ce mois-ci
-    </div>
-
-    <div class="space-y-3">
-      <RouterLink
-        v-for="event in calendar.events"
-        :key="event.id"
-        :to="`/calendar/${event.id}`"
-        class="card block hover:shadow-md transition-shadow !p-4"
-      >
-        <div class="flex items-center space-x-4">
-          <div
-            class="w-1 h-12 rounded-full"
-            :style="{ backgroundColor: event.type_color || '#999' }"
-          />
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center space-x-2">
-              <span class="text-xs font-medium px-2 py-0.5 rounded-full text-white" :style="{ backgroundColor: event.type_color || '#999' }">
-                {{ event.type_as_string }}
-              </span>
-              <span class="font-semibold truncate">{{ event.title }}</span>
-            </div>
-            <div class="text-sm text-gray-500 mt-1">
-              {{ formatDate(event.start_date) }} - {{ formatDate(event.end_date) }}
-            </div>
-          </div>
-          <div class="text-sm text-gray-400">
-            {{ event.owner_nickname }}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="md:col-span-1">
+        <div class="card">
+          <h2 class="font-semibold mb-3">Légende</h2>
+          <div v-for="et in eventTypes" :key="et.label" class="flex items-center space-x-2 mb-1">
+            <i class="fa-solid fa-circle text-xs" :style="{ color: et.color }"></i>
+            <span class="text-sm" :style="{ color: et.color }">{{ et.label }}</span>
           </div>
         </div>
-      </RouterLink>
+      </div>
+
+      <div v-if="auth.isAuthenticated" class="md:col-span-3">
+        <div class="card">
+          <h2 class="font-semibold mb-3">Mes prochains événements</h2>
+
+          <div v-if="calendar.myEvents.length === 0" class="text-sm text-gray-500 italic">
+            Je n'ai prévu de participer à aucun événement pour l'instant.
+          </div>
+
+          <div v-for="event in calendar.myEvents" :key="event.id" class="flex items-center flex-wrap gap-2 mb-2 text-sm">
+            <i class="fa-solid fa-circle text-xs" :style="{ color: event.type_color || '#999' }"></i>
+            <span :style="{ color: event.type_color || '#999' }">{{ event.type_as_string }}</span>
+            <span class="text-gray-600">{{ formatDate(event.start_date) }}</span>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded-full"
+              :class="eventTimeBadge(event).cssClass"
+            >
+              {{ eventTimeBadge(event).text }}
+            </span>
+            <RouterLink
+              :to="`/calendar/${event.id}`"
+              class="text-veaf-600 hover:text-veaf-800 hover:underline"
+            >
+              {{ event.title }}
+            </RouterLink>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
