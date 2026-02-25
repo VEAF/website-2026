@@ -75,6 +75,7 @@ class EventDetailOut(EventListOut):
     map_id: int | None = None
     map_name: str | None = None
     server_id: int | None = None
+    image_id: int | None = None
     image_uuid: str | None = None
     owner_id: int
     module_ids: list[int] = Field(default_factory=list)
@@ -97,6 +98,7 @@ class EventCreate(BaseModel):
     repeat_event: int = 0
     map_id: int | None = None
     server_id: int | None = None
+    image_id: int | None = None
     module_ids: list[int] = Field(default_factory=list)
 
 

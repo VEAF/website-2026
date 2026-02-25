@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_, or_
@@ -9,6 +9,7 @@ from app.auth.dependencies import get_current_user
 from app.auth.permissions import can_add_event, can_choose_event, can_delete_event, can_edit_event, can_vote_event
 from app.database import get_db
 from app.models.calendar import CalendarEvent, Choice, Flight, Notification, Slot, Vote
+from app.models.module import Module
 from app.models.user import User
 from app.schemas.calendar import (
     ChoiceCreate,
@@ -67,7 +68,7 @@ async def list_events(month: str | None = None, db: AsyncSession = Depends(get_d
 
 @router.get("/my-events", response_model=list[EventListOut])
 async def my_events(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     query = (
         select(CalendarEvent)
         .join(Vote, Vote.event_id == CalendarEvent.id)
@@ -144,6 +145,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
         map_id=event.map_id,
         map_name=event.map.name if event.map else None,
         server_id=event.server_id,
+        image_id=event.image_id,
         image_uuid=event.image.uuid if event.image else None,
         owner_id=event.owner_id,
         module_ids=[m.id for m in event.modules],
@@ -181,7 +183,7 @@ async def create_event(data: EventCreate, user: User = Depends(get_current_user)
     if not can_add_event(user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     event = CalendarEvent(
         title=data.title,
         start_date=data.start_date,
@@ -196,11 +198,18 @@ async def create_event(data: EventCreate, user: User = Depends(get_current_user)
         repeat_event=data.repeat_event,
         map_id=data.map_id,
         server_id=data.server_id,
+        image_id=data.image_id,
         owner_id=user.id,
         created_at=now,
         updated_at=now,
     )
     db.add(event)
+    await db.flush()
+
+    if data.module_ids:
+        result = await db.execute(select(Module).where(Module.id.in_(data.module_ids)))
+        event.modules = list(result.scalars().all())
+
     await db.commit()
     await db.refresh(event)
 
@@ -209,7 +218,10 @@ async def create_event(data: EventCreate, user: User = Depends(get_current_user)
 
 @router.put("/events/{event_id}", response_model=EventDetailOut)
 async def update_event(event_id: int, data: EventUpdate, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    event = await db.get(CalendarEvent, event_id)
+    result = await db.execute(
+        select(CalendarEvent).where(CalendarEvent.id == event_id).options(selectinload(CalendarEvent.modules))
+    )
+    event = result.scalar_one_or_none()
     if event is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     if not can_edit_event(user, event):
@@ -228,8 +240,15 @@ async def update_event(event_id: int, data: EventUpdate, user: User = Depends(ge
     event.repeat_event = data.repeat_event
     event.map_id = data.map_id
     event.server_id = data.server_id
+    event.image_id = data.image_id
     event.debrief = data.debrief
-    event.updated_at = datetime.now(timezone.utc)
+    event.updated_at = datetime.utcnow()
+
+    if data.module_ids:
+        mod_result = await db.execute(select(Module).where(Module.id.in_(data.module_ids)))
+        event.modules = list(mod_result.scalars().all())
+    else:
+        event.modules = []
 
     await db.commit()
     return await get_event(event_id, db)
@@ -244,8 +263,8 @@ async def delete_event(event_id: int, user: User = Depends(get_current_user), db
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     event.deleted = True
-    event.deleted_at = datetime.now(timezone.utc)
-    event.updated_at = datetime.now(timezone.utc)
+    event.deleted_at = datetime.utcnow()
+    event.updated_at = datetime.utcnow()
     await db.commit()
 
 
@@ -261,7 +280,7 @@ async def copy_event(event_id: int, user: User = Depends(get_current_user), db: 
     if source is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     new_event = CalendarEvent(
         title=source.title,
         start_date=source.start_date,
@@ -302,7 +321,7 @@ async def vote_event(event_id: int, data: VoteCreate, user: User = Depends(get_c
     result = await db.execute(select(Vote).where(Vote.event_id == event_id, Vote.user_id == user.id))
     vote = result.scalar_one_or_none()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     if vote:
         vote.vote = data.vote
         vote.comment = data.comment
@@ -325,7 +344,7 @@ async def add_choice(event_id: int, data: ChoiceCreate, user: User = Depends(get
     if not can_choose_event(user, event):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     choice = Choice(
         event_id=event_id, user_id=user.id, module_id=data.module_id,
         task=data.task, priority=data.priority, comment=data.comment,
@@ -363,7 +382,7 @@ async def update_choice(choice_id: int, data: ChoiceUpdate, user: User = Depends
     if data.comment is not None:
         choice.comment = data.comment
 
-    choice.updated_at = datetime.now(timezone.utc)
+    choice.updated_at = datetime.utcnow()
     await db.commit()
     await db.refresh(choice)
 
@@ -383,7 +402,7 @@ async def mark_all_viewed(user: User = Depends(get_current_user), db: AsyncSessi
         select(Notification).where(Notification.user_id == user.id, Notification.read_at.is_(None))
     )
     notifications = result.scalars().all()
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     for n in notifications:
         n.read_at = now
     await db.commit()

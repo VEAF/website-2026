@@ -2,16 +2,23 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getEvent, createEvent, updateEvent } from '@/api/calendar'
-import type { EventCreate } from '@/types/calendar'
+import { getModules } from '@/api/modules'
+import { getServers } from '@/api/servers'
+import { uploadFile } from '@/api/files'
+import { useToast } from '@/composables/useToast'
+import type { EventUpdate } from '@/types/calendar'
+import type { Module } from '@/types/module'
+import type { Server } from '@/types/api'
 
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 
 const id = route.params.id ? Number(route.params.id) : null
 const isEdit = computed(() => id !== null)
 const loading = ref(false)
 
-const form = ref<EventCreate>({
+const form = ref<EventUpdate>({
   title: '',
   start_date: '',
   end_date: '',
@@ -23,7 +30,11 @@ const form = ref<EventCreate>({
   registration: true,
   ato: false,
   repeat_event: 0,
+  map_id: undefined,
+  server_id: undefined,
+  image_id: undefined,
   module_ids: [],
+  debrief: '',
 })
 
 const eventTypes = [
@@ -35,7 +46,33 @@ const eventTypes = [
   { value: 6, label: 'ATC / GCI' },
 ]
 
+const repeatOptions = [
+  { value: 0, label: 'Pas de répétition' },
+  { value: 1, label: '1x par semaine, le même jour' },
+  { value: 2, label: '1x par mois, le même jour' },
+  { value: 3, label: '1x par mois, même jour de la semaine' },
+]
+
+// Dropdown data
+const maps = ref<Module[]>([])
+const aircraftModules = ref<Module[]>([])
+const servers = ref<Server[]>([])
+
+// Image state
+const imageUploading = ref(false)
+const currentImageUuid = ref<string | null>(null)
+
 onMounted(async () => {
+  // Load dropdown data in parallel
+  const [mapsData, allModules, serversData] = await Promise.all([
+    getModules(1),
+    getModules(),
+    getServers(),
+  ])
+  maps.value = mapsData
+  aircraftModules.value = allModules.filter(m => [2, 3, 4].includes(m.type))
+  servers.value = serversData
+
   if (id) {
     const event = await getEvent(id)
     form.value = {
@@ -52,8 +89,11 @@ onMounted(async () => {
       repeat_event: event.repeat_event,
       map_id: event.map_id ?? undefined,
       server_id: event.server_id ?? undefined,
+      image_id: event.image_id ?? undefined,
       module_ids: event.module_ids,
+      debrief: event.debrief || '',
     }
+    currentImageUuid.value = event.image_uuid
   } else if (route.query.date) {
     const dateStr = route.query.date as string
     form.value.start_date = `${dateStr}T21:00`
@@ -61,16 +101,56 @@ onMounted(async () => {
   }
 })
 
+async function handleImageUpload(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!allowedTypes.includes(file.type)) {
+    toast.error('Format accepté : JPG ou PNG uniquement')
+    input.value = ''
+    return
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    toast.error('La taille du fichier ne doit pas dépasser 20 Mo')
+    input.value = ''
+    return
+  }
+
+  imageUploading.value = true
+  try {
+    const result = await uploadFile(file)
+    form.value.image_id = result.id
+    currentImageUuid.value = result.uuid
+    toast.success('Image uploadée')
+  } catch (e) {
+    toast.error(e)
+  } finally {
+    imageUploading.value = false
+    input.value = ''
+  }
+}
+
+function removeImage() {
+  form.value.image_id = null
+  currentImageUuid.value = null
+}
+
 async function handleSubmit() {
   loading.value = true
   try {
     if (isEdit.value && id) {
       await updateEvent(id, form.value)
+      toast.success('Événement modifié')
       router.push(`/calendar/${id}`)
     } else {
       const event = await createEvent(form.value)
+      toast.success('Événement créé')
       router.push(`/calendar/${event.id}`)
     }
+  } catch (e) {
+    toast.error(e)
   } finally {
     loading.value = false
   }
@@ -78,26 +158,31 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto">
+  <div class="max-w-7xl mx-auto">
     <h1 class="text-2xl font-bold mb-6">{{ isEdit ? "Modifier l'événement" : 'Créer un événement' }}</h1>
 
     <form @submit.prevent="handleSubmit" class="card space-y-4">
-      <div>
-        <label class="label">Titre</label>
-        <input v-model="form.title" type="text" class="input" required />
-      </div>
-
+      <!-- Dates -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="label">Date de début</label>
+          <label class="label">Début</label>
           <input v-model="form.start_date" type="datetime-local" class="input" required />
         </div>
         <div>
-          <label class="label">Date de fin</label>
+          <label class="label">Fin</label>
           <input v-model="form.end_date" type="datetime-local" class="input" required />
         </div>
       </div>
 
+      <!-- Registration -->
+      <div>
+        <label class="flex items-center space-x-2">
+          <input v-model="form.registration" type="checkbox" class="rounded" />
+          <span class="text-sm">Inscriptions ouvertes</span>
+        </label>
+      </div>
+
+      <!-- Type -->
       <div>
         <label class="label">Type</label>
         <select v-model.number="form.type" class="input">
@@ -105,23 +190,15 @@ async function handleSubmit() {
         </select>
       </div>
 
-      <div>
-        <label class="label">Description</label>
-        <textarea v-model="form.description" class="input" rows="4" />
-      </div>
-
+      <!-- Sim / ATO checkboxes -->
       <div class="flex space-x-6">
         <label class="flex items-center space-x-2">
           <input v-model="form.sim_dcs" type="checkbox" class="rounded" />
-          <span class="text-sm">DCS</span>
+          <span class="text-sm">Simulateur DCS</span>
         </label>
         <label class="flex items-center space-x-2">
           <input v-model="form.sim_bms" type="checkbox" class="rounded" />
-          <span class="text-sm">BMS</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <input v-model="form.registration" type="checkbox" class="rounded" />
-          <span class="text-sm">Inscription</span>
+          <span class="text-sm">Simulateur BMS</span>
         </label>
         <label class="flex items-center space-x-2">
           <input v-model="form.ato" type="checkbox" class="rounded" />
@@ -129,9 +206,101 @@ async function handleSubmit() {
         </label>
       </div>
 
+      <!-- Title -->
+      <div>
+        <label class="label">Titre</label>
+        <input v-model="form.title" type="text" class="input" required />
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="label">Description</label>
+        <textarea v-model="form.description" class="input" rows="4" />
+      </div>
+
+      <!-- Restrictions -->
+      <div>
+        <label class="label">Réservé aux</label>
+        <p class="text-xs text-gray-500 mb-1">Ne rien cocher si ouvert à tout le monde</p>
+        <div class="flex space-x-6">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" :value="1" v-model="form.restrictions" class="rounded" />
+            <span class="text-sm">Cadets</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" :value="2" v-model="form.restrictions" class="rounded" />
+            <span class="text-sm">Membres</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div>
+        <label class="label">Carte</label>
+        <select v-model="form.map_id" class="input">
+          <option :value="undefined">-</option>
+          <option v-for="m in maps" :key="m.id" :value="m.id">{{ m.long_name || m.name }}</option>
+        </select>
+      </div>
+
+      <!-- Modules -->
+      <div v-if="aircraftModules.length">
+        <label class="label">Modules</label>
+        <div class="flex flex-wrap gap-3 mt-1">
+          <label v-for="m in aircraftModules" :key="m.id" class="flex items-center space-x-1">
+            <input type="checkbox" :value="m.id" v-model="form.module_ids" class="rounded" />
+            <span class="text-sm">{{ m.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Image -->
+      <div>
+        <label class="label">Image</label>
+        <div v-if="currentImageUuid" class="mb-2">
+          <img :src="`/api/files/${currentImageUuid}`" alt="Image de l'événement"
+               class="max-w-full max-h-40 rounded border border-gray-300" />
+          <button type="button" class="mt-1 text-red-600 hover:text-red-800 text-sm" @click="removeImage">
+            <i class="fa-solid fa-trash mr-1"></i>Supprimer l'image
+          </button>
+        </div>
+        <input type="file" accept="image/jpeg,image/png" class="input"
+               :disabled="imageUploading" @change="handleImageUpload" />
+        <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo</p>
+      </div>
+
+      <!-- Server -->
+      <div>
+        <label class="label">Serveur</label>
+        <select v-model="form.server_id" class="input">
+          <option :value="undefined">-</option>
+          <option v-for="s in servers" :key="s.id" :value="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+
+      <!-- Debrief (edit only) -->
+      <div v-if="isEdit">
+        <label class="label">Debrief</label>
+        <textarea v-model="form.debrief" class="input" rows="4" />
+      </div>
+
+      <!-- Repeat -->
+      <div>
+        <label class="label">Répétition</label>
+        <div class="space-y-2 mt-1">
+          <label v-for="opt in repeatOptions" :key="opt.value" class="flex items-center space-x-2">
+            <input type="radio" :value="opt.value" v-model.number="form.repeat_event" />
+            <span class="text-sm">{{ opt.label }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Actions -->
       <div class="flex justify-end space-x-3">
-        <button type="button" @click="router.back()" class="btn-secondary"><i class="fa-solid fa-xmark mr-1"></i>Annuler</button>
-        <button type="submit" class="btn-primary" :disabled="loading">
+        <button type="button" @click="router.back()" class="btn-secondary">
+          <i class="fa-solid fa-xmark mr-1"></i>Annuler
+        </button>
+        <button type="submit" class="btn-primary" :disabled="loading || imageUploading">
           <i class="fa-solid fa-floppy-disk mr-1"></i>{{ loading ? 'Sauvegarde...' : isEdit ? 'Modifier' : 'Créer' }}
         </button>
       </div>
