@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPage } from '@/api/pages'
+import { renderMarkdown } from '@/composables/useMarkdown'
 import type { Page } from '@/types/api'
 
 const route = useRoute()
@@ -38,7 +39,7 @@ watch(() => route.params.slug, fetchPage)
   <div v-else-if="page" class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">{{ page.title }}</h1>
     <div v-for="block in page.blocks" :key="block.id" class="prose max-w-none mb-6">
-      <div v-if="block.type === 1" class="whitespace-pre-wrap">{{ block.content }}</div>
+      <div v-if="block.type === 1" v-html="renderMarkdown(block.content)"></div>
     </div>
   </div>
 </template>

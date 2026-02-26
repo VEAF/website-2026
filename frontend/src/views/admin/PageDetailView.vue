@@ -11,6 +11,7 @@ import {
 import type { Page, PageBlock } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
+import MarkdownEditor from '@/components/ui/MarkdownEditor.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -297,12 +298,7 @@ onMounted(loadPage)
         <form class="space-y-4" @submit.prevent="handleBlockSubmit">
           <div>
             <label class="label">Contenu (Markdown)</label>
-            <textarea
-              v-model="blockForm.content"
-              class="input font-mono text-sm"
-              rows="15"
-              required
-            ></textarea>
+            <MarkdownEditor v-model="blockForm.content" :rows="15" />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
