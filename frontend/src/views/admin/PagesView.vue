@@ -335,6 +335,9 @@ onMounted(loadPages)
             <td class="p-2 text-xs">{{ restrictionLabels[p.restriction] ?? '-' }}</td>
             <td class="p-2 text-xs">{{ formatDate(p.updated_at) }}</td>
             <td class="p-2 space-x-3">
+              <a :href="'/' + p.path" target="_blank" class="text-veaf-600 hover:text-veaf-800 text-sm" title="Ouvrir la page">
+                <i class="fa-solid fa-up-right-from-square mr-1"></i>Ouvrir
+              </a>
               <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="goToDetail(p)">
                 <i class="fa-solid fa-eye mr-1"></i>Voir
               </button>

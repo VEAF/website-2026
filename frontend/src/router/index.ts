@@ -112,12 +112,6 @@ const router = createRouter({
       name: 'metrics',
       component: () => import('@/views/MetricsView.vue'),
     },
-    {
-      path: '/pages/:slug(.*)',
-      name: 'page',
-      component: () => import('@/views/PageView.vue'),
-      props: true,
-    },
     // Admin routes
     {
       path: '/admin',
@@ -178,6 +172,18 @@ const router = createRouter({
       name: 'admin-menu',
       component: () => import('@/views/admin/MenuView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    // Redirect old /pages/ URLs
+    {
+      path: '/pages/:slug(.*)',
+      redirect: to => ({ name: 'page', params: { slug: to.params.slug } }),
+    },
+    // CMS catch-all (must be LAST)
+    {
+      path: '/:slug(.*)',
+      name: 'page',
+      component: () => import('@/views/PageView.vue'),
+      props: true,
     },
   ],
 })

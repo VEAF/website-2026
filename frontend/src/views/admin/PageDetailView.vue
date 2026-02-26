@@ -179,9 +179,14 @@ onMounted(loadPage)
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">{{ page?.title ?? 'Chargement...' }}</h1>
-      <button class="btn-secondary" @click="router.push({ name: 'admin-pages' })">
-        <i class="fa-solid fa-arrow-left mr-1"></i>Retour à la liste
-      </button>
+      <div class="flex items-center space-x-3">
+        <a v-if="page" :href="'/' + page.path" target="_blank" class="btn-secondary" title="Ouvrir la page dans un nouvel onglet">
+          <i class="fa-solid fa-up-right-from-square mr-1"></i>Ouvrir la page
+        </a>
+        <button class="btn-secondary" @click="router.push({ name: 'admin-pages' })">
+          <i class="fa-solid fa-arrow-left mr-1"></i>Retour à la liste
+        </button>
+      </div>
     </div>
 
     <div v-if="page">
