@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,7 +14,7 @@ async def load_calendar_events(
     modules: dict[str, Module],
     servers: dict[str, Server],
 ) -> None:
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today + timedelta(days=1)
     plus2 = today + timedelta(days=2)

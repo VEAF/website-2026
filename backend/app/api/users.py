@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -71,7 +71,7 @@ async def update_me(data: UserUpdate, user: User = Depends(get_current_user), db
     if data.sim_bms is not None:
         user.sim_bms = data.sim_bms
 
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(user)
 

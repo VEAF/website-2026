@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Response, Cookie, status
 from sqlalchemy import select
@@ -56,8 +56,8 @@ async def register(data: RegisterRequest, response: Response, db: AsyncSession =
         roles="ROLE_USER",
         sim_dcs=True,
         status=User.STATUS_UNKNOWN,
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
     db.add(user)
     await db.commit()
@@ -126,7 +126,7 @@ async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(
 
     token = secrets.token_urlsafe(32)
     user.password_request_token = token
-    user.password_request_expired_at = datetime.now(timezone.utc) + timedelta(hours=24)
+    user.password_request_expired_at = datetime.now(UTC) + timedelta(hours=24)
     await db.commit()
 
     # TODO: Send email with reset link
@@ -141,13 +141,13 @@ async def reset_password_confirm(data: ResetPasswordConfirm, db: AsyncSession = 
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
 
-    if user.password_request_expired_at and user.password_request_expired_at < datetime.now(timezone.utc):
+    if user.password_request_expired_at and user.password_request_expired_at < datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token expired")
 
     user.password = hash_password(data.password)
     user.password_request_token = None
     user.password_request_expired_at = None
-    user.updated_at = datetime.now(timezone.utc)
+    user.updated_at = datetime.now(UTC)
     await db.commit()
 
     return {"detail": "Password updated"}
