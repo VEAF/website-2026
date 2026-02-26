@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import require_admin
 from app.database import get_db
+from app.models.content import Page
 from app.models.module import Module
 from app.models.user import User
 
@@ -14,6 +15,7 @@ router = APIRouter(prefix="/admin/stats", tags=["admin-stats"])
 class AdminStats(BaseModel):
     modules: int = 0
     users: int = 0
+    pages: int = 0
 
 
 @router.get("", response_model=AdminStats)
@@ -27,4 +29,7 @@ async def get_stats(
     result = await db.execute(select(func.count()).select_from(User))
     users_count = result.scalar_one()
 
-    return AdminStats(modules=modules_count, users=users_count)
+    result = await db.execute(select(func.count()).select_from(Page))
+    pages_count = result.scalar_one()
+
+    return AdminStats(modules=modules_count, users=users_count, pages=pages_count)

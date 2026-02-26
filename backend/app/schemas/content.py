@@ -27,6 +27,56 @@ class PageOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# --- Admin schemas ---
+
+
+class PageCreate(BaseModel):
+    title: str
+    route: str
+    path: str
+    enabled: bool = False
+    restriction: int = 0
+
+
+class PageUpdate(BaseModel):
+    title: str
+    route: str
+    path: str
+    enabled: bool
+    restriction: int
+
+
+class AdminPageOut(BaseModel):
+    id: int
+    route: str
+    path: str
+    title: str
+    enabled: bool
+    restriction: int
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    blocks: list[PageBlockOut] = Field(default_factory=list)
+
+    model_config = {"from_attributes": True}
+
+
+class AdminPageListOut(BaseModel):
+    items: list[AdminPageOut]
+    total: int
+
+
+class PageBlockCreate(BaseModel):
+    content: str
+    number: int
+    enabled: bool = False
+
+
+class PageBlockUpdate(BaseModel):
+    content: str
+    number: int
+    enabled: bool
+
+
 class MenuItemOut(BaseModel):
     id: int
     label: str | None = None

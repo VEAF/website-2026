@@ -10,7 +10,7 @@ from app.auth.permissions import (
 from tests.factories import EventFactory, UserFactory
 from app.models.user import User
 from app.models.calendar import CalendarEvent
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 
 def test_can_add_event_member():
@@ -51,7 +51,7 @@ def test_can_vote_finished():
     user = UserFactory.build(status=User.STATUS_MEMBER, sim_dcs=True)
     event = EventFactory.build(
         registration=True,
-        end_date=datetime.now(timezone.utc) - timedelta(hours=1),
+        end_date=datetime.now(UTC) - timedelta(hours=1),
     )
     assert can_vote_event(user, event) is False
 

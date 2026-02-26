@@ -17,7 +17,7 @@ function getItemLink(item: MenuItem): string | null {
     case 3: // TYPE_URL
       return item.url_slug ? `/${item.url_slug}` : null
     case 4: // TYPE_PAGE
-      return item.page_path ? `/pages/${item.page_path}` : null
+      return item.page_path ? `/${item.page_path}` : null
     case 6: // TYPE_OFFICE
       return '/office'
     case 7: // TYPE_SERVERS

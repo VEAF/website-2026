@@ -17,7 +17,7 @@ NEXT_EVENTS_DAYS = 7
 
 @router.get("", response_model=HeaderDataOut)
 async def get_header_data(db: AsyncSession = Depends(get_db)):
-    now = datetime.now(UTC).replace(tzinfo=None)
+    now = datetime.now(UTC)
 
     # Connected DCS players (from cached DCSServerBot API)
     connected_players = 0

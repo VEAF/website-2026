@@ -1,6 +1,6 @@
 """Factory-boy factories for test data creation."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import factory
 
@@ -28,8 +28,8 @@ class UserFactory(factory.Factory):
     status = User.STATUS_MEMBER
     sim_dcs = True
     sim_bms = False
-    created_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
-    updated_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
 
 
 class AdminFactory(UserFactory):
@@ -76,15 +76,38 @@ class ServerFactory(factory.Factory):
     gci = False
 
 
+class PageFactory(factory.Factory):
+    class Meta:
+        model = Page
+
+    title = factory.Sequence(lambda n: f"Page {n}")
+    route = factory.Sequence(lambda n: f"page_{n}")
+    path = factory.Sequence(lambda n: f"/page-{n}")
+    enabled = True
+    restriction = Page.LEVEL_ALL
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
+class PageBlockFactory(factory.Factory):
+    class Meta:
+        model = PageBlock
+
+    type = PageBlock.TYPE_MARKDOWN
+    content = factory.Sequence(lambda n: f"Block content {n}")
+    number = factory.Sequence(lambda n: n + 1)
+    enabled = True
+
+
 class EventFactory(factory.Factory):
     class Meta:
         model = CalendarEvent
 
     title = factory.Sequence(lambda n: f"Event {n}")
-    start_date = factory.LazyFunction(lambda: datetime.now(timezone.utc))
-    end_date = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    start_date = factory.LazyFunction(lambda: datetime.now(UTC))
+    end_date = factory.LazyFunction(lambda: datetime.now(UTC))
     type = CalendarEvent.EVENT_TYPE_TRAINING
     sim_dcs = True
     registration = True
-    created_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
-    updated_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(UTC))

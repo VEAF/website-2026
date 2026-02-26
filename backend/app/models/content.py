@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
@@ -32,7 +32,7 @@ class File(Base):
     type: Mapped[int | None] = mapped_column(Integer, nullable=True)
     mime_type: Mapped[str] = mapped_column(String(255), nullable=False)
     size: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     original_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     extension: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -66,8 +66,8 @@ class Page(Base):
     route: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     path: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     restriction: Mapped[int] = mapped_column(Integer, default=LEVEL_ALL)
 
@@ -101,8 +101,8 @@ class Url(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     target: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     status: Mapped[bool] = mapped_column(Boolean, default=True)
 
 

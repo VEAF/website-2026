@@ -223,7 +223,7 @@ function isLevelDisabled(moduleType: number, level: number): boolean {
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Informations</h2>
           <button class="btn-secondary text-sm" @click="showEditModal = true">
-            <i class="fa-solid fa-pen mr-1"></i>Modifier
+            <i class="fa-solid fa-edit mr-1"></i>Modifier
           </button>
         </div>
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,7 +30,7 @@ USERS_DATA = [
 
 
 async def load_users(session: AsyncSession) -> dict[str, User]:
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     hashed = hash_password("test1234")
 
     users: dict[str, User] = {}

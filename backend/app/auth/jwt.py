@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from jose import JWTError, jwt
 
@@ -6,7 +6,7 @@ from app.config import settings
 
 
 def create_access_token(user_id: int, roles: list[str]) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": str(user_id),
         "roles": roles,
@@ -17,7 +17,7 @@ def create_access_token(user_id: int, roles: list[str]) -> str:
 
 
 def create_refresh_token(user_id: int) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(UTC) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {
         "sub": str(user_id),
         "exp": expire,

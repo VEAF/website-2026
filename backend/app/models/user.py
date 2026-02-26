@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -57,10 +57,10 @@ class User(Base):
     roles: Mapped[str] = mapped_column(String(255), nullable=False, default="")  # comma-separated
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     password_request_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    password_request_expired_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    password_request_expired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     nickname: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     sim_bms: Mapped[bool] = mapped_column(Boolean, default=False)
     sim_dcs: Mapped[bool] = mapped_column(Boolean, default=False)
     status: Mapped[int] = mapped_column(Integer, default=STATUS_UNKNOWN)

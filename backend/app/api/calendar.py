@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_, or_
@@ -68,7 +68,7 @@ async def list_events(month: str | None = None, db: AsyncSession = Depends(get_d
 
 @router.get("/my-events", response_model=list[EventListOut])
 async def my_events(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     query = (
         select(CalendarEvent)
         .join(Vote, Vote.event_id == CalendarEvent.id)
@@ -187,7 +187,7 @@ async def create_event(data: EventCreate, user: User = Depends(get_current_user)
     if not can_add_event(user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     event = CalendarEvent(
         title=data.title,
         start_date=data.start_date,
@@ -246,7 +246,7 @@ async def update_event(event_id: int, data: EventUpdate, user: User = Depends(ge
     event.server_id = data.server_id
     event.image_id = data.image_id
     event.debrief = data.debrief
-    event.updated_at = datetime.utcnow()
+    event.updated_at = datetime.now(UTC)
 
     if data.module_ids:
         mod_result = await db.execute(select(Module).where(Module.id.in_(data.module_ids)))
@@ -267,8 +267,8 @@ async def delete_event(event_id: int, user: User = Depends(get_current_user), db
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     event.deleted = True
-    event.deleted_at = datetime.utcnow()
-    event.updated_at = datetime.utcnow()
+    event.deleted_at = datetime.now(UTC)
+    event.updated_at = datetime.now(UTC)
     await db.commit()
 
 
@@ -284,7 +284,7 @@ async def copy_event(event_id: int, user: User = Depends(get_current_user), db: 
     if source is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     new_event = CalendarEvent(
         title=source.title,
         start_date=source.start_date,
@@ -325,7 +325,7 @@ async def vote_event(event_id: int, data: VoteCreate, user: User = Depends(get_c
     result = await db.execute(select(Vote).where(Vote.event_id == event_id, Vote.user_id == user.id))
     vote = result.scalar_one_or_none()
 
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     if vote:
         vote.vote = data.vote
         vote.comment = data.comment
@@ -348,7 +348,7 @@ async def add_choice(event_id: int, data: ChoiceCreate, user: User = Depends(get
     if not can_choose_event(user, event):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     choice = Choice(
         event_id=event_id, user_id=user.id, module_id=data.module_id,
         task=data.task, priority=data.priority, comment=data.comment,
@@ -386,7 +386,7 @@ async def update_choice(choice_id: int, data: ChoiceUpdate, user: User = Depends
     if data.comment is not None:
         choice.comment = data.comment
 
-    choice.updated_at = datetime.utcnow()
+    choice.updated_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(choice)
 
@@ -406,7 +406,7 @@ async def mark_all_viewed(user: User = Depends(get_current_user), db: AsyncSessi
         select(Notification).where(Notification.user_id == user.id, Notification.read_at.is_(None))
     )
     notifications = result.scalars().all()
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     for n in notifications:
         n.read_at = now
     await db.commit()

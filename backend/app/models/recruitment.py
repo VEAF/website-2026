@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -24,11 +24,11 @@ class RecruitmentEvent(Base):
     }
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    event_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    event_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     type: Mapped[int] = mapped_column(Integer, nullable=False)
-    ack_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    ack_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     comment: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)

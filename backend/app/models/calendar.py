@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -66,10 +66,10 @@ class CalendarEvent(Base):
     }
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     type: Mapped[int] = mapped_column(Integer, nullable=False)
     sim_dcs: Mapped[bool] = mapped_column(Boolean, default=False)
     sim_bms: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -77,7 +77,7 @@ class CalendarEvent(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     restrictions: Mapped[str | None] = mapped_column(String(255), nullable=True)  # comma-separated
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     registration: Mapped[bool] = mapped_column(Boolean, default=False)
     ato: Mapped[bool] = mapped_column(Boolean, default=False)
     debrief: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -110,7 +110,7 @@ class CalendarEvent(Base):
 
     @property
     def is_finished(self) -> bool:
-        return self.end_date < datetime.now(timezone.utc)
+        return self.end_date < datetime.now(UTC)
 
     def has_restriction(self, restriction: int) -> bool:
         if not self.restrictions:
@@ -175,8 +175,8 @@ class Choice(Base):
     task: Mapped[int | None] = mapped_column(Integer, nullable=True)
     priority: Mapped[int] = mapped_column(Integer, default=1)
     comment: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey("calendar_event.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
@@ -195,8 +195,8 @@ class Vote(Base):
     __tablename__ = "event_vote"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     vote: Mapped[bool | None] = mapped_column(Boolean, nullable=True)  # True=yes, False=no, None=maybe
     comment: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
@@ -211,7 +211,7 @@ class Notification(Base):
     __tablename__ = "notification"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey("calendar_event.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)

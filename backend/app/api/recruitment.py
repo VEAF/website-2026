@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -47,7 +47,7 @@ async def add_recruitment_event(
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if type == RecruitmentEvent.TYPE_PRESENTATION:
         if not can_mark_presentation(user):
