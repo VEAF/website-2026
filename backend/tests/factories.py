@@ -76,6 +76,29 @@ class ServerFactory(factory.Factory):
     gci = False
 
 
+class PageFactory(factory.Factory):
+    class Meta:
+        model = Page
+
+    title = factory.Sequence(lambda n: f"Page {n}")
+    route = factory.Sequence(lambda n: f"page_{n}")
+    path = factory.Sequence(lambda n: f"/page-{n}")
+    enabled = True
+    restriction = Page.LEVEL_ALL
+    created_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+    updated_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
+
+
+class PageBlockFactory(factory.Factory):
+    class Meta:
+        model = PageBlock
+
+    type = PageBlock.TYPE_MARKDOWN
+    content = factory.Sequence(lambda n: f"Block content {n}")
+    number = factory.Sequence(lambda n: n + 1)
+    enabled = True
+
+
 class EventFactory(factory.Factory):
     class Meta:
         model = CalendarEvent

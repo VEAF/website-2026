@@ -150,6 +150,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: '/admin/pages/:id',
+      name: 'admin-page-detail',
+      component: () => import('@/views/admin/PageDetailView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/admin/files',
       name: 'admin-files',
       component: () => import('@/views/admin/FilesView.vue'),

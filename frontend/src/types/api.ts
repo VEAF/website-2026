@@ -39,6 +39,41 @@ export interface PageBlock {
   enabled: boolean
 }
 
+// --- Admin page types ---
+
+export interface PageCreate {
+  title: string
+  route: string
+  path: string
+  enabled: boolean
+  restriction: number
+}
+
+export interface PageUpdate {
+  title: string
+  route: string
+  path: string
+  enabled: boolean
+  restriction: number
+}
+
+export interface AdminPageListResponse {
+  items: Page[]
+  total: number
+}
+
+export interface PageBlockCreate {
+  content: string
+  number: number
+  enabled: boolean
+}
+
+export interface PageBlockUpdate {
+  content: string
+  number: number
+  enabled: boolean
+}
+
 export interface Server {
   id: number
   name: string

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(scripts/npm.sh:*)",
-      "Bash(scripts/uv.sh:*)"
+      "Bash(scripts/uv.sh:*)",
+      "Bash(grep -r \"pages\" /home/debian/veaf/website-2026/backend/app/api/admin_*.py)",
+      "Bash(grep -l \"page\\\\|menu\\\\|file\" /home/debian/veaf/website-2026/backend/alembic/versions/*.py)"
     ]
   }
 }
