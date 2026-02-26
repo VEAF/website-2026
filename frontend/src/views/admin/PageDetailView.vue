@@ -195,7 +195,7 @@ onMounted(loadPage)
         <div class="flex justify-between items-start mb-4">
           <h2 class="text-lg font-semibold">Propriétés de la page</h2>
           <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openPageEdit">
-            <i class="fa-solid fa-pen mr-1"></i>Modifier
+            <i class="fa-solid fa-edit mr-1"></i>Modifier
           </button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
@@ -348,7 +348,7 @@ onMounted(loadPage)
             </div>
             <div class="space-x-3">
               <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openEditBlock(block)">
-                <i class="fa-solid fa-pen mr-1"></i>Modifier
+                <i class="fa-solid fa-edit mr-1"></i>Modifier
               </button>
               <button class="text-red-600 hover:text-red-800 text-sm" @click="handleDeleteBlock(block)">
                 <i class="fa-solid fa-trash mr-1"></i>Supprimer

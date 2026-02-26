@@ -590,7 +590,7 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditModule(m)"
                 >
-                  <i class="fa-solid fa-pen mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit mr-1"></i>Modifier
                 </button>
               </td>
             </tr>
@@ -661,7 +661,7 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditRole(r)"
                 >
-                  <i class="fa-solid fa-pen mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit mr-1"></i>Modifier
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"
@@ -738,7 +738,7 @@ onMounted(loadAll)
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
                   @click="openEditSystem(s)"
                 >
-                  <i class="fa-solid fa-pen mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit mr-1"></i>Modifier
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"

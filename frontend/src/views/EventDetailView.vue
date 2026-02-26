@@ -149,7 +149,7 @@ function formatTime(d: string) {
         </div>
         <div v-if="canEdit" class="flex space-x-2 flex-shrink-0">
           <button @click="handleCopy" class="btn-secondary text-sm"><i class="fa-solid fa-copy mr-1"></i>Copier</button>
-          <RouterLink :to="`/calendar/${event.id}/edit`" class="btn-secondary text-sm"><i class="fa-solid fa-pen mr-1"></i>Modifier</RouterLink>
+          <RouterLink :to="`/calendar/${event.id}/edit`" class="btn-secondary text-sm"><i class="fa-solid fa-edit mr-1"></i>Modifier</RouterLink>
           <button @click="handleDelete" class="btn-danger text-sm"><i class="fa-solid fa-trash mr-1"></i>Supprimer</button>
         </div>
       </div>

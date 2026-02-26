@@ -298,7 +298,7 @@ onMounted(loadUsers)
                 class="text-veaf-600 hover:text-veaf-800 text-sm"
                 @click="openEditUser(u)"
               >
-                <i class="fa-solid fa-pen mr-1"></i>Modifier
+                <i class="fa-solid fa-edit mr-1"></i>Modifier
               </button>
             </td>
           </tr>

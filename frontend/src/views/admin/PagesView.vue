@@ -342,7 +342,7 @@ onMounted(loadPages)
                 <i class="fa-solid fa-eye mr-1"></i>Voir
               </button>
               <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openEdit(p)">
-                <i class="fa-solid fa-pen mr-1"></i>Modifier
+                <i class="fa-solid fa-edit mr-1"></i>Modifier
               </button>
               <button class="text-red-600 hover:text-red-800 text-sm" @click="handleDelete(p)">
                 <i class="fa-solid fa-trash mr-1"></i>Supprimer
