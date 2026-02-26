@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { getEvent, voteEvent, deleteEvent, copyEvent } from '@/api/calendar'
 import type { EventDetail, Choice } from '@/types/calendar'
 import { useConfirm } from '@/composables/useConfirm'
+import { renderMarkdown } from '@/composables/useMarkdown'
 
 const route = useRoute()
 const router = useRouter()
@@ -196,11 +197,11 @@ function formatTime(d: string) {
 
       <!-- Contenu onglet -->
       <div v-if="activeTab === 'description'" class="prose max-w-none mb-6">
-        <p v-if="event.description" class="whitespace-pre-wrap">{{ event.description }}</p>
+        <div v-if="event.description" v-html="renderMarkdown(event.description)"></div>
         <p v-else class="text-gray-400 italic">Aucune description.</p>
       </div>
       <div v-else class="prose max-w-none mb-6">
-        <p v-if="event.debrief" class="whitespace-pre-wrap">{{ event.debrief }}</p>
+        <div v-if="event.debrief" v-html="renderMarkdown(event.debrief)"></div>
         <p v-else class="text-gray-400 italic">Aucun debrief.</p>
       </div>
 

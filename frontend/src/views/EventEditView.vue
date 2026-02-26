@@ -6,6 +6,7 @@ import { getModules } from '@/api/modules'
 import { getServers } from '@/api/servers'
 import { uploadFile } from '@/api/files'
 import { useToast } from '@/composables/useToast'
+import MarkdownEditor from '@/components/ui/MarkdownEditor.vue'
 import type { EventUpdate } from '@/types/calendar'
 import type { Module } from '@/types/module'
 import type { Server } from '@/types/api'
@@ -215,7 +216,7 @@ async function handleSubmit() {
       <!-- Description -->
       <div>
         <label class="label">Description</label>
-        <textarea v-model="form.description" class="input" rows="4" />
+        <MarkdownEditor :model-value="form.description ?? ''" @update:model-value="form.description = $event" />
       </div>
 
       <!-- Restrictions -->
@@ -281,7 +282,7 @@ async function handleSubmit() {
       <!-- Debrief (edit only) -->
       <div v-if="isEdit">
         <label class="label">Debrief</label>
-        <textarea v-model="form.debrief" class="input" rows="4" />
+        <MarkdownEditor :model-value="form.debrief ?? ''" @update:model-value="form.debrief = $event" />
       </div>
 
       <!-- Repeat -->

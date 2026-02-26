@@ -14,7 +14,7 @@ PAGES_DATA = [
     {"key": "status", "route": "status", "path": "fr/association/statuts", "title": "Les status", "enabled": True, "restriction": Page.LEVEL_ALL, "created_at": _TS1, "updated_at": _TS2},
     {"key": "guest", "route": "guest", "path": "fr/restriction/guest", "title": "Guest", "enabled": True, "restriction": Page.LEVEL_GUEST, "created_at": _TS1, "updated_at": _TS2},
     {"key": "cadet", "route": "cadet", "path": "fr/restriction/cadet", "title": "Cadet", "enabled": True, "restriction": Page.LEVEL_CADET, "created_at": _TS1, "updated_at": _TS2},
-    {"key": "member", "route": "member", "path": "fr/restriction/member", "title": "Cadet", "enabled": True, "restriction": Page.LEVEL_MEMBER, "created_at": _TS1, "updated_at": _TS2},
+    {"key": "member", "route": "member", "path": "fr/restriction/member", "title": "Member", "enabled": True, "restriction": Page.LEVEL_MEMBER, "created_at": _TS1, "updated_at": _TS2},
 ]
 
 URLS_DATA = [
