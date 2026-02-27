@@ -57,6 +57,7 @@ function getItemLink(item: MenuItem): string | null {
               :to="getItemLink(child)!"
               class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700"
             >
+              <span v-if="child.icon" class="mr-1"><i :class="child.icon" /></span>
               {{ child.label }}
             </RouterLink>
           </template>
