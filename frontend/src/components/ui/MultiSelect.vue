@@ -308,8 +308,9 @@ watch(search, () => {
               :aria-selected="isSelected(option.id)"
               class="flex items-center px-3 py-1.5 text-sm cursor-pointer"
               :class="{
-                'bg-gray-100': highlightedIndex === flatIndex(sectionIndex, groupIndex, optionIndex),
-                'font-medium': isSelected(option.id),
+                'bg-gray-100': highlightedIndex === flatIndex(sectionIndex, groupIndex, optionIndex) && !isSelected(option.id),
+                'bg-gray-50 text-gray-400': isSelected(option.id),
+                'text-gray-900': !isSelected(option.id),
               }"
               @click="toggleOption(option.id)"
               @mouseenter="highlightedIndex = flatIndex(sectionIndex, groupIndex, optionIndex)"
@@ -317,10 +318,11 @@ watch(search, () => {
               <span
                 class="w-2 h-2 rounded-full mr-2 flex-shrink-0"
                 :class="{
-                  'bg-blue-500': option.colorClass === 'module-aircraft',
-                  'bg-emerald-500': option.colorClass === 'module-helicopter',
-                  'bg-amber-500': option.colorClass === 'module-special',
-                  'bg-gray-400': !option.colorClass,
+                  'bg-gray-300': isSelected(option.id),
+                  'bg-blue-500': !isSelected(option.id) && option.colorClass === 'module-aircraft',
+                  'bg-emerald-500': !isSelected(option.id) && option.colorClass === 'module-helicopter',
+                  'bg-amber-500': !isSelected(option.id) && option.colorClass === 'module-special',
+                  'bg-gray-400': !isSelected(option.id) && !option.colorClass,
                 }"
               ></span>
               {{ option.label }}
