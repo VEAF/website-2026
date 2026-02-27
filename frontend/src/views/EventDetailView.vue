@@ -347,6 +347,7 @@ function formatShortDate(d: string) {
 
       <!-- Inscriptions fermées -->
       <div v-else-if="!event.registration" class="bg-blue-50 text-blue-700 border border-blue-200 rounded-md p-3 text-sm">
+        Les inscriptions à cet événement sont terminées. Contactez directement l'organisateur ({{ event.owner_nickname }}) pour plus de précisions.
         Les inscriptions ê0 cet événement sont terminées. Contactez directement l'organisateur ({{ event.owner_nickname }}) pour plus de précisions.
       </div>
 
