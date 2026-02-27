@@ -4,6 +4,7 @@ export interface AdminStats {
   modules: number
   users: number
   pages: number
+  urls: number
 }
 
 export async function getAdminStats(): Promise<AdminStats> {

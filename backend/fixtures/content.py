@@ -18,10 +18,10 @@ PAGES_DATA = [
 ]
 
 URLS_DATA = [
-    {"key": "test", "slug": "test", "target": "https://www.google.com", "status": True, "created_at": _TS1, "updated_at": _TS1},
-    {"key": "ot", "slug": "ot", "target": "https://tinyurl.com/veaf-opentraining", "status": True, "created_at": _TS3, "updated_at": _TS4},
-    {"key": "discord", "slug": "discord", "target": "https://tinyurl.com/veafdisc", "status": True, "created_at": _TS3, "updated_at": _TS4},
-    {"key": "fail", "slug": "fail", "target": "https://thisurldoesnotexist.com", "status": False, "created_at": _TS3, "updated_at": _TS4},
+    {"key": "facebook", "slug": "facebook", "target": "https://www.veaf.org/facebook", "delay": 0, "status": True, "created_at": _TS1, "updated_at": _TS1},
+    {"key": "discord", "slug": "discord", "target": "https://discord.com/invite/6AV2bBATUY", "delay": 5, "status": True, "created_at": _TS1, "updated_at": _TS1},
+    {"key": "teamspeak-server", "slug": "teamspeak-server", "target": "ts3server://ts.veaf.org?port=9987", "delay": 5, "status": True, "created_at": _TS1, "updated_at": _TS1},
+    {"key": "youtube", "slug": "youtube", "target": "https://www.youtube.com/channel/UCEF1A_q8Cnw9JLW_Rlig3OQ/featured", "delay": 0, "status": True, "created_at": _TS1, "updated_at": _TS1},
 ]
 
 BLOCKS_DATA = [

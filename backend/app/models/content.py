@@ -101,6 +101,7 @@ class Url(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     target: Mapped[str] = mapped_column(String(255), nullable=False)
+    delay: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     status: Mapped[bool] = mapped_column(Boolean, default=True)
