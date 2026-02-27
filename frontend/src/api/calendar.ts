@@ -1,5 +1,5 @@
 import apiClient from './client'
-import type { EventListItem, EventDetail, EventCreate, EventUpdate, VoteCreate, Vote, ChoiceCreate, Choice } from '@/types/calendar'
+import type { EventListItem, EventDetail, EventCreate, EventUpdate, VoteCreate, Vote, ChoiceCreate, Choice, TaskType } from '@/types/calendar'
 
 export async function getEvents(month?: string): Promise<EventListItem[]> {
   const params = month ? { month } : {}
@@ -51,6 +51,15 @@ export async function updateChoice(choiceId: number, choice: Partial<ChoiceCreat
   return data
 }
 
+export async function deleteChoice(choiceId: number): Promise<void> {
+  await apiClient.delete(`/calendar/choices/${choiceId}`)
+}
+
 export async function markAllViewed(): Promise<void> {
   await apiClient.post('/calendar/mark-all-viewed')
+}
+
+export async function getTasks(): Promise<TaskType[]> {
+  const { data } = await apiClient.get<TaskType[]>('/calendar/tasks')
+  return data
 }
