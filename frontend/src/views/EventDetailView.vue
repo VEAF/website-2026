@@ -194,7 +194,7 @@ function formatShortDate(d: string) {
 <template>
   <div v-if="loading" class="text-center py-12 text-gray-500">Chargement...</div>
 
-  <div v-else-if="event" class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+  <div v-else-if="event" class="page-container py-6 space-y-6">
 
     <!-- Bloc 1 : En-tête -->
     <div class="card">

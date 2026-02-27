@@ -49,7 +49,7 @@ async function handleLogout() {
 
 <template>
   <header class="bg-gray-900 text-white shadow-lg">
-    <div class="container mx-auto px-4">
+    <div class="page-container">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center space-x-2 text-white hover:text-gray-300">

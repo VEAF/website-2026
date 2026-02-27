@@ -202,7 +202,7 @@ function isLevelDisabled(moduleType: number, level: number): boolean {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto">
+  <div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Mon profil</h1>

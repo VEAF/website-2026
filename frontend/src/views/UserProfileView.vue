@@ -20,7 +20,7 @@ onMounted(async () => {
 <template>
   <div v-if="loading" class="text-center py-12 text-gray-500">Chargement...</div>
 
-  <div v-else-if="user" class="max-w-2xl mx-auto">
+  <div v-else-if="user">
     <div class="card">
       <h1 class="text-2xl font-bold mb-4">{{ user.nickname }}</h1>
 

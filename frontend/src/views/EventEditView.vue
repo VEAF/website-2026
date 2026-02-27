@@ -177,7 +177,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6">
+  <div class="page-container py-6">
     <h1 class="text-2xl font-bold mb-6">{{ isEdit ? "Modifier l'événement" : 'Créer un événement' }}</h1>
 
     <form @submit.prevent="handleSubmit" class="card space-y-4">
