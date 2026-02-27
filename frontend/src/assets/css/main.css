@@ -53,6 +53,17 @@
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
+
+  /* Module type color badges — used in MultiSelect tags and dropdown */
+  .module-aircraft {
+    @apply bg-blue-100 text-blue-800;
+  }
+  .module-helicopter {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+  .module-special {
+    @apply bg-amber-100 text-amber-800;
+  }
 }
 
 /* Toast notification overrides */
