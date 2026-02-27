@@ -14,19 +14,15 @@ const loading = ref(false)
 const saving = ref(false)
 const hasChanges = ref(false)
 
-const [rootRef, rootItems, updateConfig] = useDragAndDrop<AdminMenuItemTree>([], {
-  group: 'menu-tree',
-  dragHandle: '.drag-handle',
-  draggingClass: 'opacity-50',
-  dropZoneClass: 'bg-veaf-50',
-})
-
 function onChanged() {
   hasChanges.value = true
 }
 
-// Watch root items changes via the drag-and-drop library's onSort/onTransfer
-updateConfig({
+const [rootRef, rootItems] = useDragAndDrop<AdminMenuItemTree>([], {
+  group: 'menu-tree',
+  dragHandle: '.drag-handle',
+  draggingClass: 'opacity-50',
+  dropZoneClass: 'bg-veaf-50',
   onSort: () => {
     hasChanges.value = true
   },
@@ -112,8 +108,8 @@ onMounted(loadTree)
       Aucun élément de menu
     </div>
 
-    <!-- Tree -->
-    <div v-else ref="rootRef" class="space-y-1">
+    <!-- Tree (always mounted to keep drag-and-drop parent element stable) -->
+    <div v-show="!loading && rootItems.length" ref="rootRef" class="space-y-1">
       <MenuTreeNode
         v-for="item in rootItems"
         :key="item.id"
