@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { dragAndDrop } from '@formkit/drag-and-drop/vue'
+import { tearDown } from '@formkit/drag-and-drop'
 import type { AdminMenuItemTree } from '@/types/api'
 
 const props = defineProps<{
@@ -38,18 +39,6 @@ const childrenRef = ref<HTMLElement>()
 const children = ref<AdminMenuItemTree[]>([...props.item.items])
 const expanded = ref(true)
 
-watch(
-  () => props.item.items,
-  (newItems) => {
-    children.value = [...newItems]
-  },
-)
-
-watch(children, () => {
-  props.item.items = children.value
-  emit('changed')
-}, { deep: false })
-
 onMounted(async () => {
   if (props.item.type === TYPE_MENU && childrenRef.value) {
     await nextTick()
@@ -60,7 +49,21 @@ onMounted(async () => {
       dragHandle: '.drag-handle',
       draggingClass: 'opacity-50',
       dropZoneClass: 'bg-veaf-50',
+      onSort: () => {
+        props.item.items = children.value
+        emit('changed')
+      },
+      onTransfer: () => {
+        props.item.items = children.value
+        emit('changed')
+      },
     })
+  }
+})
+
+onUnmounted(() => {
+  if (childrenRef.value) {
+    tearDown(childrenRef.value)
   }
 })
 </script>
