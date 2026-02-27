@@ -55,7 +55,7 @@ onMounted(async () => {
       </RouterLink>
       <RouterLink to="/admin/menu" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-bars text-2xl"></i></div>
-        <div class="text-3xl font-bold text-veaf-600 mb-2">-</div>
+        <div class="text-3xl font-bold text-veaf-600 mb-2">{{ stats?.menu_items ?? '-' }}</div>
         <div class="text-sm text-gray-600">Menu</div>
       </RouterLink>
     </div>

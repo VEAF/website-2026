@@ -99,6 +99,20 @@ class PageBlockFactory(factory.Factory):
     enabled = True
 
 
+class MenuItemFactory(factory.Factory):
+    class Meta:
+        model = MenuItem
+
+    label = factory.Sequence(lambda n: f"Menu Item {n}")
+    type = MenuItem.TYPE_LINK
+    icon = None
+    theme_classes = None
+    enabled = True
+    position = factory.Sequence(lambda n: n + 1)
+    link = factory.Sequence(lambda n: f"https://example.com/{n}")
+    restriction = MenuItem.LEVEL_ALL
+
+
 class UrlFactory(factory.Factory):
     class Meta:
         model = Url

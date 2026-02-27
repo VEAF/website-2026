@@ -95,6 +95,94 @@ class MenuItemOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# --- Admin Menu Item schemas ---
+
+
+class AdminMenuItemOut(BaseModel):
+    id: int
+    label: str | None = None
+    type: int
+    type_as_string: str | None = None
+    icon: str | None = None
+    theme_classes: str | None = None
+    enabled: bool
+    position: int | None = None
+    link: str | None = None
+    restriction: int
+    menu_id: int | None = None
+    menu_label: str | None = None
+    url_id: int | None = None
+    url_slug: str | None = None
+    page_id: int | None = None
+    page_title: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class AdminMenuItemListOut(BaseModel):
+    items: list[AdminMenuItemOut]
+    total: int
+
+
+class AdminMenuItemTreeOut(BaseModel):
+    id: int
+    label: str | None = None
+    type: int
+    type_as_string: str | None = None
+    icon: str | None = None
+    theme_classes: str | None = None
+    enabled: bool
+    position: int | None = None
+    link: str | None = None
+    restriction: int
+    menu_id: int | None = None
+    url_id: int | None = None
+    url_slug: str | None = None
+    page_id: int | None = None
+    page_title: str | None = None
+    items: list["AdminMenuItemTreeOut"] = Field(default_factory=list)
+
+    model_config = {"from_attributes": True}
+
+
+class MenuItemCreate(BaseModel):
+    label: str | None = None
+    type: int
+    icon: str | None = None
+    theme_classes: str | None = None
+    enabled: bool = False
+    position: int | None = None
+    link: str | None = None
+    restriction: int = 0
+    menu_id: int | None = None
+    url_id: int | None = None
+    page_id: int | None = None
+
+
+class MenuItemUpdate(BaseModel):
+    label: str | None = None
+    type: int
+    icon: str | None = None
+    theme_classes: str | None = None
+    enabled: bool
+    position: int | None = None
+    link: str | None = None
+    restriction: int
+    menu_id: int | None = None
+    url_id: int | None = None
+    page_id: int | None = None
+
+
+class MenuItemReorderEntry(BaseModel):
+    id: int
+    menu_id: int | None = None
+    position: int
+
+
+class MenuItemReorderRequest(BaseModel):
+    items: list[MenuItemReorderEntry] = Field(default_factory=list)
+
+
 class FileOut(BaseModel):
     id: int
     uuid: str

@@ -19,6 +19,85 @@ export interface MenuItem {
   items: MenuItem[]
 }
 
+// --- Admin MenuItem types ---
+
+export interface AdminMenuItem {
+  id: number
+  label: string | null
+  type: number
+  type_as_string: string | null
+  icon: string | null
+  theme_classes: string | null
+  enabled: boolean
+  position: number | null
+  link: string | null
+  restriction: number
+  menu_id: number | null
+  menu_label: string | null
+  url_id: number | null
+  url_slug: string | null
+  page_id: number | null
+  page_title: string | null
+}
+
+export interface AdminMenuItemListResponse {
+  items: AdminMenuItem[]
+  total: number
+}
+
+export interface AdminMenuItemTree {
+  id: number
+  label: string | null
+  type: number
+  type_as_string: string | null
+  icon: string | null
+  theme_classes: string | null
+  enabled: boolean
+  position: number | null
+  link: string | null
+  restriction: number
+  menu_id: number | null
+  url_id: number | null
+  url_slug: string | null
+  page_id: number | null
+  page_title: string | null
+  items: AdminMenuItemTree[]
+}
+
+export interface MenuItemCreate {
+  label: string | null
+  type: number
+  icon: string | null
+  theme_classes: string | null
+  enabled: boolean
+  position: number | null
+  link: string | null
+  restriction: number
+  menu_id: number | null
+  url_id: number | null
+  page_id: number | null
+}
+
+export interface MenuItemUpdate {
+  label: string | null
+  type: number
+  icon: string | null
+  theme_classes: string | null
+  enabled: boolean
+  position: number | null
+  link: string | null
+  restriction: number
+  menu_id: number | null
+  url_id: number | null
+  page_id: number | null
+}
+
+export interface MenuItemReorderEntry {
+  id: number
+  menu_id: number | null
+  position: number
+}
+
 export interface Page {
   id: number
   route: string
