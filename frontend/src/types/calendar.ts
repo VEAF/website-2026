@@ -1,3 +1,9 @@
+export interface TaskType {
+  value: number
+  label: string
+  icon: string
+}
+
 export interface Vote {
   id: number
   user_id: number
@@ -13,6 +19,7 @@ export interface Choice {
   user_nickname: string | null
   module_id: number
   module_name: string | null
+  module_type: number | null
   task: number | null
   task_as_string: string | null
   priority: number

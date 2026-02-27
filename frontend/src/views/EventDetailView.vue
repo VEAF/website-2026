@@ -2,10 +2,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { getEvent, voteEvent, deleteEvent, copyEvent } from '@/api/calendar'
+import { getEvent, voteEvent, deleteEvent, copyEvent, addChoice, updateChoice, deleteChoice } from '@/api/calendar'
 import type { EventDetail, Choice } from '@/types/calendar'
 import { useConfirm } from '@/composables/useConfirm'
 import { renderMarkdown } from '@/composables/useMarkdown'
+import ChoiceModal from '@/components/ui/ChoiceModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,6 +19,11 @@ const showAllChoices = ref(false)
 const { confirm } = useConfirm()
 const id = Number(route.params.id)
 
+// Choice modal state
+const choiceModalVisible = ref(false)
+const choiceModalPriority = ref(1)
+const choiceModalChoice = ref<Choice | null>(null)
+
 onMounted(async () => {
   try {
     event.value = await getEvent(id)
@@ -25,6 +31,7 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
 
 const canEdit = computed(() => {
   if (!auth.user || !event.value) return false
@@ -57,6 +64,33 @@ const isFinished = computed(() => {
   return new Date(event.value.end_date).getTime() < Date.now()
 })
 
+const canVote = computed(() => {
+  if (!event.value || !auth.user) return { allowed: false, reason: '' }
+  const e = event.value
+  const u = auth.user
+
+  if (!e.registration || isFinished.value) return { allowed: false, reason: '' }
+
+  const isAdmin = u.roles.includes('ROLE_ADMIN')
+  const isMember = (u.status >= 2 && u.status <= 8) || isAdmin
+  const isCadet = u.status === 1
+
+  if (e.restrictions.includes(2) && !isMember) {
+    return { allowed: false, reason: 'Cet événement est réservé aux membres.' }
+  }
+  if (e.restrictions.includes(1) && !(isCadet || isMember)) {
+    return { allowed: false, reason: 'Cet événement est réservé aux cadets et membres.' }
+  }
+  if (e.sim_dcs && !u.sim_dcs) {
+    return { allowed: false, reason: 'Vous devez posséder le simulateur DCS pour participer.' }
+  }
+  if (e.sim_bms && !u.sim_bms) {
+    return { allowed: false, reason: 'Vous devez posséder le simulateur BMS pour participer.' }
+  }
+
+  return { allowed: true, reason: '' }
+})
+
 const votesYes = computed(() => event.value?.votes.filter(v => v.vote === true) ?? [])
 const votesMaybe = computed(() => event.value?.votes.filter(v => v.vote === null) ?? [])
 const votesNo = computed(() => event.value?.votes.filter(v => v.vote === false) ?? [])
@@ -86,6 +120,12 @@ const usersChoicesMap = computed(() => {
   return map
 })
 
+function moduleTypeIcon(moduleType: number | null): string {
+  if (moduleType === 3) return 'fa-solid fa-helicopter'
+  if (moduleType === 4) return 'fa-solid fa-gear'
+  return 'fa-solid fa-plane'
+}
+
 const imageUrl = computed(() => {
   if (!event.value?.image_uuid) return null
   return `/api/files/${event.value.image_uuid}`
@@ -109,12 +149,45 @@ async function handleDelete() {
   router.push('/calendar')
 }
 
+function openChoiceModal(priority: number) {
+  choiceModalPriority.value = priority
+  choiceModalChoice.value = userChoices.value[priority] ?? null
+  choiceModalVisible.value = true
+}
+
+async function handleChoiceSave(data: { module_id: number; task: number; comment: string }) {
+  if (!event.value) return
+  if (choiceModalChoice.value) {
+    await updateChoice(choiceModalChoice.value.id, data)
+  } else {
+    await addChoice(event.value.id, {
+      module_id: data.module_id,
+      task: data.task,
+      priority: choiceModalPriority.value,
+      comment: data.comment,
+    })
+  }
+  event.value = await getEvent(id)
+  choiceModalVisible.value = false
+}
+
+async function handleChoiceDelete(choiceId: number) {
+  if (!event.value) return
+  await deleteChoice(choiceId)
+  event.value = await getEvent(id)
+  choiceModalVisible.value = false
+}
+
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 function formatTime(d: string) {
   return new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatShortDate(d: string) {
+  return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 </script>
 
@@ -129,10 +202,10 @@ function formatTime(d: string) {
         <div>
           <h1 class="text-2xl font-bold">
             <i class="fa-solid fa-circle text-sm mr-2" :style="{ color: event.type_color || '#999' }"></i>
-            {{ event.type_as_string }} — {{ event.title }}
+            {{ event.type_as_string }} = {{ event.title }}
           </h1>
           <div class="mt-2 text-sm text-gray-600">
-            Le {{ formatDate(event.start_date) }} à {{ formatTime(event.end_date) }}
+            Le {{ formatDate(event.start_date) }} ê0 {{ formatTime(event.end_date) }}
             <span
               v-if="eventStatus"
               class="text-xs font-medium px-2 py-0.5 rounded-full ml-2"
@@ -140,7 +213,7 @@ function formatTime(d: string) {
             >
               {{ eventStatus.text }}
             </span>
-            <span v-if="event.repeat_event !== 0" class="ml-2 text-gray-400" title="Événement récurrent">
+            <span v-if="event.repeat_event !== 0" class="ml-2 text-gray-400" title="\u00c9vénement récurrent">
               <i class="fa-solid fa-clock"></i>
             </span>
           </div>
@@ -255,7 +328,7 @@ function formatTime(d: string) {
             <td class="py-2">
               <template v-for="(s, idx) in f.slots" :key="s.id">
                 <span v-if="idx > 0">, </span>
-                <span>{{ s.user_nickname || s.username || '— vide —' }}</span>
+                <span>{{ s.user_nickname || s.username || '= vide =' }}</span>
               </template>
             </td>
           </tr>
@@ -267,7 +340,7 @@ function formatTime(d: string) {
     <div class="card">
       <h2 class="text-lg font-semibold mb-4">Je participe</h2>
 
-      <!-- Événement terminé -->
+      <!-- Evénement terminé -->
       <div v-if="isFinished" class="bg-blue-50 text-blue-700 border border-blue-200 rounded-md p-3 text-sm">
         Cet événement est maintenant terminé, vous ne pouvez plus participer.
       </div>
@@ -277,35 +350,43 @@ function formatTime(d: string) {
         Les inscriptions à cet événement sont terminées. Contactez directement l'organisateur ({{ event.owner_nickname }}) pour plus de précisions.
       </div>
 
-      <!-- Boutons de vote (user authentifié) -->
-      <div v-else-if="auth.isAuthenticated" class="grid grid-cols-3 gap-3">
-        <button
-          @click="handleVote(true)"
-          class="py-2 rounded-md font-medium text-sm transition-colors text-center"
-          :class="userVote?.vote === true
-            ? 'bg-green-600 text-white hover:bg-green-700'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-        >
-          Oui
-        </button>
-        <button
-          @click="handleVote(null)"
-          class="py-2 rounded-md font-medium text-sm transition-colors text-center"
-          :class="userVote !== undefined && userVote.vote === null
-            ? 'bg-veaf-600 text-white hover:bg-veaf-700'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-        >
-          Peut-être
-        </button>
-        <button
-          @click="handleVote(false)"
-          class="py-2 rounded-md font-medium text-sm transition-colors text-center"
-          :class="userVote?.vote === false
-            ? 'bg-red-600 text-white hover:bg-red-700'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-        >
-          Non
-        </button>
+      <!-- Restrictions non respectées -->
+      <div v-else-if="auth.isAuthenticated && !canVote.allowed" class="bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-md p-3 text-sm">
+        <i class="fa-solid fa-lock mr-1"></i>
+        {{ canVote.reason }}
+      </div>
+
+      <!-- Boutons de vote (user authentifié + autorisé) -->
+      <div v-else-if="auth.isAuthenticated && canVote.allowed">
+        <div class="grid grid-cols-3 gap-3">
+          <button
+            @click="handleVote(true)"
+            class="py-2 rounded-md font-medium text-sm transition-colors text-center"
+            :class="userVote?.vote === true
+              ? 'bg-green-600 text-white hover:bg-green-700'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          >
+            Oui
+          </button>
+          <button
+            @click="handleVote(null)"
+            class="py-2 rounded-md font-medium text-sm transition-colors text-center"
+            :class="userVote !== undefined && userVote.vote === null
+              ? 'bg-veaf-600 text-white hover:bg-veaf-700'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          >
+            Peut-être
+          </button>
+          <button
+            @click="handleVote(false)"
+            class="py-2 rounded-md font-medium text-sm transition-colors text-center"
+            :class="userVote?.vote === false
+              ? 'bg-red-600 text-white hover:bg-red-700'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          >
+            Non
+          </button>
+        </div>
       </div>
 
       <!-- Non connecté -->
@@ -318,12 +399,13 @@ function formatTime(d: string) {
         v-if="auth.isAuthenticated && userVote && userVote.vote !== false && !isFinished"
         class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6"
       >
-        <div v-for="n in [1, 2, 3]" :key="n" class="bg-gray-800 text-white rounded-lg p-4">
+        <div v-for="n in [1, 2, 3]" :key="n" class="bg-gray-800 text-white rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors" @click="openChoiceModal(n)">
           <div class="flex items-center justify-between mb-3">
             <span class="font-medium">Choix {{ n }}</span>
+            <i class="fa-solid fa-pen-to-square text-gray-400"></i>
           </div>
           <div v-if="userChoices[n]" class="flex items-center justify-between">
-            <i class="fa-solid fa-plane text-3xl"></i>
+            <i :class="moduleTypeIcon(userChoices[n]!.module_type)" class="text-3xl"></i>
             <div class="text-right">
               <div class="font-medium">{{ userChoices[n]!.module_name }}</div>
               <div class="text-sm text-gray-300">{{ userChoices[n]!.task_as_string }}</div>
@@ -351,26 +433,35 @@ function formatTime(d: string) {
           <span class="text-green-600 font-medium">Oui</span> :
           <template v-for="(v, idx) in votesYes" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>{{ v.user_nickname }}</span>
+            <span>
+              {{ v.user_nickname }}
+              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
+            </span>
           </template>
         </div>
         <div>
           <span class="text-gray-500 font-medium">Peut-être</span> :
           <template v-for="(v, idx) in votesMaybe" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>{{ v.user_nickname }}</span>
+            <span>
+              {{ v.user_nickname }}
+              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
+            </span>
           </template>
         </div>
         <div>
           <span class="text-red-600 font-medium">Non</span> :
           <template v-for="(v, idx) in votesNo" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>{{ v.user_nickname }}</span>
+            <span>
+              {{ v.user_nickname }}
+              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
+            </span>
           </template>
         </div>
       </div>
 
-      <!-- "voir plus" — tableau extensible des choix par joueur -->
+      <!-- "voir plus" = tableau extensible des choix par joueur -->
       <div>
         <button
           @click="showAllChoices = !showAllChoices"
@@ -400,6 +491,8 @@ function formatTime(d: string) {
               <td class="py-2">
                 {{ v.user_nickname }}
                 <i v-if="v.vote === null" class="fa-solid fa-exclamation-circle text-yellow-500 ml-1" title="peut-être absent"></i>
+                <i v-if="v.comment" class="fa-solid fa-comment text-gray-400 ml-1" :title="v.comment"></i>
+                <span v-if="v.created_at" class="text-xs text-gray-400 ml-1">{{ formatShortDate(v.created_at) }}</span>
               </td>
               <template v-for="n in [1, 2, 3]" :key="n">
                 <template v-if="usersChoicesMap.get(v.user_id)?.[n]">
@@ -420,6 +513,17 @@ function formatTime(d: string) {
         </table>
       </div>
     </div>
+
+    <!-- Choice Modal -->
+    <ChoiceModal
+      :visible="choiceModalVisible"
+      :priority="choiceModalPriority"
+      :choice="choiceModalChoice"
+      :event-module-ids="event?.module_ids ?? []"
+      @close="choiceModalVisible = false"
+      @save="handleChoiceSave"
+      @delete="handleChoiceDelete"
+    />
 
   </div>
 </template>

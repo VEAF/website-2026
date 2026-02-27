@@ -21,11 +21,18 @@ from app.schemas.calendar import (
     EventUpdate,
     FlightOut,
     SlotOut,
+    TaskOut,
     VoteCreate,
     VoteOut,
 )
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
+
+
+@router.get("/tasks", response_model=list[TaskOut])
+async def list_tasks():
+    return [TaskOut(value=value, label=label, icon=Choice.TASK_ICONS[value]) for value, label in Choice.TASKS.items()]
+
 
 
 @router.get("/events", response_model=list[EventListOut])
@@ -164,6 +171,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
             ChoiceOut(
                 id=c.id, user_id=c.user_id, user_nickname=c.user.nickname,
                 module_id=c.module_id, module_name=c.module.name if c.module else None,
+                module_type=c.module.type if c.module else None,
                 task=c.task, task_as_string=c.task_as_string, priority=c.priority, comment=c.comment,
             )
             for c in event.choices
@@ -364,6 +372,7 @@ async def add_choice(event_id: int, data: ChoiceCreate, user: User = Depends(get
     return ChoiceOut(
         id=choice.id, user_id=choice.user_id, user_nickname=user.nickname,
         module_id=choice.module_id, module_name=choice.module.name if choice.module else None,
+        module_type=choice.module.type if choice.module else None,
         task=choice.task, task_as_string=choice.task_as_string, priority=choice.priority, comment=choice.comment,
     )
 
@@ -396,8 +405,30 @@ async def update_choice(choice_id: int, data: ChoiceUpdate, user: User = Depends
     return ChoiceOut(
         id=choice.id, user_id=choice.user_id, user_nickname=user.nickname,
         module_id=choice.module_id, module_name=choice.module.name if choice.module else None,
+        module_type=choice.module.type if choice.module else None,
         task=choice.task, task_as_string=choice.task_as_string, priority=choice.priority, comment=choice.comment,
     )
+
+
+@router.delete("/choices/{choice_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_choice(
+    choice_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Choice).where(Choice.id == choice_id))
+    choice = result.scalar_one_or_none()
+    if choice is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if choice.user_id != user.id and not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    event = await db.get(CalendarEvent, choice.event_id)
+    if event and not can_choose_event(user, event):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    await db.delete(choice)
+    await db.commit()
 
 
 @router.post("/mark-all-viewed")

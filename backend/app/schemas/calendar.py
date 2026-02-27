@@ -3,6 +3,12 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
+class TaskOut(BaseModel):
+    value: int
+    label: str
+    icon: str
+
+
 class VoteOut(BaseModel):
     id: int
     user_id: int
@@ -20,6 +26,7 @@ class ChoiceOut(BaseModel):
     user_nickname: str | None = None
     module_id: int
     module_name: str | None = None
+    module_type: int | None = None
     task: int | None = None
     task_as_string: str | None = None
     priority: int
@@ -111,7 +118,7 @@ class EventUpdate(EventCreate):
 
 class VoteCreate(BaseModel):
     vote: bool | None = None  # True=yes, False=no, None=maybe
-    comment: str | None = None
+    comment: str | None = None  # Deprecated: no longer used in the UI
 
 
 class ChoiceCreate(BaseModel):

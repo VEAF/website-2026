@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import * as calendarApi from '@/api/calendar'
-import type { EventListItem } from '@/types/calendar'
+import type { EventListItem, TaskType } from '@/types/calendar'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const events = ref<EventListItem[]>([])
   const currentMonth = ref('')
   const myEvents = ref<EventListItem[]>([])
+  const tasks = ref<TaskType[]>([])
+
+  async function fetchTasks() {
+    if (tasks.value.length > 0) return
+    tasks.value = await calendarApi.getTasks()
+  }
 
   async function fetchEvents(month: string) {
     currentMonth.value = month
@@ -21,5 +27,5 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
-  return { events, currentMonth, myEvents, fetchEvents, fetchMyEvents }
+  return { events, currentMonth, myEvents, tasks, fetchEvents, fetchMyEvents, fetchTasks }
 })

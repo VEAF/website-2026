@@ -171,6 +171,15 @@ class Choice(Base):
         TASK_TRANSPORT: "Transport",
     }
 
+    TASK_ICONS = {
+        TASK_UNDEFINED: "fa-solid fa-question",
+        TASK_CAP: "fa-solid fa-shield-halved",
+        TASK_CAS: "fa-solid fa-crosshairs",
+        TASK_SEAD: "fa-solid fa-bolt",
+        TASK_ESCORT: "fa-solid fa-jet-fighter",
+        TASK_TRANSPORT: "fa-solid fa-truck-plane",
+    }
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     task: Mapped[int | None] = mapped_column(Integer, nullable=True)
     priority: Mapped[int] = mapped_column(Integer, default=1)
@@ -198,7 +207,7 @@ class Vote(Base):
     created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     vote: Mapped[bool | None] = mapped_column(Boolean, nullable=True)  # True=yes, False=no, None=maybe
-    comment: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    comment: Mapped[str | None] = mapped_column(String(255), nullable=True)  # Deprecated: no longer used in the UI
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey("calendar_event.id"), nullable=False)
