@@ -4,9 +4,11 @@ import { useDragAndDrop } from '@formkit/drag-and-drop/vue'
 import { getAdminMenuTree, reorderAdminMenuItems } from '@/api/menu'
 import type { AdminMenuItemTree, MenuItemReorderEntry } from '@/types/api'
 import { useToast } from '@/composables/useToast'
+import { useMenuStore } from '@/stores/menu'
 import MenuTreeNode from '@/components/admin/MenuTreeNode.vue'
 
 const toast = useToast()
+const menuStore = useMenuStore()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -68,6 +70,7 @@ async function saveOrder() {
     const updatedTree = await reorderAdminMenuItems(entries)
     rootItems.value = updatedTree
     hasChanges.value = false
+    await menuStore.fetchMenu()
     toast.success('Ordre du menu mis à jour')
   } catch (e) {
     toast.error(e)
