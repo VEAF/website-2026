@@ -115,8 +115,28 @@ class UrlOut(BaseModel):
     id: int
     slug: str
     target: str
+    delay: int
     status: bool
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
+
+
+class UrlCreate(BaseModel):
+    slug: str
+    target: str
+    delay: int = 0
+    status: bool = True
+
+
+class UrlUpdate(BaseModel):
+    slug: str
+    target: str
+    delay: int
+    status: bool
+
+
+class AdminUrlListOut(BaseModel):
+    items: list[UrlOut]
+    total: int

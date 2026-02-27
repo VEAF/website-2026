@@ -99,6 +99,18 @@ class PageBlockFactory(factory.Factory):
     enabled = True
 
 
+class UrlFactory(factory.Factory):
+    class Meta:
+        model = Url
+
+    slug = factory.Sequence(lambda n: f"url-{n}")
+    target = factory.Sequence(lambda n: f"https://example.com/{n}")
+    delay = 0
+    status = True
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
 class EventFactory(factory.Factory):
     class Meta:
         model = CalendarEvent

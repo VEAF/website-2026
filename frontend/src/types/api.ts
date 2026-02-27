@@ -207,6 +207,37 @@ export interface DcsBotServerDetailPage {
   attendance: DcsBotAttendance | null
 }
 
+// --- URL types ---
+
+export interface Url {
+  id: number
+  slug: string
+  target: string
+  delay: number
+  status: boolean
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface UrlCreate {
+  slug: string
+  target: string
+  delay: number
+  status: boolean
+}
+
+export interface UrlUpdate {
+  slug: string
+  target: string
+  delay: number
+  status: boolean
+}
+
+export interface AdminUrlListResponse {
+  items: Url[]
+  total: number
+}
+
 export interface HeaderData {
   connected_players: number
   next_events_count: number
