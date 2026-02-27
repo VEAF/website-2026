@@ -2,6 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAdminPages, createAdminPage, updateAdminPage, deleteAdminPage } from '@/api/pages'
+import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
 import type { Page } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
@@ -208,7 +209,7 @@ onMounted(loadPages)
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">Gestion des pages</h1>
+    <AdminBreadcrumb />
 
     <!-- Search & Filters -->
     <div class="flex flex-wrap gap-4 mb-4">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { getAdminUrls, createAdminUrl, updateAdminUrl, deleteAdminUrl } from '@/api/urls'
+import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
 import type { Url } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
@@ -144,7 +145,7 @@ onMounted(loadUrls)
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">Gestion des URLs</h1>
+    <AdminBreadcrumb />
 
     <!-- Search & Filters -->
     <div class="flex flex-wrap gap-4 mb-4">

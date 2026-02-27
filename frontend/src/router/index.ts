@@ -117,61 +117,132 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('@/views/admin/DashboardView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Dashboard' },
+        ],
+      },
     },
     {
       path: '/admin/users',
       name: 'admin-users',
       component: () => import('@/views/admin/UsersView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Utilisateurs' },
+        ],
+      },
     },
     {
       path: '/admin/modules',
       name: 'admin-modules',
       component: () => import('@/views/admin/ModulesView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Modules' },
+        ],
+      },
     },
     {
       path: '/admin/calendar',
       name: 'admin-calendar',
       component: () => import('@/views/admin/CalendarAdminView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Calendrier' },
+        ],
+      },
     },
     {
       path: '/admin/pages',
       name: 'admin-pages',
       component: () => import('@/views/admin/PagesView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Pages' },
+        ],
+      },
     },
     {
       path: '/admin/pages/:id',
       name: 'admin-page-detail',
       component: () => import('@/views/admin/PageDetailView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Pages', to: 'admin-pages' },
+          { label: '' },
+        ],
+      },
     },
     {
       path: '/admin/files',
       name: 'admin-files',
       component: () => import('@/views/admin/FilesView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Fichiers' },
+        ],
+      },
     },
     {
       path: '/admin/servers',
       name: 'admin-servers',
       component: () => import('@/views/admin/ServersView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Serveurs' },
+        ],
+      },
     },
     {
       path: '/admin/urls',
       name: 'admin-urls',
       component: () => import('@/views/admin/UrlsView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'URLs' },
+        ],
+      },
     },
     {
       path: '/admin/menu',
       name: 'admin-menu',
       component: () => import('@/views/admin/MenuView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Menu' },
+        ],
+      },
     },
     // Redirect old /pages/ URLs
     {
