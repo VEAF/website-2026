@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import { useDragAndDrop } from '@formkit/drag-and-drop/vue'
 import { getAdminMenuTree, reorderAdminMenuItems } from '@/api/menu'
 import type { AdminMenuItemTree, MenuItemReorderEntry } from '@/types/api'
@@ -50,6 +50,11 @@ async function loadTree() {
   loading.value = true
   try {
     const tree = await getAdminMenuTree()
+    // Clear then reassign after nextTick so the MutationObserver
+    // sees a clean DOM transition (0 → N nodes) instead of
+    // partial swaps that desync node count vs values count.
+    rootItems.value = []
+    await nextTick()
     rootItems.value = tree
     hasChanges.value = false
   } catch (e) {
@@ -64,6 +69,8 @@ async function saveOrder() {
   try {
     const entries = flattenTree(rootItems.value)
     const updatedTree = await reorderAdminMenuItems(entries)
+    rootItems.value = []
+    await nextTick()
     rootItems.value = updatedTree
     hasChanges.value = false
     await menuStore.fetchMenu()
