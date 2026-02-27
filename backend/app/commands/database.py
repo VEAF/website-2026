@@ -2,7 +2,7 @@ import asyncio
 
 import typer
 
-database_app = typer.Typer(help="Database management commands")
+database_app = typer.Typer(help="Database management commands", no_args_is_help=True)
 
 
 async def _drop_tables() -> None:
