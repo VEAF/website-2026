@@ -7,6 +7,8 @@ import { getServers } from '@/api/servers'
 import { uploadFile } from '@/api/files'
 import { useToast } from '@/composables/useToast'
 import MarkdownEditor from '@/components/ui/MarkdownEditor.vue'
+import MultiSelect from '@/components/ui/MultiSelect.vue'
+import type { MultiSelectOption } from '@/components/ui/MultiSelect.vue'
 import type { EventUpdate } from '@/types/calendar'
 import type { Module } from '@/types/module'
 import type { Server } from '@/types/api'
@@ -58,6 +60,22 @@ const repeatOptions = [
 const maps = ref<Module[]>([])
 const aircraftModules = ref<Module[]>([])
 const servers = ref<Server[]>([])
+
+const MODULE_TYPE_COLORS: Record<number, string> = {
+  2: 'module-aircraft',
+  3: 'module-helicopter',
+  4: 'module-special',
+}
+
+const moduleOptions = computed((): MultiSelectOption[] =>
+  aircraftModules.value.map(m => ({
+    id: m.id,
+    label: m.name,
+    section: m.period_as_string || 'Autre',
+    group: m.type_as_string ?? '',
+    colorClass: MODULE_TYPE_COLORS[m.type],
+  }))
+)
 
 // Image state
 const imageUploading = ref(false)
@@ -247,12 +265,13 @@ async function handleSubmit() {
       <!-- Modules -->
       <div v-if="aircraftModules.length">
         <label class="label">Modules</label>
-        <div class="flex flex-wrap gap-3 mt-1">
-          <label v-for="m in aircraftModules" :key="m.id" class="flex items-center space-x-1">
-            <input type="checkbox" :value="m.id" v-model="form.module_ids" class="rounded" />
-            <span class="text-sm">{{ m.name }}</span>
-          </label>
-        </div>
+        <MultiSelect
+          :model-value="form.module_ids ?? []"
+          @update:model-value="form.module_ids = $event"
+          :options="moduleOptions"
+          placeholder="Rechercher un module..."
+          no-results-text="Aucun module trouvé"
+        />
       </div>
 
       <!-- Image -->
