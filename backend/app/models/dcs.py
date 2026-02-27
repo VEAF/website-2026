@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Boolean
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -11,9 +11,7 @@ class Server(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
-    code: Mapped[str] = mapped_column(String(64), nullable=False)
-    atc: Mapped[bool] = mapped_column(Boolean, default=False)
-    gci: Mapped[bool] = mapped_column(Boolean, default=False)
+    code: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
 
 
 class Player(Base):

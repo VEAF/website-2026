@@ -7,10 +7,23 @@ class ServerOut(BaseModel):
     id: int
     name: str
     code: str
-    atc: bool
-    gci: bool
 
     model_config = {"from_attributes": True}
+
+
+class ServerCreate(BaseModel):
+    name: str
+    code: str
+
+
+class ServerUpdate(BaseModel):
+    name: str
+    code: str
+
+
+class AdminServerListOut(BaseModel):
+    items: list[ServerOut]
+    total: int
 
 
 # --- DCSServerBot API response schemas ---

@@ -6,6 +6,7 @@ export interface AdminStats {
   pages: number
   urls: number
   menu_items: number
+  servers: number
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
