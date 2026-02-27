@@ -72,8 +72,6 @@ class ServerFactory(factory.Factory):
 
     name = factory.Sequence(lambda n: f"Server {n}")
     code = factory.Sequence(lambda n: f"srv{n}")
-    atc = False
-    gci = False
 
 
 class PageFactory(factory.Factory):

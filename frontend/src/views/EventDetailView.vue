@@ -205,7 +205,7 @@ function formatShortDate(d: string) {
             {{ event.type_as_string }} = {{ event.title }}
           </h1>
           <div class="mt-2 text-sm text-gray-600">
-            Le {{ formatDate(event.start_date) }} ê0 {{ formatTime(event.end_date) }}
+            Le {{ formatDate(event.start_date) }} à {{ formatTime(event.end_date) }}
             <span
               v-if="eventStatus"
               class="text-xs font-medium px-2 py-0.5 rounded-full ml-2"
@@ -213,7 +213,7 @@ function formatShortDate(d: string) {
             >
               {{ eventStatus.text }}
             </span>
-            <span v-if="event.repeat_event !== 0" class="ml-2 text-gray-400" title="\u00c9vénement récurrent">
+            <span v-if="event.repeat_event !== 0" class="ml-2 text-gray-400" title="événement récurrent">
               <i class="fa-solid fa-clock"></i>
             </span>
           </div>

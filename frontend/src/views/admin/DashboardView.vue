@@ -45,7 +45,7 @@ onMounted(async () => {
       </RouterLink>
       <RouterLink to="/admin/servers" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-server text-2xl"></i></div>
-        <div class="text-3xl font-bold text-veaf-600 mb-2">-</div>
+        <div class="text-3xl font-bold text-veaf-600 mb-2">{{ stats?.servers ?? '-' }}</div>
         <div class="text-sm text-gray-600">Serveurs</div>
       </RouterLink>
       <RouterLink to="/admin/urls" class="card text-center hover:shadow-md transition-shadow">

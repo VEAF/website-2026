@@ -157,8 +157,21 @@ export interface Server {
   id: number
   name: string
   code: string
-  atc: boolean
-  gci: boolean
+}
+
+export interface ServerCreate {
+  name: string
+  code: string
+}
+
+export interface ServerUpdate {
+  name: string
+  code: string
+}
+
+export interface AdminServerListResponse {
+  items: Server[]
+  total: number
 }
 
 // DCSServerBot types
