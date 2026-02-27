@@ -1,5 +1,5 @@
 <template>
-  <section class="max-w-7xl mx-auto px-4 pt-6 mb-6">
+  <section class="page-container pt-6 mb-6">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <img
         src="/img/test_banniere_1.jpg"

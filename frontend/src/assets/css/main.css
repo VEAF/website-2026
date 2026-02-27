@@ -50,6 +50,10 @@
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
 
+  .page-container {
+    @apply w-full max-w-7xl mx-auto px-4;
+  }
+
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }

@@ -56,7 +56,7 @@ onMounted(async () => {
 
     <template v-else>
       <!-- Aircrafts -->
-      <section v-if="aircrafts.length" class="max-w-7xl mx-auto px-4 mb-6">
+      <section v-if="aircrafts.length" class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4">
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <ModuleCard v-for="m in aircrafts" :key="m.id" :module="m" variant="card" />
@@ -65,7 +65,7 @@ onMounted(async () => {
       </section>
 
       <!-- Helicopters -->
-      <section v-if="helicopters.length" class="max-w-7xl mx-auto px-4 mb-6">
+      <section v-if="helicopters.length" class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4">
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <ModuleCard v-for="m in helicopters" :key="m.id" :module="m" variant="card" />
@@ -74,27 +74,27 @@ onMounted(async () => {
       </section>
 
       <!-- Maps -->
-      <section v-if="maps.length" class="max-w-7xl mx-auto px-4 mb-6">
+      <section v-if="maps.length" class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4 space-y-4">
           <ModuleCard v-for="m in maps" :key="m.id" :module="m" variant="banner" />
         </div>
       </section>
 
       <!-- Specials -->
-      <section v-if="specials.length" class="max-w-7xl mx-auto px-4 mb-6">
+      <section v-if="specials.length" class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4 space-y-4">
           <ModuleCard v-for="m in specials" :key="m.id" :module="m" variant="banner" />
         </div>
       </section>
 
       <!-- Bottom Banners -->
-      <section class="max-w-7xl mx-auto px-4 mb-6">
+      <section class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
           <img src="/img/bms.jpg" alt="BMS" class="w-full" />
         </div>
       </section>
 
-      <section class="max-w-7xl mx-auto px-4 mb-6">
+      <section class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
           <img src="/img/uh-1h-boat.jpg" alt="UH-1H" class="w-full" />
         </div>
