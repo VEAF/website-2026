@@ -120,7 +120,7 @@ async def load_content(session: AsyncSession) -> tuple[dict[str, Page], dict[str
     # --- MenuItems (pass 2: children) ---
     child_menu_data = [
         {"label": "Discord", "icon": "fab fa-discord", "type": MenuItem.TYPE_URL, "enabled": True, "position": 1, "menu": "news", "url_key": "discord"},
-        {"label": "Facebook", "icon": "fab fa-facebook", "type": MenuItem.TYPE_LINK, "enabled": True, "position": 2, "menu": "news"},
+        {"label": "Facebook", "icon": "fab fa-facebook", "type": MenuItem.TYPE_URL, "enabled": True, "position": 2, "menu": "news", "url_key": "facebook"},
         {"label": "Présentation", "type": MenuItem.TYPE_PAGE, "enabled": True, "position": 1, "menu": "asso", "page_key": "presentation"},
         {"label": "Le bureau", "type": MenuItem.TYPE_OFFICE, "enabled": True, "position": 2, "menu": "asso", "page_key": "status"},
         {"label": "Les statuts", "type": MenuItem.TYPE_PAGE, "enabled": True, "position": 3, "menu": "asso", "page_key": "status"},
