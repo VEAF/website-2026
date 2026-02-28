@@ -5,7 +5,9 @@ export interface UserModule {
   module_code: string | null
   module_long_name: string | null
   module_type: number | null
+  module_type_as_string: string | null
   module_period: number | null
+  module_period_as_string: string | null
   active: boolean
   level: number
   level_as_string: string | null

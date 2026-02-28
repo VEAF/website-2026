@@ -23,6 +23,25 @@ from app.schemas.user import (
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+def _build_user_module_out(um: UserModule) -> UserModuleOut:
+    """Build a UserModuleOut from a UserModule with its loaded module relationship."""
+    mod = um.module
+    return UserModuleOut(
+        id=um.id,
+        module_id=um.module_id,
+        module_name=mod.name if mod else None,
+        module_code=mod.code if mod else None,
+        module_long_name=mod.long_name if mod else None,
+        module_type=mod.type if mod else None,
+        module_type_as_string=mod.type_as_string if mod else None,
+        module_period=mod.period if mod else None,
+        module_period_as_string=mod.period_as_string if mod else None,
+        active=um.active,
+        level=um.level,
+        level_as_string=um.level_as_string,
+    )
+
+
 @router.get("/me", response_model=UserMe)
 async def get_me(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -44,21 +63,7 @@ async def get_me(user: User = Depends(get_current_user), db: AsyncSession = Depe
         roles=user.get_roles_list(),
         need_presentation=user.need_presentation,
         cadet_flights=user.cadet_flights,
-        modules=[
-            UserModuleOut(
-                id=um.id,
-                module_id=um.module_id,
-                module_name=um.module.name if um.module else None,
-                module_code=um.module.code if um.module else None,
-                module_long_name=um.module.long_name if um.module else None,
-                module_type=um.module.type if um.module else None,
-                module_period=um.module.period if um.module else None,
-                active=um.active,
-                level=um.level,
-                level_as_string=um.level_as_string,
-            )
-            for um in user.modules
-        ],
+        modules=[_build_user_module_out(um) for um in user.modules],
     )
 
 
@@ -187,19 +192,5 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
         discord=user.discord,
         forum=user.forum,
         created_at=user.created_at,
-        modules=[
-            UserModuleOut(
-                id=um.id,
-                module_id=um.module_id,
-                module_name=um.module.name if um.module else None,
-                module_code=um.module.code if um.module else None,
-                module_long_name=um.module.long_name if um.module else None,
-                module_type=um.module.type if um.module else None,
-                module_period=um.module.period if um.module else None,
-                active=um.active,
-                level=um.level,
-                level_as_string=um.level_as_string,
-            )
-            for um in user.modules
-        ],
+        modules=[_build_user_module_out(um) for um in user.modules],
     )
