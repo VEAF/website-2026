@@ -32,6 +32,7 @@ dev = [
     "factory-boy>=3.3.0",
     "httpx>=0.28.0",
     "ruff>=0.8.0",
+    "pytest-cov>=7.0.0",
 ]
 
 [build-system]
@@ -45,6 +46,9 @@ packages = ["app"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+concurrency = ["greenlet"]
 
 [tool.ruff]
 target-version = "py312"

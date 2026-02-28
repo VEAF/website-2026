@@ -208,7 +208,7 @@ function isLevelDisabled(moduleType: number, level: number): boolean {
       <h1 class="text-2xl font-bold">Mon profil</h1>
       <RouterLink
         v-if="auth.user"
-        :to="`/user/${auth.user.id}`"
+        :to="`/user/${auth.user.nickname}`"
         class="btn-secondary text-sm"
       >
         <i class="fa-solid fa-eye mr-1"></i>Voir mon profil public

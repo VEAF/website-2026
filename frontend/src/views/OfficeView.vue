@@ -25,7 +25,7 @@ const statusLabels: Record<number, string> = {
     <div class="space-y-4">
       <div v-for="m in members" :key="m.id" class="card !p-4 flex items-center justify-between">
         <div>
-          <RouterLink :to="`/user/${m.id}`" class="font-semibold text-veaf-600">{{ m.nickname }}</RouterLink>
+          <RouterLink :to="`/user/${m.nickname}`" class="font-semibold text-veaf-600">{{ m.nickname }}</RouterLink>
           <p class="text-sm text-gray-500 capitalize">{{ statusLabels[m.status] || m.status_as_string }}</p>
         </div>
       </div>

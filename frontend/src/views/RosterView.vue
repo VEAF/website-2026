@@ -84,7 +84,7 @@ function levelClass(level: number): string {
         <tbody>
           <tr v-for="u in users" :key="u.id" class="border-b hover:bg-gray-50">
             <td class="py-2 px-3">
-              <RouterLink :to="`/user/${u.id}`" class="text-veaf-600 hover:text-veaf-800 font-medium">{{ u.nickname }}</RouterLink>
+              <RouterLink :to="`/user/${u.nickname}`" class="text-veaf-600 hover:text-veaf-800 font-medium">{{ u.nickname }}</RouterLink>
             </td>
             <td class="py-2 px-3 capitalize">{{ u.status_as_string }}</td>
             <td class="py-2 px-3">
