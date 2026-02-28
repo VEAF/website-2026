@@ -11,7 +11,6 @@ from app.schemas.roster import (
     RosterModuleDetailUserOut,
     RosterModuleOut,
     RosterStatsOut,
-    RosterUserModuleOut,
     RosterUserOut,
 )
 
@@ -40,11 +39,17 @@ async def get_roster_stats(db: AsyncSession = Depends(get_db)):
 
 @router.get("/pilots", response_model=list[RosterUserOut])
 async def get_roster_pilots(group: str = "all", db: AsyncSession = Depends(get_db)):
-    query = select(User).options(selectinload(User.modules).selectinload(UserModule.module))
+    # Query users with a subquery count of active modules (active=true, level>0)
+    active_module_count = (
+        select(func.count())
+        .where(UserModule.user_id == User.id, UserModule.active.is_(True), UserModule.level > 0)
+        .correlate(User)
+        .scalar_subquery()
+    )
+    query = select(User, active_module_count.label("active_module_count"))
     query = _apply_group_filter(query, group)
     query = query.order_by(User.nickname)
     result = await db.execute(query)
-    users = result.scalars().all()
 
     return [
         RosterUserOut(
@@ -52,26 +57,9 @@ async def get_roster_pilots(group: str = "all", db: AsyncSession = Depends(get_d
             nickname=u.nickname,
             status=u.status,
             status_as_string=u.status_as_string,
-            sim_dcs=u.sim_dcs,
-            sim_bms=u.sim_bms,
-            modules=[
-                RosterUserModuleOut(
-                    module_id=um.module_id,
-                    module_name=um.module.name if um.module else None,
-                    module_code=um.module.code if um.module else None,
-                    module_long_name=um.module.long_name if um.module else None,
-                    module_type=um.module.type if um.module else None,
-                    module_type_as_string=um.module.type_as_string if um.module else None,
-                    module_period=um.module.period if um.module else None,
-                    module_period_as_string=um.module.period_as_string if um.module else None,
-                    active=um.active,
-                    level=um.level,
-                    level_as_string=um.level_as_string,
-                )
-                for um in u.modules
-            ],
+            active_module_count=count or 0,
         )
-        for u in users
+        for u, count in result.all()
     ]
 
 

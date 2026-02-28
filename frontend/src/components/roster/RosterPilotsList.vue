@@ -2,21 +2,17 @@
 import { ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getRosterPilots } from '@/api/roster'
-import type { RosterUser, RosterUserModule } from '@/api/roster'
+import type { RosterUser } from '@/api/roster'
 import { useRosterHelpers } from '@/composables/useRosterHelpers'
 
 const props = defineProps<{
   group: string
 }>()
 
-const { statusIcon, levelBadge, levelClass } = useRosterHelpers()
+const { statusIcon } = useRosterHelpers()
 
 const users = ref<RosterUser[]>([])
 const loading = ref(true)
-
-function activeModules(user: RosterUser): RosterUserModule[] {
-  return user.modules.filter((m) => m.active && m.level > 0)
-}
 
 async function fetchPilots() {
   loading.value = true
@@ -33,7 +29,7 @@ watch(() => props.group, fetchPilots, { immediate: true })
 <template>
   <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
 
-  <div v-else class="overflow-x-auto">
+  <div v-else class="card overflow-x-auto">
     <table class="w-full text-sm">
       <tbody>
         <tr v-for="u in users" :key="u.id" class="border-b hover:bg-gray-50">
@@ -51,18 +47,13 @@ watch(() => props.group, fetchPilots, { immediate: true })
             </RouterLink>
           </td>
           <td class="py-2 px-3 text-right">
-            <div class="flex flex-wrap justify-end gap-1">
-              <span
-                v-for="m in activeModules(u)"
-                :key="m.module_id"
-                :class="levelClass(m.level)"
-                class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
-                :title="`${m.module_name} - ${m.level_as_string}`"
-              >
-                {{ m.module_code }}
-                <span class="ml-0.5 font-bold">{{ levelBadge(m.level) }}</span>
-              </span>
-            </div>
+            <span
+              v-if="u.active_module_count > 0"
+              class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-veaf-100 text-veaf-800"
+              :title="`${u.active_module_count} module(s) actif(s)`"
+            >
+              {{ u.active_module_count }}
+            </span>
           </td>
         </tr>
       </tbody>

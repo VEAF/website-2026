@@ -8,28 +8,12 @@ export interface RosterStats {
   members: number
 }
 
-export interface RosterUserModule {
-  module_id: number
-  module_name: string | null
-  module_code: string | null
-  module_long_name: string | null
-  module_type: number | null
-  module_type_as_string: string | null
-  module_period: number | null
-  module_period_as_string: string | null
-  active: boolean
-  level: number
-  level_as_string: string | null
-}
-
 export interface RosterUser {
   id: number
   nickname: string
   status: number
   status_as_string: string | null
-  sim_dcs: boolean
-  sim_bms: boolean
-  modules: RosterUserModule[]
+  active_module_count: number
 }
 
 export interface RosterModule {

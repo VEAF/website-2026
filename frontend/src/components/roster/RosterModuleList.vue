@@ -50,7 +50,7 @@ watch([() => props.moduleType, () => props.group], fetchModules, { immediate: tr
 <template>
   <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
 
-  <div v-else>
+  <div v-else class="card">
     <!-- Aircraft: grouped by period -->
     <template v-if="moduleType === TYPE_AIRCRAFT">
       <template v-for="periodGroup in groupedByPeriod" :key="periodGroup.period">

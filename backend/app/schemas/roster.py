@@ -7,28 +7,12 @@ class RosterStatsOut(BaseModel):
     members: int
 
 
-class RosterUserModuleOut(BaseModel):
-    module_id: int
-    module_name: str | None = None
-    module_code: str | None = None
-    module_long_name: str | None = None
-    module_type: int | None = None
-    module_type_as_string: str | None = None
-    module_period: int | None = None
-    module_period_as_string: str | None = None
-    active: bool
-    level: int
-    level_as_string: str | None = None
-
-
 class RosterUserOut(BaseModel):
     id: int
     nickname: str
     status: int
     status_as_string: str | None = None
-    sim_dcs: bool
-    sim_bms: bool
-    modules: list[RosterUserModuleOut] = Field(default_factory=list)
+    active_module_count: int = 0
 
 
 class RosterModuleOut(BaseModel):

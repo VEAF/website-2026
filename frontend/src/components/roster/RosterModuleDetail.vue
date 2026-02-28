@@ -104,7 +104,7 @@ watch([() => props.moduleId, () => props.group], fetchDetail, { immediate: true 
     </div>
 
     <!-- Pilots table -->
-    <div class="overflow-x-auto">
+    <div class="card overflow-x-auto">
       <table class="w-full text-sm">
         <tbody>
           <tr
