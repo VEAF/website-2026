@@ -52,6 +52,7 @@ const calendarOptions = computed(() => ({
     meridiem: false as const,
   },
   nowIndicator: true,
+  dayMaxEvents: false,
   events: calendarEvents.value,
   eventClick: handleEventClick,
   dateClick: handleDateClick,
