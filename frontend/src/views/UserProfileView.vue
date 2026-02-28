@@ -5,16 +5,12 @@ import { getUser } from '@/api/users'
 import { useAuthStore } from '@/stores/auth'
 import type { UserProfile } from '@/types/user'
 import type { UserModule } from '@/types/user'
+import { TYPES_WITH_LEVEL, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_ORDER } from '@/constants/modules'
 
 const route = useRoute()
 const auth = useAuthStore()
 const user = ref<UserProfile | null>(null)
 const loading = ref(true)
-
-// Module types that have a skill level (aircraft=2, helicopter=3, special=4)
-const TYPES_WITH_LEVEL = [2, 3, 4]
-// Aircraft type uses period sub-groups
-const TYPE_AIRCRAFT = 2
 
 interface PeriodGroup {
   period: number | null
@@ -36,14 +32,14 @@ const isOwnProfile = computed(() => {
 const groupedModules = computed<TypeGroup[]>(() => {
   if (!user.value?.modules?.length) return []
 
-  const typeOrder = [1, 2, 3, 4]
+  const typeOrder = MODULE_TYPE_ORDER
   const groups: TypeGroup[] = []
 
   for (const type of typeOrder) {
     const modulesOfType = user.value.modules
       .filter((m) => m.module_type === type)
       .sort((a, b) => {
-        if (type === TYPE_AIRCRAFT) {
+        if (type === MODULE_TYPE_AIRCRAFT) {
           const pa = a.module_period ?? 0
           const pb = b.module_period ?? 0
           if (pb !== pa) return pb - pa
@@ -56,7 +52,7 @@ const groupedModules = computed<TypeGroup[]>(() => {
     // Use the type label from the backend (first module of the group)
     const typeLabel = modulesOfType[0].module_type_as_string ?? ''
 
-    if (type === TYPE_AIRCRAFT) {
+    if (type === MODULE_TYPE_AIRCRAFT) {
       const periodMap = new Map<number, UserModule[]>()
       for (const m of modulesOfType) {
         const p = m.module_period ?? 0

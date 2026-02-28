@@ -1,109 +1,128 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import apiClient from '@/api/client'
+import { getRosterStats } from '@/api/roster'
+import type { RosterStats } from '@/api/roster'
+import RosterPilotsList from '@/components/roster/RosterPilotsList.vue'
+import RosterModuleList from '@/components/roster/RosterModuleList.vue'
+import RosterModuleDetail from '@/components/roster/RosterModuleDetail.vue'
+import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
 
-interface RosterUser {
-  id: number
-  nickname: string
-  status: number
-  status_as_string: string
-  sim_dcs: boolean
-  sim_bms: boolean
-  modules: {
-    module_id: number
-    module_name: string
-    module_code: string
-    module_type: number
-    active: boolean
-    level: number
-    level_as_string: string
-  }[]
-}
-
-const users = ref<RosterUser[]>([])
-const group = ref('members')
+const group = ref('all')
+const tab = ref('pilots')
+const selectedModuleId = ref<number | null>(null)
+const stats = ref<RosterStats>({ all: 0, cadets: 0, members: 0 })
 const loading = ref(true)
 
-async function fetchRoster() {
-  loading.value = true
-  const { data } = await apiClient.get('/roster', { params: { group: group.value } })
-  users.value = data
-  loading.value = false
-}
-
-onMounted(fetchRoster)
-
 const groups = [
-  { value: 'all', label: 'Tous' },
-  { value: 'members', label: 'Membres' },
-  { value: 'cadets', label: 'Cadets' },
-  { value: 'cadets-members', label: 'Cadets + Membres' },
+  { value: 'all', label: 'Tout le monde', icon: 'fa-solid fa-users' },
+  { value: 'cadets', label: 'Cadets', icon: 'fa-solid fa-user-graduate' },
+  { value: 'members', label: 'Membres', icon: 'fa-solid fa-user' },
 ]
 
-function levelBadge(level: number): string {
-  if (level === 3) return 'I'
-  if (level === 2) return 'M'
-  if (level === 1) return 'R'
-  return ''
+const tabs = [
+  { value: 'pilots', label: 'Pilotes', icon: 'fa-solid fa-users' },
+  { value: 'maps', label: 'Cartes', icon: 'fa-solid fa-map' },
+  { value: 'aircrafts', label: 'Avions', icon: 'fa-solid fa-plane' },
+  { value: 'helicopters', label: 'Hélicoptères', icon: 'fa-solid fa-helicopter' },
+  { value: 'specials', label: 'Spéciaux', icon: 'fa-solid fa-ship' },
+]
+
+const tabToModuleType = TAB_TO_MODULE_TYPE
+
+function statValue(groupValue: string): number {
+  return stats.value[groupValue as keyof RosterStats] ?? 0
 }
 
-function levelClass(level: number): string {
-  if (level === 3) return 'bg-green-100 text-green-800'
-  if (level === 2) return 'bg-blue-100 text-blue-800'
-  if (level === 1) return 'bg-yellow-100 text-yellow-800'
-  return 'bg-gray-100 text-gray-500'
+async function loadStats() {
+  stats.value = await getRosterStats()
 }
+
+function changeGroup(newGroup: string) {
+  group.value = newGroup
+  loadStats()
+}
+
+function changeTab(newTab: string) {
+  tab.value = newTab
+  selectedModuleId.value = null
+}
+
+onMounted(async () => {
+  await loadStats()
+  loading.value = false
+})
 </script>
 
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-6">Roster</h1>
 
-    <div class="flex space-x-2 mb-6">
-      <button
-        v-for="g in groups" :key="g.value"
-        @click="group = g.value; fetchRoster()"
-        :class="[group === g.value ? 'btn-primary' : 'btn-secondary']"
-        class="text-sm"
-      >
-        {{ g.label }}
-      </button>
+    <!-- Top bar: group selector + tabs -->
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
+    >
+      <!-- Group selector -->
+      <div class="flex space-x-2">
+        <button
+          v-for="g in groups"
+          :key="g.value"
+          :class="[group === g.value ? 'btn-primary' : 'btn-secondary']"
+          class="text-sm"
+          @click="changeGroup(g.value)"
+        >
+          <i :class="g.icon" class="mr-1"></i>
+          <span class="hidden xl:inline">{{ g.label }}</span>
+          <span
+            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20"
+          >
+            {{ statValue(g.value) }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Tab selector -->
+      <div class="flex space-x-1">
+        <button
+          v-for="t in tabs"
+          :key="t.value"
+          :class="[tab === t.value ? 'btn-primary' : 'btn-secondary']"
+          class="text-sm"
+          @click="changeTab(t.value)"
+        >
+          <i :class="t.icon" class="mr-1"></i>
+          <span class="hidden xl:inline">{{ t.label }}</span>
+        </button>
+      </div>
     </div>
 
-    <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
-
-    <div v-else class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b bg-gray-50">
-            <th class="text-left py-2 px-3">Pilote</th>
-            <th class="text-left py-2 px-3">Statut</th>
-            <th class="text-center py-2 px-3">Modules</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="u in users" :key="u.id" class="border-b hover:bg-gray-50">
-            <td class="py-2 px-3">
-              <RouterLink :to="`/user/${u.nickname}`" class="text-veaf-600 hover:text-veaf-800 font-medium">{{ u.nickname }}</RouterLink>
-            </td>
-            <td class="py-2 px-3 capitalize">{{ u.status_as_string }}</td>
-            <td class="py-2 px-3">
-              <div class="flex flex-wrap gap-1">
-                <span
-                  v-for="m in u.modules.filter(m => m.active && m.level > 0)"
-                  :key="m.module_id"
-                  :class="levelClass(m.level)"
-                  class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
-                  :title="`${m.module_name} - ${m.level_as_string}`"
-                >
-                  {{ m.module_code }}
-                  <span class="ml-0.5 font-bold">{{ levelBadge(m.level) }}</span>
-                </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Content area -->
+    <div v-if="loading" class="text-center py-8 text-gray-500">
+      Chargement...
     </div>
+
+    <template v-else>
+      <!-- Pilots tab -->
+      <RosterPilotsList v-if="tab === 'pilots'" :group="group" />
+
+      <!-- Module tabs -->
+      <template v-else>
+        <!-- Module detail -->
+        <RosterModuleDetail
+          v-if="selectedModuleId !== null"
+          :module-id="selectedModuleId"
+          :group="group"
+          :module-type="tabToModuleType[tab]"
+          @back="selectedModuleId = null"
+        />
+
+        <!-- Module list -->
+        <RosterModuleList
+          v-else
+          :module-type="tabToModuleType[tab]"
+          :group="group"
+          @select-module="selectedModuleId = $event"
+        />
+      </template>
+    </template>
   </div>
 </template>

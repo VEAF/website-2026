@@ -4,6 +4,7 @@ import { getModules } from '@/api/modules'
 import { useCalendarStore } from '@/stores/calendar'
 import type { Module } from '@/types/module'
 import type { Choice } from '@/types/calendar'
+import { FLYABLE_MODULE_TYPES, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_HELICOPTER, MODULE_TYPE_SPECIAL } from '@/constants/modules'
 
 const calendarStore = useCalendarStore()
 
@@ -155,7 +156,7 @@ onMounted(async () => {
   document.addEventListener('mousedown', onClickOutside)
   await calendarStore.fetchTasks()
   const allModules = await getModules()
-  let filtered = allModules.filter(m => [2, 3, 4].includes(m.type))
+  let filtered = allModules.filter(m => FLYABLE_MODULE_TYPES.includes(m.type))
   if (props.eventModuleIds.length > 0) {
     filtered = filtered.filter(m => props.eventModuleIds.includes(m.id))
   }
@@ -297,9 +298,9 @@ function onKeydown(e: KeyboardEvent) {
                         <span
                           class="w-2 h-2 rounded-full mr-2 flex-shrink-0"
                           :class="{
-                            'bg-blue-500': m.type === 2,
-                            'bg-emerald-500': m.type === 3,
-                            'bg-amber-500': m.type === 4,
+                            'bg-blue-500': m.type === MODULE_TYPE_AIRCRAFT,
+                            'bg-emerald-500': m.type === MODULE_TYPE_HELICOPTER,
+                            'bg-amber-500': m.type === MODULE_TYPE_SPECIAL,
                           }"
                         ></span>
                         {{ m.name }}
