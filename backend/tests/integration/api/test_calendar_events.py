@@ -150,3 +150,12 @@ async def test_list_events_to_date_only(client: AsyncClient, db_session: AsyncSe
     titles = [e["title"] for e in data]
     assert "Early" in titles
     assert "Late" not in titles
+
+
+@pytest.mark.asyncio
+async def test_list_events_invalid_date_returns_422(client: AsyncClient):
+    # WHEN
+    response = await client.get("/api/calendar/events?from_date=not-a-date")
+
+    # THEN
+    assert response.status_code == 422

@@ -3,9 +3,14 @@ import { ref } from 'vue'
 import * as calendarApi from '@/api/calendar'
 import type { EventListItem, TaskType } from '@/types/calendar'
 
+interface DateRange {
+  from: string
+  to: string
+}
+
 export const useCalendarStore = defineStore('calendar', () => {
   const events = ref<EventListItem[]>([])
-  const currentRange = ref({ from: '', to: '' })
+  const currentRange = ref<DateRange>({ from: '', to: '' })
   const myEvents = ref<EventListItem[]>([])
   const tasks = ref<TaskType[]>([])
 
