@@ -1,5 +1,5 @@
 import apiClient from './client'
-import type { EventListItem, EventDetail, EventCreate, EventUpdate, VoteCreate, Vote, ChoiceCreate, Choice, TaskType } from '@/types/calendar'
+import type { EventListItem, EventDetail, EventCreate, EventUpdate, VoteCreate, Vote, ChoiceCreate, Choice, TaskType, AdminEvent, AdminEventListResponse } from '@/types/calendar'
 
 export async function getEvents(month?: string): Promise<EventListItem[]> {
   const params = month ? { month } : {}
@@ -61,5 +61,31 @@ export async function markAllViewed(): Promise<void> {
 
 export async function getTasks(): Promise<TaskType[]> {
   const { data } = await apiClient.get<TaskType[]>('/calendar/tasks')
+  return data
+}
+
+// --- Admin Event endpoints ---
+
+export async function getAdminEvents(params?: {
+  search?: string
+  type?: number
+  deleted?: boolean
+  sim?: string
+  date_from?: string
+  date_to?: string
+  skip?: number
+  limit?: number
+}): Promise<AdminEventListResponse> {
+  const { data } = await apiClient.get<AdminEventListResponse>('/admin/events', { params })
+  return data
+}
+
+export async function getAdminEvent(id: number): Promise<EventDetail> {
+  const { data } = await apiClient.get<EventDetail>(`/admin/events/${id}`)
+  return data
+}
+
+export async function restoreAdminEvent(id: number): Promise<AdminEvent> {
+  const { data } = await apiClient.patch<AdminEvent>(`/admin/events/${id}/restore`)
   return data
 }

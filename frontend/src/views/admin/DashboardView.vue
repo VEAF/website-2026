@@ -30,7 +30,7 @@ onMounted(async () => {
       </RouterLink>
       <RouterLink to="/admin/calendar" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-calendar-days text-2xl"></i></div>
-        <div class="text-3xl font-bold text-veaf-600 mb-2">-</div>
+        <div class="text-3xl font-bold text-veaf-600 mb-2">{{ stats?.events ?? '-' }}</div>
         <div class="text-sm text-gray-600">Événements</div>
       </RouterLink>
       <RouterLink to="/admin/pages" class="card text-center hover:shadow-md transition-shadow">

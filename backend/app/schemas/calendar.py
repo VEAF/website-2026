@@ -133,3 +133,33 @@ class ChoiceUpdate(BaseModel):
     task: int | None = None
     priority: int | None = None
     comment: str | None = None
+
+
+# --- Admin schemas ---
+
+
+class AdminEventOut(BaseModel):
+    id: int
+    title: str
+    start_date: datetime
+    end_date: datetime
+    type: int
+    type_as_string: str | None = None
+    type_color: str | None = None
+    sim_dcs: bool
+    sim_bms: bool
+    registration: bool
+    deleted: bool
+    deleted_at: datetime | None = None
+    owner_id: int
+    owner_nickname: str | None = None
+    map_name: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class AdminEventListOut(BaseModel):
+    items: list[AdminEventOut]
+    total: int
