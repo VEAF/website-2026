@@ -10,6 +10,7 @@ class UserModuleOut(BaseModel):
     module_code: str | None = None
     module_long_name: str | None = None
     module_type: int | None = None
+    module_period: int | None = None
     active: bool
     level: int
     level_as_string: str | None = None
@@ -29,6 +30,10 @@ class UserPublic(BaseModel):
     created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
+
+
+class UserProfileOut(UserPublic):
+    modules: list[UserModuleOut] = Field(default_factory=list)
 
 
 class UserMe(UserPublic):

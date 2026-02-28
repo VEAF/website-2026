@@ -15,6 +15,7 @@ from app.schemas.user import (
     UserModuleLevelUpdate,
     UserModuleOut,
     UserModuleUpdateResponse,
+    UserProfileOut,
     UserPublic,
     UserUpdate,
 )
@@ -51,6 +52,7 @@ async def get_me(user: User = Depends(get_current_user), db: AsyncSession = Depe
                 module_code=um.module.code if um.module else None,
                 module_long_name=um.module.long_name if um.module else None,
                 module_type=um.module.type if um.module else None,
+                module_period=um.module.period if um.module else None,
                 active=um.active,
                 level=um.level,
                 level_as_string=um.level_as_string,
@@ -166,13 +168,16 @@ async def update_my_module_active(
     )
 
 
-@router.get("/{user_id}", response_model=UserPublic)
+@router.get("/{user_id}", response_model=UserProfileOut)
 async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    user = await db.get(User, user_id)
+    result = await db.execute(
+        select(User).where(User.id == user_id).options(selectinload(User.modules).selectinload(UserModule.module))
+    )
+    user = result.scalar_one_or_none()
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    return UserPublic(
+    return UserProfileOut(
         id=user.id,
         nickname=user.nickname,
         status=user.status,
@@ -182,4 +187,19 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
         discord=user.discord,
         forum=user.forum,
         created_at=user.created_at,
+        modules=[
+            UserModuleOut(
+                id=um.id,
+                module_id=um.module_id,
+                module_name=um.module.name if um.module else None,
+                module_code=um.module.code if um.module else None,
+                module_long_name=um.module.long_name if um.module else None,
+                module_type=um.module.type if um.module else None,
+                module_period=um.module.period if um.module else None,
+                active=um.active,
+                level=um.level,
+                level_as_string=um.level_as_string,
+            )
+            for um in user.modules
+        ],
     )

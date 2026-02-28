@@ -5,6 +5,7 @@ import type {
   AdminUserUpdate,
   UserMe,
   UserModuleUpdateResponse,
+  UserProfile,
   UserPublic,
   UserUpdate,
 } from '@/types/user'
@@ -41,8 +42,8 @@ export async function updateMyModuleActive(
   return data
 }
 
-export async function getUser(userId: number): Promise<UserPublic> {
-  const { data } = await apiClient.get<UserPublic>(`/users/${userId}`)
+export async function getUser(userId: number): Promise<UserProfile> {
+  const { data } = await apiClient.get<UserProfile>(`/users/${userId}`)
   return data
 }
 
