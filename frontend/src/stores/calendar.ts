@@ -5,7 +5,7 @@ import type { EventListItem, TaskType } from '@/types/calendar'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const events = ref<EventListItem[]>([])
-  const currentMonth = ref('')
+  const currentRange = ref({ from: '', to: '' })
   const myEvents = ref<EventListItem[]>([])
   const tasks = ref<TaskType[]>([])
 
@@ -14,9 +14,9 @@ export const useCalendarStore = defineStore('calendar', () => {
     tasks.value = await calendarApi.getTasks()
   }
 
-  async function fetchEvents(month: string) {
-    currentMonth.value = month
-    events.value = await calendarApi.getEvents(month)
+  async function fetchEvents(fromDate: string, toDate: string) {
+    currentRange.value = { from: fromDate, to: toDate }
+    events.value = await calendarApi.getEvents(fromDate, toDate)
   }
 
   async function fetchMyEvents() {
@@ -27,5 +27,5 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
-  return { events, currentMonth, myEvents, tasks, fetchEvents, fetchMyEvents, fetchTasks }
+  return { events, currentRange, myEvents, tasks, fetchEvents, fetchMyEvents, fetchTasks }
 })

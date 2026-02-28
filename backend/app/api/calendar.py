@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -36,18 +36,20 @@ async def list_tasks():
 
 
 @router.get("/events", response_model=list[EventListOut])
-async def list_events(month: str | None = None, db: AsyncSession = Depends(get_db)):
+async def list_events(from_date: str | None = None, to_date: str | None = None, db: AsyncSession = Depends(get_db)):
     query = select(CalendarEvent).where(CalendarEvent.deleted == False)  # noqa: E712
 
-    if month:
+    if from_date:
         try:
-            year, m = month.split("-")
-            from calendar import monthrange
+            dt_from = datetime.fromisoformat(from_date)
+            query = query.where(CalendarEvent.end_date >= dt_from)
+        except ValueError:
+            pass
 
-            start = datetime(int(year), int(m), 1)
-            _, last_day = monthrange(int(year), int(m))
-            end = datetime(int(year), int(m), last_day, 23, 59, 59)
-            query = query.where(and_(CalendarEvent.start_date <= end, CalendarEvent.end_date >= start))
+    if to_date:
+        try:
+            dt_to = datetime.fromisoformat(to_date)
+            query = query.where(CalendarEvent.start_date <= dt_to)
         except ValueError:
             pass
 

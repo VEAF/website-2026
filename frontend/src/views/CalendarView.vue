@@ -74,10 +74,11 @@ function handleDateClick(info: DateClickArg) {
 }
 
 function handleDatesSet(info: DatesSetArg) {
-  const mid = new Date((info.start.getTime() + info.end.getTime()) / 2)
-  const month = `${mid.getFullYear()}-${String(mid.getMonth() + 1).padStart(2, '0')}`
-  if (month !== calendar.currentMonth) {
-    calendar.fetchEvents(month)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const fromDate = `${info.start.getFullYear()}-${pad(info.start.getMonth() + 1)}-${pad(info.start.getDate())}`
+  const toDate = `${info.end.getFullYear()}-${pad(info.end.getMonth() + 1)}-${pad(info.end.getDate())}`
+  if (fromDate !== calendar.currentRange.from || toDate !== calendar.currentRange.to) {
+    calendar.fetchEvents(fromDate, toDate)
   }
 }
 
@@ -107,10 +108,6 @@ function eventTimeBadge(event: EventListItem): { text: string; cssClass: string 
 }
 
 onMounted(() => {
-  const now = new Date()
-  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  calendar.fetchEvents(month)
-
   if (auth.isAuthenticated) {
     calendar.fetchMyEvents()
   }
