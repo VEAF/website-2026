@@ -165,3 +165,7 @@
 .fc .fc-daygrid-event-dot {
   border-width: 5px;
 }
+
+.fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+  min-height: 4.5em;
+}

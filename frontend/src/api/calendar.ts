@@ -1,8 +1,10 @@
 import apiClient from './client'
 import type { EventListItem, EventDetail, EventCreate, EventUpdate, VoteCreate, Vote, ChoiceCreate, Choice, TaskType, AdminEvent, AdminEventListResponse } from '@/types/calendar'
 
-export async function getEvents(month?: string): Promise<EventListItem[]> {
-  const params = month ? { month } : {}
+export async function getEvents(fromDate?: string, toDate?: string): Promise<EventListItem[]> {
+  const params: Record<string, string> = {}
+  if (fromDate) params.from_date = fromDate
+  if (toDate) params.to_date = toDate
   const { data } = await apiClient.get<EventListItem[]>('/calendar/events', { params })
   return data
 }
