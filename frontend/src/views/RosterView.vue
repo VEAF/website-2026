@@ -6,11 +6,14 @@ import RosterPilotsList from '@/components/roster/RosterPilotsList.vue'
 import RosterModuleList from '@/components/roster/RosterModuleList.vue'
 import RosterModuleDetail from '@/components/roster/RosterModuleDetail.vue'
 import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const group = ref('all')
 const tab = ref('pilots')
 const selectedModuleId = ref<number | null>(null)
-const stats = ref<RosterStats>({ all: 0, cadets: 0, members: 0 })
+const stats = ref<RosterStats>({ all: 0, cadets: 0, members: 0, cadets_need_presentation: 0 })
 const loading = ref(true)
 
 const groups = [
@@ -93,6 +96,20 @@ onMounted(async () => {
           <span class="hidden xl:inline">{{ t.label }}</span>
         </button>
       </div>
+    </div>
+
+    <!-- Alert: cadets needing presentation -->
+    <div
+      v-if="authStore.isMember && stats.cadets_need_presentation > 0"
+      class="mb-6 rounded-lg bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm text-yellow-800"
+    >
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-200 text-yellow-900 mr-2">
+        {{ stats.cadets_need_presentation }}
+      </span>
+      <i class="fa-solid fa-user-graduate text-yellow-500 mr-1"></i>
+      cadet(s) n'ont pas encore eu la
+      <i class="fa-solid fa-bullhorn text-yellow-500 mx-1"></i>
+      présentation de l'association
     </div>
 
     <!-- Content area -->
