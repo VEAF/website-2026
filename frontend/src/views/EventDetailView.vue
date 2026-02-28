@@ -7,6 +7,7 @@ import type { EventDetail, Choice } from '@/types/calendar'
 import { useConfirm } from '@/composables/useConfirm'
 import { renderMarkdown } from '@/composables/useMarkdown'
 import ChoiceModal from '@/components/ui/ChoiceModal.vue'
+import { moduleTypeIcon } from '@/constants/modules'
 
 const route = useRoute()
 const router = useRouter()
@@ -119,12 +120,6 @@ const usersChoicesMap = computed(() => {
   }
   return map
 })
-
-function moduleTypeIcon(moduleType: number | null): string {
-  if (moduleType === 3) return 'fa-solid fa-helicopter'
-  if (moduleType === 4) return 'fa-solid fa-gear'
-  return 'fa-solid fa-plane'
-}
 
 const imageUrl = computed(() => {
   if (!event.value?.image_uuid) return null

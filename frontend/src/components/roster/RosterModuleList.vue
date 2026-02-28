@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { getRosterModules } from '@/api/roster'
 import type { RosterModule } from '@/api/roster'
+import { MODULE_TYPE_AIRCRAFT } from '@/constants/modules'
 
 const props = defineProps<{
   moduleType: number
@@ -11,8 +12,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   'select-module': [id: number]
 }>()
-
-const TYPE_AIRCRAFT = 2
 
 const modules = ref<RosterModule[]>([])
 const loading = ref(true)
@@ -52,7 +51,7 @@ watch([() => props.moduleType, () => props.group], fetchModules, { immediate: tr
 
   <div v-else class="card">
     <!-- Aircraft: grouped by period -->
-    <template v-if="moduleType === TYPE_AIRCRAFT">
+    <template v-if="moduleType === MODULE_TYPE_AIRCRAFT">
       <template v-for="periodGroup in groupedByPeriod" :key="periodGroup.period">
         <div
           v-if="periodGroup.label"

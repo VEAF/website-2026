@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { getRosterModuleDetail } from '@/api/roster'
 import type { RosterModuleDetail } from '@/api/roster'
 import { useRosterHelpers } from '@/composables/useRosterHelpers'
+import { TYPES_WITH_LEVEL } from '@/constants/modules'
 
 const props = defineProps<{
   moduleId: number
@@ -17,19 +18,21 @@ const emit = defineEmits<{
 
 const { statusIcon } = useRosterHelpers()
 
-const TYPES_WITH_LEVEL = [2, 3, 4]
-
 const detail = ref<RosterModuleDetail | null>(null)
 const loading = ref(true)
+let fetchId = 0
 
 const hasLevel = computed(() => TYPES_WITH_LEVEL.includes(props.moduleType))
 
 async function fetchDetail() {
+  const id = ++fetchId
   loading.value = true
   try {
-    detail.value = await getRosterModuleDetail(props.moduleId, props.group)
+    const result = await getRosterModuleDetail(props.moduleId, props.group)
+    if (id !== fetchId) return // stale response — discard
+    detail.value = result
   } finally {
-    loading.value = false
+    if (id === fetchId) loading.value = false
   }
 }
 

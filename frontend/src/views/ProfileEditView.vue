@@ -8,6 +8,7 @@ import { useToast } from '@/composables/useToast'
 import ProfileEditModal from '@/components/ui/ProfileEditModal.vue'
 import type { Module } from '@/types/module'
 import type { UserUpdate } from '@/types/user'
+import { TYPES_WITH_LEVEL, MODULE_TYPE_LABELS_PLURAL, MODULE_TYPE_ORDER, MODULE_TYPE_AIRCRAFT } from '@/constants/modules'
 
 const auth = useAuthStore()
 const toast = useToast()
@@ -23,15 +24,6 @@ const myModulesMap = ref(new Map<number, { active: boolean; level: number }>())
 
 // Brief check mark feedback per module row
 const savedFeedback = ref(new Set<number>())
-
-const TYPES_WITH_LEVEL = [2, 3, 4] // AIRCRAFT, HELICOPTER, SPECIAL
-
-const MODULE_TYPE_LABELS: Record<number, string> = {
-  1: 'Cartes',
-  2: 'Avions',
-  3: 'Hélicoptères',
-  4: 'Spécial',
-}
 
 const PERIOD_LABELS: Record<number, string> = {
   1: 'WW2',
@@ -52,7 +44,7 @@ interface TypeGroup {
 }
 
 const groupedModules = computed<TypeGroup[]>(() => {
-  const typeOrder = [1, 2, 3, 4]
+  const typeOrder = MODULE_TYPE_ORDER
   const groups: TypeGroup[] = []
 
   for (const type of typeOrder) {
@@ -60,7 +52,7 @@ const groupedModules = computed<TypeGroup[]>(() => {
       .filter((m) => m.type === type)
       .sort((a, b) => {
         // For aircraft: sort by period desc, then name asc
-        if (type === 2) {
+        if (type === MODULE_TYPE_AIRCRAFT) {
           const pa = a.period ?? 0
           const pb = b.period ?? 0
           if (pb !== pa) return pb - pa
@@ -70,7 +62,7 @@ const groupedModules = computed<TypeGroup[]>(() => {
 
     if (modulesOfType.length === 0) continue
 
-    if (type === 2) {
+    if (type === MODULE_TYPE_AIRCRAFT) {
       // Sub-group aircraft by period
       const periodMap = new Map<number, Module[]>()
       for (const m of modulesOfType) {
@@ -85,11 +77,11 @@ const groupedModules = computed<TypeGroup[]>(() => {
           label: PERIOD_LABELS[period] || '',
           modules,
         }))
-      groups.push({ type, label: MODULE_TYPE_LABELS[type], periods })
+      groups.push({ type, label: MODULE_TYPE_LABELS_PLURAL[type], periods })
     } else {
       groups.push({
         type,
-        label: MODULE_TYPE_LABELS[type],
+        label: MODULE_TYPE_LABELS_PLURAL[type],
         periods: [{ period: null, label: '', modules: modulesOfType }],
       })
     }

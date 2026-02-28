@@ -21,6 +21,7 @@ import {
 import type { Module, ModuleRole, ModuleSystem } from '@/types/module'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
+import { MODULE_TYPE_NONE, MODULE_TYPE_MAP, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_HELICOPTER, MODULE_TYPE_SPECIAL, MODULE_TYPE_LABELS } from '@/constants/modules'
 
 const { confirm } = useConfirm()
 const toast = useToast()
@@ -39,7 +40,7 @@ const loading = ref(false)
 const showModuleForm = ref(false)
 const editingModuleId = ref<number | null>(null)
 const moduleForm = ref({
-  type: 2,
+  type: MODULE_TYPE_AIRCRAFT,
   name: '',
   long_name: '',
   code: '',
@@ -55,11 +56,11 @@ const currentImageUuid = ref<string | null>(null)
 const currentImageHeaderUuid = ref<string | null>(null)
 
 const moduleTypes = [
-  { value: 0, label: 'Aucun' },
-  { value: 1, label: 'Carte' },
-  { value: 2, label: 'Avion' },
-  { value: 3, label: 'Hélicoptère' },
-  { value: 4, label: 'Spécial' },
+  { value: MODULE_TYPE_NONE, label: MODULE_TYPE_LABELS[MODULE_TYPE_NONE] },
+  { value: MODULE_TYPE_MAP, label: MODULE_TYPE_LABELS[MODULE_TYPE_MAP] },
+  { value: MODULE_TYPE_AIRCRAFT, label: MODULE_TYPE_LABELS[MODULE_TYPE_AIRCRAFT] },
+  { value: MODULE_TYPE_HELICOPTER, label: MODULE_TYPE_LABELS[MODULE_TYPE_HELICOPTER] },
+  { value: MODULE_TYPE_SPECIAL, label: MODULE_TYPE_LABELS[MODULE_TYPE_SPECIAL] },
 ]
 
 const modulePeriods = [
@@ -99,7 +100,7 @@ function openNewModule() {
   currentImageUuid.value = null
   currentImageHeaderUuid.value = null
   moduleForm.value = {
-    type: 2,
+    type: MODULE_TYPE_AIRCRAFT,
     name: '',
     long_name: '',
     code: '',

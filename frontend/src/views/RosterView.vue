@@ -5,6 +5,7 @@ import type { RosterStats } from '@/api/roster'
 import RosterPilotsList from '@/components/roster/RosterPilotsList.vue'
 import RosterModuleList from '@/components/roster/RosterModuleList.vue'
 import RosterModuleDetail from '@/components/roster/RosterModuleDetail.vue'
+import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
 
 const group = ref('all')
 const tab = ref('pilots')
@@ -26,12 +27,7 @@ const tabs = [
   { value: 'specials', label: 'Spéciaux', icon: 'fa-solid fa-ship' },
 ]
 
-const tabToModuleType: Record<string, number> = {
-  maps: 1,
-  aircrafts: 2,
-  helicopters: 3,
-  specials: 4,
-}
+const tabToModuleType = TAB_TO_MODULE_TYPE
 
 function statValue(groupValue: string): number {
   return stats.value[groupValue as keyof RosterStats] ?? 0

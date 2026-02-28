@@ -12,6 +12,7 @@ import type { MultiSelectOption } from '@/components/ui/MultiSelect.vue'
 import type { EventUpdate } from '@/types/calendar'
 import type { Module } from '@/types/module'
 import type { Server } from '@/types/api'
+import { MODULE_TYPE_MAP, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_HELICOPTER, MODULE_TYPE_SPECIAL, FLYABLE_MODULE_TYPES } from '@/constants/modules'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,9 +63,9 @@ const aircraftModules = ref<Module[]>([])
 const servers = ref<Server[]>([])
 
 const MODULE_TYPE_COLORS: Record<number, string> = {
-  2: 'module-aircraft',
-  3: 'module-helicopter',
-  4: 'module-special',
+  [MODULE_TYPE_AIRCRAFT]: 'module-aircraft',
+  [MODULE_TYPE_HELICOPTER]: 'module-helicopter',
+  [MODULE_TYPE_SPECIAL]: 'module-special',
 }
 
 const moduleOptions = computed((): MultiSelectOption[] =>
@@ -84,12 +85,12 @@ const currentImageUuid = ref<string | null>(null)
 onMounted(async () => {
   // Load dropdown data in parallel
   const [mapsData, allModules, serversData] = await Promise.all([
-    getModules(1),
+    getModules(MODULE_TYPE_MAP),
     getModules(),
     getServers(),
   ])
   maps.value = mapsData
-  aircraftModules.value = allModules.filter(m => [2, 3, 4].includes(m.type))
+  aircraftModules.value = allModules.filter(m => FLYABLE_MODULE_TYPES.includes(m.type))
   servers.value = serversData
 
   if (id) {
