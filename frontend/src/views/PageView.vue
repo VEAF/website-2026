@@ -108,7 +108,7 @@ onUnmounted(clearCountdown)
   </div>
 
   <!-- CMS page content -->
-  <div v-else-if="page" class="max-w-4xl mx-auto">
+  <div v-else-if="page" class="max-w-4xl mx-auto card">
     <h1 class="text-3xl font-bold mb-6">{{ page.title }}</h1>
     <div v-for="block in page.blocks" :key="block.id" class="prose max-w-none mb-6">
       <div v-if="block.type === 1" v-html="renderMarkdown(block.content)"></div>
