@@ -100,6 +100,8 @@ npm run lint                         # ESLint
 
 **Ruff**: line-length=120, target Python 3.12.
 
+**Admin paginated list pattern**: All admin list endpoints use `skip` (offset, default 0) + `limit` (default 50, max 100) query params. Total count via `select(func.count()).select_from(query.subquery())`. Response shape: `{ items: list[T], total: int }`. Frontend: `currentPage` ref + `pageSize = 50`, debounced search (300ms), `watch([search, ...filters])` resets page to 1 and reloads. Reference: `admin_users.py` / `UsersView.vue`.
+
 ### Frontend (`frontend/`)
 
 **Entry point**: `src/main.ts` → creates Vue app with Pinia + Vue Router.

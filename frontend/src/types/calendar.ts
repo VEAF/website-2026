@@ -112,3 +112,30 @@ export interface ChoiceCreate {
   priority?: number
   comment?: string
 }
+
+// --- Admin types ---
+
+export interface AdminEvent {
+  id: number
+  title: string
+  start_date: string
+  end_date: string
+  type: number
+  type_as_string: string | null
+  type_color: string | null
+  sim_dcs: boolean
+  sim_bms: boolean
+  registration: boolean
+  deleted: boolean
+  deleted_at: string | null
+  owner_id: number
+  owner_nickname: string | null
+  map_name: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface AdminEventListResponse {
+  items: AdminEvent[]
+  total: number
+}
