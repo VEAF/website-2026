@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.api.dependencies import resolve_user, resolve_user_by_nickname
 from app.auth.dependencies import get_current_user
 from app.database import get_db
 from app.models.module import Module
@@ -173,15 +174,7 @@ async def update_my_module_active(
     )
 
 
-@router.get("/{user_id}", response_model=UserProfileOut)
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(User).where(User.id == user_id).options(selectinload(User.modules).selectinload(UserModule.module))
-    )
-    user = result.scalar_one_or_none()
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
+def _build_user_profile_out(user: User) -> UserProfileOut:
     return UserProfileOut(
         id=user.id,
         nickname=user.nickname,
@@ -194,3 +187,13 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
         created_at=user.created_at,
         modules=[_build_user_module_out(um) for um in user.modules],
     )
+
+
+@router.get("/by-nickname/{nickname}", response_model=UserProfileOut)
+async def get_user_by_nickname(user: User = Depends(resolve_user_by_nickname)):
+    return _build_user_profile_out(user)
+
+
+@router.get("/{user_id}", response_model=UserProfileOut)
+async def get_user(user: User = Depends(resolve_user)):
+    return _build_user_profile_out(user)

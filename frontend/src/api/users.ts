@@ -42,8 +42,8 @@ export async function updateMyModuleActive(
   return data
 }
 
-export async function getUser(userId: number): Promise<UserProfile> {
-  const { data } = await apiClient.get<UserProfile>(`/users/${userId}`)
+export async function getUser(nickname: string): Promise<UserProfile> {
+  const { data } = await apiClient.get<UserProfile>(`/users/by-nickname/${encodeURIComponent(nickname)}`)
   return data
 }
 

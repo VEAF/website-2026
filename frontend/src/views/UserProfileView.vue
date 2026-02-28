@@ -96,7 +96,7 @@ function formatDate(dateStr: string | null): string {
 
 onMounted(async () => {
   try {
-    user.value = await getUser(Number(route.params.id))
+    user.value = await getUser(route.params.nickname as string)
   } finally {
     loading.value = false
   }

@@ -124,6 +124,54 @@ async def test_get_user_profile_no_auth_required(client: AsyncClient, db_session
 
 
 @pytest.mark.asyncio
+async def test_get_user_by_nickname_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    user = await _create_user(db_session, nickname="TestPilot", discord="pilot#1234")
+
+    # WHEN
+    response = await client.get(f"/api/users/by-nickname/{user.nickname}")
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == user.id
+    assert data["nickname"] == "TestPilot"
+    assert data["discord"] == "pilot#1234"
+    assert data["modules"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_nickname_not_found(client: AsyncClient, db_session: AsyncSession):
+    # WHEN
+    response = await client.get("/api/users/by-nickname/NonExistentPilot")
+
+    # THEN
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_nickname_with_modules(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    user = await _create_user(db_session, nickname="ModulePilot")
+    aircraft = await _create_module(db_session, type=Module.TYPE_AIRCRAFT, long_name="F-16C Viper", period=Module.PERIOD_MODERN)
+
+    um = UserModule(user_id=user.id, module_id=aircraft.id, active=True, level=UserModule.LEVEL_MISSION)
+    db_session.add(um)
+    await db_session.commit()
+
+    # WHEN
+    response = await client.get(f"/api/users/by-nickname/{user.nickname}")
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["modules"]) == 1
+    assert data["modules"][0]["module_long_name"] == "F-16C Viper"
+    assert data["modules"][0]["active"] is True
+    assert data["modules"][0]["level"] == UserModule.LEVEL_MISSION
+
+
+@pytest.mark.asyncio
 async def test_get_me_with_modules_returns_module_period(client: AsyncClient, db_session: AsyncSession):
     # GIVEN
     user, headers = await _create_user_with_auth(db_session)
