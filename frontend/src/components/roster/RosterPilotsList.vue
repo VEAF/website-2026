@@ -4,12 +4,14 @@ import { RouterLink } from 'vue-router'
 import { getRosterPilots } from '@/api/roster'
 import type { RosterUser } from '@/api/roster'
 import { useRosterHelpers } from '@/composables/useRosterHelpers'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
   group: string
 }>()
 
 const { statusIcon } = useRosterHelpers()
+const authStore = useAuthStore()
 
 const users = ref<RosterUser[]>([])
 const loading = ref(true)
@@ -45,6 +47,13 @@ watch(() => props.group, fetchPilots, { immediate: true })
             >
               {{ u.nickname }}
             </RouterLink>
+            <span
+              v-if="authStore.isMember && u.need_presentation"
+              class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-700"
+              title="Ce pilote a besoin d'une présentation de l'association"
+            >
+              <i class="fa-solid fa-bullhorn"></i>
+            </span>
           </td>
           <td class="py-2 px-3 text-right">
             <span

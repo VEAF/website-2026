@@ -5,6 +5,7 @@ class RosterStatsOut(BaseModel):
     all: int
     cadets: int
     members: int
+    cadets_need_presentation: int = 0
 
 
 class RosterUserOut(BaseModel):
@@ -13,6 +14,7 @@ class RosterUserOut(BaseModel):
     status: int
     status_as_string: str | None = None
     active_module_count: int = 0
+    need_presentation: bool = False
 
 
 class RosterModuleOut(BaseModel):

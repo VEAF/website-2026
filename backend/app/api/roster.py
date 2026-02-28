@@ -34,7 +34,17 @@ async def get_roster_stats(db: AsyncSession = Depends(get_db)):
     members_count = await db.scalar(
         select(func.count()).select_from(User).where(User.status.in_(User.STATUSES_MEMBER))
     )
-    return RosterStatsOut(all=all_count or 0, cadets=cadets_count or 0, members=members_count or 0)
+    cadets_need_presentation = await db.scalar(
+        select(func.count())
+        .select_from(User)
+        .where(User.status == User.STATUS_CADET, User.need_presentation.is_(True))
+    )
+    return RosterStatsOut(
+        all=all_count or 0,
+        cadets=cadets_count or 0,
+        members=members_count or 0,
+        cadets_need_presentation=cadets_need_presentation or 0,
+    )
 
 
 @router.get("/pilots", response_model=list[RosterUserOut])
@@ -58,6 +68,7 @@ async def get_roster_pilots(group: str = "all", db: AsyncSession = Depends(get_d
             status=u.status,
             status_as_string=u.status_as_string,
             active_module_count=count or 0,
+            need_presentation=u.need_presentation,
         )
         for u, count in result.all()
     ]
