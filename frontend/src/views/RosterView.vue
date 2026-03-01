@@ -59,7 +59,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Top bar: group selector + tabs -->
     <div

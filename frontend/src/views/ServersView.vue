@@ -66,7 +66,7 @@ function formatAvgPlaytime(seconds: number): string {
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
 
@@ -152,7 +152,7 @@ function formatAvgPlaytime(seconds: number): string {
       </div>
 
       <!-- Global statistics -->
-      <div v-if="pageData.stats">
+      <div v-if="pageData.stats" class="card">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-chart-bar mr-2"></i>Statistiques globales
         </h2>

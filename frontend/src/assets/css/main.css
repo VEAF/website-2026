@@ -117,7 +117,7 @@
   }
 
   .stat-card-light {
-    @apply rounded-lg p-6 text-center shadow-sm border border-gray-200 bg-gray-50;
+    @apply rounded-lg p-6 text-center shadow-sm border border-gray-200 bg-white;
   }
 
   .badge {
