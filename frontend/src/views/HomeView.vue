@@ -90,13 +90,13 @@ onMounted(async () => {
       <!-- Bottom Banners -->
       <section class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4">
-          <img src="/img/bms.jpg" alt="BMS" class="w-full rounded-lg" />
+          <img src="/img/bms.webp" alt="BMS" class="w-full rounded-lg" />
         </div>
       </section>
 
       <section class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4">
-          <img src="/img/uh-1h-boat.jpg" alt="UH-1H" class="w-full rounded-lg" />
+          <img src="/img/uh-1h-boat.webp" alt="UH-1H" class="w-full rounded-lg" />
         </div>
       </section>
     </template>

@@ -6,7 +6,7 @@
   body {
     @apply font-sans antialiased;
     color: #495057;
-    background-image: url('/img/background-01-blur.jpg');
+    background-image: url('/img/background-01-blur.webp');
     background-attachment: fixed;
     background-size: cover;
   }
