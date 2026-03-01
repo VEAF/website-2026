@@ -38,7 +38,14 @@ const router = createRouter({
       path: '/calendar/new',
       name: 'event-create',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true, fullWidth: true },
+      meta: {
+        requiresAuth: true,
+        fullWidth: true,
+        breadcrumb: [
+          { label: 'Calendrier', to: 'calendar', icon: 'fa-solid fa-calendar-days' },
+          { label: 'Créer un événement' },
+        ],
+      },
     },
     {
       path: '/calendar/:id',
@@ -51,7 +58,14 @@ const router = createRouter({
       path: '/calendar/:id/edit',
       name: 'event-edit',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true, fullWidth: true },
+      meta: {
+        requiresAuth: true,
+        fullWidth: true,
+        breadcrumb: [
+          { label: 'Calendrier', to: 'calendar', icon: 'fa-solid fa-calendar-days' },
+          { label: "Modifier l'événement" },
+        ],
+      },
       props: true,
     },
     {
@@ -148,7 +162,6 @@ const router = createRouter({
         requiresAdmin: true,
         breadcrumb: [
           { label: 'Administration', icon: 'fa-solid fa-screwdriver-wrench' },
-          { label: 'Dashboard' },
         ],
       },
     },

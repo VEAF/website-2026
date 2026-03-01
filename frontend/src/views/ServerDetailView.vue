@@ -133,7 +133,17 @@ function visNm(m: number): string {
 
 <template>
   <div>
-    <AppBreadcrumb :page-title="props.serverName" :show-title="false" />
+    <AppBreadcrumb :page-title="pageData?.server.name ?? props.serverName" :show-title="false">
+      <template v-if="pageData" #after>
+        <span
+          :class="statusBadgeClass(pageData.server.status)"
+          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-2"
+        >
+          <i :class="statusIcon(pageData.server.status)" class="mr-1"></i>
+          {{ pageData.server.status }}
+        </span>
+      </template>
+    </AppBreadcrumb>
 
     <!-- Loading -->
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
@@ -146,17 +156,6 @@ function visNm(m: number): string {
     </div>
 
     <template v-else-if="pageData">
-      <!-- Title + status badge -->
-      <h1 class="text-2xl font-bold mb-6">
-        <i class="fa-solid fa-server mr-2"></i>{{ pageData.server.name }}
-        <span
-          :class="statusBadgeClass(pageData.server.status)"
-          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-2 align-middle"
-        >
-          <i :class="statusIcon(pageData.server.status)" class="mr-1"></i>
-          {{ pageData.server.status }}
-        </span>
-      </h1>
 
       <!-- Server info + Mission (two-column) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -376,11 +375,11 @@ function visNm(m: number): string {
       </template>
 
       <!-- Online players -->
-      <div v-if="pageData.server.status === 'Running' && pageData.server.players.length > 0" class="mb-6">
+      <div v-if="pageData.server.status === 'Running' && pageData.server.players.length > 0" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-users mr-2"></i>Joueurs en ligne ({{ pageData.server.players.length }})
         </h2>
-        <div class="card overflow-x-auto">
+        <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b bg-gray-50">
@@ -416,7 +415,7 @@ function visNm(m: number): string {
       </div>
 
       <!-- Server statistics -->
-      <div v-if="pageData.stats" class="mb-6">
+      <div v-if="pageData.stats" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-chart-bar mr-2"></i>Statistiques du serveur
         </h2>
@@ -463,7 +462,7 @@ function visNm(m: number): string {
       </div>
 
       <!-- Attendance -->
-      <template v-if="pageData.attendance">
+      <div v-if="pageData.attendance" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-chart-line mr-2"></i>Fréquentation du serveur
         </h2>
@@ -489,7 +488,7 @@ function visNm(m: number): string {
         </div>
 
         <!-- Period comparison table -->
-        <div class="card mb-6 overflow-x-auto">
+        <div class="mb-6 overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b bg-gray-50">
@@ -547,8 +546,8 @@ function visNm(m: number): string {
         </div>
 
         <!-- Top lists -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div v-if="pageData.attendance.top_theatres.length > 0" class="card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div v-if="pageData.attendance.top_theatres.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-globe mr-1"></i> Top Théâtres
             </h3>
@@ -562,7 +561,7 @@ function visNm(m: number): string {
             </table>
           </div>
 
-          <div v-if="pageData.attendance.top_missions.length > 0" class="card">
+          <div v-if="pageData.attendance.top_missions.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-list-check mr-1"></i> Top Missions
             </h3>
@@ -576,7 +575,7 @@ function visNm(m: number): string {
             </table>
           </div>
 
-          <div v-if="pageData.attendance.top_modules.length > 0" class="card">
+          <div v-if="pageData.attendance.top_modules.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-fighter-jet mr-1"></i> Top Modules
             </h3>
@@ -590,7 +589,7 @@ function visNm(m: number): string {
             </table>
           </div>
         </div>
-      </template>
+      </div>
     </template>
   </div>
 </template>

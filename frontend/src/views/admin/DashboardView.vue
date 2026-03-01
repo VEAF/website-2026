@@ -16,7 +16,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <RouterLink to="/admin/users" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-users text-2xl"></i></div>

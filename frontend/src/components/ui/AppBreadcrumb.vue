@@ -57,6 +57,7 @@ const lastItem = computed(() => items.value[items.value.length - 1] ?? null)
           </component>
         </li>
       </ol>
+      <slot name="after" />
     </nav>
     <h1 v-if="showTitle && lastItem" class="text-2xl font-bold mt-3">
       {{ lastItem.label }}
