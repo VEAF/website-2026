@@ -160,19 +160,19 @@ function formatAvgPlaytime(seconds: number): string {
 
         <!-- Primary stats row -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div class="rounded-lg p-4 text-center text-white bg-veaf-500">
+          <div class="stat-card text-white bg-veaf-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-users mr-1"></i>Joueurs total</div>
             <div class="text-3xl font-bold">{{ pageData.stats.total_players }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-green-600">
+          <div class="stat-card text-white bg-green-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-user-check mr-1"></i>Joueurs actifs</div>
             <div class="text-3xl font-bold">{{ pageData.stats.active_players }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-sky-600">
+          <div class="stat-card text-white bg-sky-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-plane-departure mr-1"></i>Sorties</div>
             <div class="text-3xl font-bold">{{ pageData.stats.total_sorties }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-gray-500">
+          <div class="stat-card text-white bg-gray-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-hourglass-half mr-1"></i>Temps moyen</div>
             <div class="text-3xl font-bold">{{ formatAvgPlaytime(pageData.stats.avg_playtime) }}</div>
           </div>
@@ -180,19 +180,19 @@ function formatAvgPlaytime(seconds: number): string {
 
         <!-- Secondary stats row -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1"></i>Kills</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_kills }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull mr-1"></i>Deaths</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_deaths }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1"></i>PvP Kills</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_pvp_kills }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull-crossbones mr-1"></i>PvP Deaths</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_pvp_deaths }}</div>
           </div>

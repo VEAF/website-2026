@@ -25,7 +25,7 @@ async function showConfirm() {
 </script>
 
 <template>
-  <div>
+  <div class="bg-white rounded-lg shadow-sm p-8">
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Systeme de design VEAF</h1>
@@ -69,16 +69,19 @@ async function showConfirm() {
       <h3 class="text-lg font-semibold mb-3">Couleurs semantiques</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div class="text-center">
-          <div class="bg-green-500 rounded-lg h-16 mb-1"></div>
+          <div class="bg-success-500 rounded-lg h-16 mb-1"></div>
           <p class="text-xs font-medium">Succes</p>
+          <p class="text-xs text-gray-500">#73a839</p>
         </div>
         <div class="text-center">
-          <div class="bg-yellow-500 rounded-lg h-16 mb-1"></div>
+          <div class="bg-warning-500 rounded-lg h-16 mb-1"></div>
           <p class="text-xs font-medium">Avertissement</p>
+          <p class="text-xs text-gray-500">#dd5600</p>
         </div>
         <div class="text-center">
-          <div class="bg-red-600 rounded-lg h-16 mb-1"></div>
+          <div class="bg-danger-500 rounded-lg h-16 mb-1"></div>
           <p class="text-xs font-medium">Danger</p>
+          <p class="text-xs text-gray-500">#c71c22</p>
         </div>
         <div class="text-center">
           <div class="bg-gray-500 rounded-lg h-16 mb-1"></div>

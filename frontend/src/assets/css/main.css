@@ -23,23 +23,48 @@
   }
 
   .btn-primary {
-    @apply btn bg-veaf-500 text-white hover:bg-veaf-600 hover:text-amber-200 focus:ring-veaf-400;
+    @apply btn text-white focus:ring-veaf-400;
+    background-image: linear-gradient(#4fb3eb, #2fa4e7 60%, #2c9ad9);
+  }
+  .btn-primary:hover {
+    @apply text-white;
+    background-image: linear-gradient(#2fa4e7, #2d9cdb 60%, #288bc4);
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400;
+    @apply btn text-gray-700 focus:ring-gray-400;
+    background-image: linear-gradient(#edeff2, #e9ecef 60%, #dbdee1);
+  }
+  .btn-secondary:hover {
+    @apply text-gray-700;
+    background-image: linear-gradient(#e9ecef, #dde0e3 60%, #c6c9cb);
   }
 
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 hover:text-white focus:ring-red-500;
+    @apply btn text-white focus:ring-[#c71c22];
+    background-image: linear-gradient(#d04045, #c71c22 60%, #bb1a20);
+  }
+  .btn-danger:hover {
+    @apply text-white;
+    background-image: linear-gradient(#c71c22, #bd1b20 60%, #a9181d);
   }
 
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-700 hover:text-white focus:ring-green-500;
+    @apply btn text-white focus:ring-[#73a839];
+    background-image: linear-gradient(#89b659, #73a839 60%, #6c9e36);
+  }
+  .btn-success:hover {
+    @apply text-white;
+    background-image: linear-gradient(#73a839, #6da036 60%, #628f30);
   }
 
   .btn-warning {
-    @apply btn bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white focus:ring-yellow-400;
+    @apply btn text-white focus:ring-[#dd5600];
+    background-image: linear-gradient(#e27129, #dd5600 60%, #d05100);
+  }
+  .btn-warning:hover {
+    @apply text-white;
+    background-image: linear-gradient(#dd5600, #d25200 60%, #bc4900);
   }
 
   .input {
@@ -71,7 +96,12 @@
   }
 
   .btn-info {
-    @apply btn bg-veaf-900 text-white hover:bg-veaf-800 focus:ring-veaf-700;
+    @apply btn text-white focus:ring-veaf-700;
+    background-image: linear-gradient(#2b5b89, #033c73 60%, #03386c);
+  }
+  .btn-info:hover {
+    @apply text-white;
+    background-image: linear-gradient(#033c73, #03396d 60%, #033362);
   }
 
   .btn-sm {
@@ -80,6 +110,14 @@
 
   .btn-lg {
     @apply px-6 py-3 text-base;
+  }
+
+  .stat-card {
+    @apply rounded-lg p-6 text-center shadow-md border border-white/20;
+  }
+
+  .stat-card-light {
+    @apply rounded-lg p-6 text-center shadow-sm border border-gray-200 bg-gray-50;
   }
 
   .badge {
@@ -91,15 +129,15 @@
   }
 
   .badge-success {
-    @apply badge bg-green-100 text-green-800;
+    @apply badge bg-[#e2edcc] text-[#4a6b25];
   }
 
   .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-800;
+    @apply badge bg-[#fde0c0] text-[#8e3700];
   }
 
   .badge-danger {
-    @apply badge bg-red-100 text-red-800;
+    @apply badge bg-[#f7cdce] text-[#7f1216];
   }
 
   .badge-neutral {
@@ -115,15 +153,15 @@
   }
 
   .alert-success {
-    @apply alert bg-green-50 border-green-200 text-green-800;
+    @apply alert bg-[#f3f8ec] border-[#c5db99] text-[#4a6b25];
   }
 
   .alert-warning {
-    @apply alert bg-yellow-50 border-yellow-200 text-yellow-800;
+    @apply alert bg-[#fef3e6] border-[#fbc180] text-[#8e3700];
   }
 
   .alert-danger {
-    @apply alert bg-red-50 border-red-200 text-red-800;
+    @apply alert bg-[#fceced] border-[#ef9b9e] text-[#7f1216];
   }
 }
 
@@ -194,8 +232,8 @@
   --fc-button-border-color: #1e8cc7;
   --fc-button-hover-bg-color: #1a75a8;
   --fc-button-hover-border-color: #165e87;
-  --fc-button-active-bg-color: #1a75a8;
-  --fc-button-active-border-color: #165e87;
+  --fc-button-active-bg-color: #2fa4e7;
+  --fc-button-active-border-color: #1e8cc7;
   --fc-today-bg-color: #f0f8fd;
   --fc-event-text-color: #ffffff;
   font-size: 0.875rem;
