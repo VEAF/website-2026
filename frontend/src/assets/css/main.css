@@ -23,7 +23,7 @@
   }
 
   .btn-primary {
-    @apply btn bg-veaf-500 text-white hover:bg-veaf-600 focus:ring-veaf-400;
+    @apply btn bg-veaf-500 text-white hover:bg-veaf-600 hover:text-amber-200 focus:ring-veaf-400;
   }
 
   .btn-secondary {
@@ -31,15 +31,15 @@
   }
 
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply btn bg-red-600 text-white hover:bg-red-700 hover:text-white focus:ring-red-500;
   }
 
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    @apply btn bg-green-600 text-white hover:bg-green-700 hover:text-white focus:ring-green-500;
   }
 
   .btn-warning {
-    @apply btn bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-400;
+    @apply btn bg-yellow-500 text-white hover:bg-yellow-600 hover:text-white focus:ring-yellow-400;
   }
 
   .input {

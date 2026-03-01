@@ -48,7 +48,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <header class="bg-veaf-gradient text-white shadow-lg">
+  <header class="text-white shadow-lg" style="background: linear-gradient(#04519b, #033c73 60%, #02325f)">
     <div class="page-container">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
