@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # App
     APP_URL: str = "http://localhost"
     UPLOAD_DIR: str = "./uploads"
+    RUN_MIGRATIONS: bool = False
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
