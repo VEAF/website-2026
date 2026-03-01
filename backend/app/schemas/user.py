@@ -36,6 +36,8 @@ class UserPublic(BaseModel):
 
 class UserProfileOut(UserPublic):
     modules: list[UserModuleOut] = Field(default_factory=list)
+    need_presentation: bool | None = None
+    cadet_flights: int | None = None
 
 
 class UserMe(UserPublic):

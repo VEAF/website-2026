@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.dependencies import resolve_user, resolve_user_by_nickname
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, get_optional_user
 from app.database import get_db
 from app.models.module import Module
 from app.models.user import User, UserModule
@@ -174,8 +174,8 @@ async def update_my_module_active(
     )
 
 
-def _build_user_profile_out(user: User) -> UserProfileOut:
-    return UserProfileOut(
+def _build_user_profile_out(user: User, viewer: User | None = None) -> UserProfileOut:
+    out = UserProfileOut(
         id=user.id,
         nickname=user.nickname,
         status=user.status,
@@ -187,13 +187,23 @@ def _build_user_profile_out(user: User) -> UserProfileOut:
         created_at=user.created_at,
         modules=[_build_user_module_out(um) for um in user.modules],
     )
+    if user.is_cadet and viewer is not None and viewer.is_member:
+        out.need_presentation = user.need_presentation
+        out.cadet_flights = user.cadet_flights
+    return out
 
 
 @router.get("/by-nickname/{nickname}", response_model=UserProfileOut)
-async def get_user_by_nickname(user: User = Depends(resolve_user_by_nickname)):
-    return _build_user_profile_out(user)
+async def get_user_by_nickname(
+    user: User = Depends(resolve_user_by_nickname),
+    viewer: User | None = Depends(get_optional_user),
+):
+    return _build_user_profile_out(user, viewer)
 
 
 @router.get("/{user_id}", response_model=UserProfileOut)
-async def get_user(user: User = Depends(resolve_user)):
-    return _build_user_profile_out(user)
+async def get_user(
+    user: User = Depends(resolve_user),
+    viewer: User | None = Depends(get_optional_user),
+):
+    return _build_user_profile_out(user, viewer)

@@ -73,7 +73,7 @@ function onKeydown(e: KeyboardEvent) {
               class="btn-danger"
               @click="handleResponse(true)"
             >
-              <i class="fa-solid fa-trash mr-1"></i>Supprimer
+              <i class="fa-solid fa-check mr-1"></i>Confirmer
             </button>
           </div>
         </div>
