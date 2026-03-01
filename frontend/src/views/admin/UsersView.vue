@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { getAdminUsers, updateAdminUser } from '@/api/users'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { AdminUser, AdminUserUpdate } from '@/types/user'
 import { useToast } from '@/composables/useToast'
 
@@ -144,7 +144,7 @@ onMounted(loadUsers)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Search & Filter -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">

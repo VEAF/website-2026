@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { getDcsBotServers } from '@/api/servers'
 import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotPage } from '@/types/api'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const pageData = ref<DcsBotPage | null>(null)
 const loading = ref(true)
@@ -65,9 +66,7 @@ function formatAvgPlaytime(seconds: number): string {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">
-      <i class="fa-solid fa-server mr-2"></i>Liste des serveurs
-    </h1>
+    <AppBreadcrumb />
 
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useConfirm } from '@/composables/useConfirm'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const { confirm } = useConfirm()
 
@@ -46,6 +47,7 @@ async function showConfirm() {
         <a href="#alertes" class="btn-secondary btn btn-sm">Alertes</a>
         <a href="#table" class="btn-secondary btn btn-sm">Table</a>
         <a href="#modale" class="btn-secondary btn btn-sm">Modale</a>
+        <a href="#breadcrumb" class="btn-secondary btn btn-sm">Breadcrumb</a>
         <a href="#icones" class="btn-secondary btn btn-sm">Icones</a>
       </div>
     </nav>
@@ -445,6 +447,88 @@ async function showConfirm() {
         <button class="btn-primary" @click="showConfirm">
           <i class="fa-solid fa-question-circle mr-1"></i>Ouvrir la modale de confirmation
         </button>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section id="breadcrumb" class="mb-12">
+      <h2 class="text-2xl font-bold mb-1 pb-2 border-b border-gray-200">Breadcrumb</h2>
+      <p class="text-sm text-gray-500 mb-6">Navigation en fil d'Ariane, style fleches de manuels de vol. Composant AppBreadcrumb.</p>
+
+      <div class="card space-y-6">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-3">Page courante (depuis le routeur)</p>
+          <AppBreadcrumb :show-title="false" />
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-3">Exemple a 2 niveaux</p>
+          <nav class="flex overflow-x-auto scrollbar-hide">
+            <ol class="flex items-center flex-nowrap">
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-first breadcrumb-segment-primary" style="z-index: 2">
+                  <i class="fa-solid fa-house mr-1.5 text-xs"></i><span>Accueil</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-active breadcrumb-segment-info" style="z-index: 1">
+                  <i class="fa-solid fa-users mr-1.5 text-xs"></i><span>Roster</span>
+                </span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-3">Exemple a 3 niveaux</p>
+          <nav class="flex overflow-x-auto scrollbar-hide">
+            <ol class="flex items-center flex-nowrap">
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-first breadcrumb-segment-primary" style="z-index: 3">
+                  <i class="fa-solid fa-house mr-1.5 text-xs"></i><span>Accueil</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-primary" style="z-index: 2">
+                  <i class="fa-solid fa-server mr-1.5 text-xs"></i><span>Serveurs</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-active breadcrumb-segment-info" style="z-index: 1">
+                  <span>VEAF-DCS-Caucasus</span>
+                </span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-3">Exemple admin a 4 niveaux</p>
+          <nav class="flex overflow-x-auto scrollbar-hide">
+            <ol class="flex items-center flex-nowrap">
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-first breadcrumb-segment-primary" style="z-index: 4">
+                  <i class="fa-solid fa-house mr-1.5 text-xs"></i><span>Accueil</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-primary" style="z-index: 3">
+                  <i class="fa-solid fa-screwdriver-wrench mr-1.5 text-xs"></i><span>Administration</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-primary" style="z-index: 2">
+                  <span>Pages</span>
+                </span>
+              </li>
+              <li class="flex-shrink-0">
+                <span class="breadcrumb-segment breadcrumb-segment-active breadcrumb-segment-info" style="z-index: 1">
+                  <span>Reglement interieur</span>
+                </span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
     </section>
 

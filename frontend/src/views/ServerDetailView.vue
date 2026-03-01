@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { RouterLink } from 'vue-router'
 import { getDcsBotServer } from '@/api/servers'
 import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotServerDetailPage } from '@/types/api'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const POLL_INTERVAL = 60_000
 
@@ -133,14 +133,7 @@ function visNm(m: number): string {
 
 <template>
   <div>
-    <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-4">
-      <RouterLink to="/servers" class="text-veaf-600 hover:text-veaf-800 hover:underline">
-        Serveurs DCS
-      </RouterLink>
-      <span class="mx-2">/</span>
-      <span class="text-gray-700">{{ props.serverName }}</span>
-    </nav>
+    <AppBreadcrumb :page-title="props.serverName" :show-title="false" />
 
     <!-- Loading -->
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>

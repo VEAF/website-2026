@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getAdminStats, type AdminStats } from '@/api/admin'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const stats = ref<AdminStats | null>(null)
 
@@ -16,7 +16,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <RouterLink to="/admin/users" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-users text-2xl"></i></div>

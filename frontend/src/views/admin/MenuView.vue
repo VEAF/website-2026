@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import MenuListView from '@/components/admin/MenuListView.vue'
 import MenuTreeView from '@/components/admin/MenuTreeView.vue'
 
@@ -9,7 +9,7 @@ const activeTab = ref<'list' | 'tree'>('list')
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Tab switcher -->
     <div class="flex space-x-1 mb-6 border-b">

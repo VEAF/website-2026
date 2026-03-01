@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import {
   getModules,
   getRoles,
@@ -326,7 +326,7 @@ onMounted(loadAll)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Tabs -->
     <div class="flex space-x-1 mb-6 border-b border-gray-200">

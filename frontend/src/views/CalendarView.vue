@@ -11,6 +11,7 @@ import type { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarStore } from '@/stores/calendar'
 import { useAuthStore } from '@/stores/auth'
 import type { EventListItem } from '@/types/calendar'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const router = useRouter()
 const calendar = useCalendarStore()
@@ -117,6 +118,7 @@ onMounted(() => {
 
 <template>
   <div class="page-container py-6">
+    <AppBreadcrumb :show-title="false" />
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Calendrier</h1>
       <RouterLink v-if="auth.isMember" to="/calendar/new" class="btn-primary">

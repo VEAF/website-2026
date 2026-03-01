@@ -163,6 +163,53 @@
   .alert-danger {
     @apply alert bg-[#fceced] border-[#ef9b9e] text-[#7f1216];
   }
+
+  /* Aviation-style arrow breadcrumb */
+  .breadcrumb-segment {
+    @apply inline-flex items-center h-8 text-sm font-medium text-white whitespace-nowrap;
+    padding-left: 20px;
+    padding-right: 16px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+    margin-left: -5px;
+  }
+
+  .breadcrumb-segment-first {
+    padding-left: 14px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+    margin-left: 0;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .breadcrumb-segment-primary {
+    background-image: linear-gradient(#4fb3eb, #2fa4e7 60%, #2c9ad9);
+    color: white;
+  }
+  .breadcrumb-segment-primary:hover {
+    background-image: linear-gradient(#2fa4e7, #2d9cdb 60%, #288bc4);
+    color: white;
+  }
+
+  .breadcrumb-segment-info {
+    background-image: linear-gradient(#2b5b89, #033c73 60%, #03386c);
+    color: white;
+  }
+  .breadcrumb-segment-info:hover {
+    background-image: linear-gradient(#033c73, #03396d 60%, #033362);
+    color: white;
+  }
+
+  .breadcrumb-segment-active {
+    @apply font-semibold;
+  }
+}
+
+/* Scrollbar hide utility for horizontal scroll breadcrumbs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Toast notification overrides */

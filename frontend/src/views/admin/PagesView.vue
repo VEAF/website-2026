@@ -2,7 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAdminPages, createAdminPage, updateAdminPage, deleteAdminPage } from '@/api/pages'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { Page } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
@@ -209,7 +209,7 @@ onMounted(loadPages)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Search & Filters -->
     <div class="flex flex-wrap gap-4 mb-4">
