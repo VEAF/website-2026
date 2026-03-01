@@ -132,9 +132,7 @@ def upgrade() -> None:
     sa.Column('player_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['player_id'], ['player.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
     sa.UniqueConstraint('email', name='email_idx'),
-    sa.UniqueConstraint('nickname'),
     sa.UniqueConstraint('nickname', name='nickname_idx')
     )
     op.create_table('file',
