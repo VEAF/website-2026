@@ -29,13 +29,23 @@ const router = createRouter({
       path: '/calendar',
       name: 'calendar',
       component: () => import('@/views/CalendarView.vue'),
-      meta: { fullWidth: true },
+      meta: {
+        fullWidth: true,
+        breadcrumb: [{ label: 'Calendrier', icon: 'fa-solid fa-calendar-days' }],
+      },
     },
     {
       path: '/calendar/new',
       name: 'event-create',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true, fullWidth: true },
+      meta: {
+        requiresAuth: true,
+        fullWidth: true,
+        breadcrumb: [
+          { label: 'Calendrier', to: 'calendar', icon: 'fa-solid fa-calendar-days' },
+          { label: 'Créer un événement' },
+        ],
+      },
     },
     {
       path: '/calendar/:id',
@@ -48,24 +58,43 @@ const router = createRouter({
       path: '/calendar/:id/edit',
       name: 'event-edit',
       component: () => import('@/views/EventEditView.vue'),
-      meta: { requiresAuth: true, fullWidth: true },
+      meta: {
+        requiresAuth: true,
+        fullWidth: true,
+        breadcrumb: [
+          { label: 'Calendrier', to: 'calendar', icon: 'fa-solid fa-calendar-days' },
+          { label: "Modifier l'événement" },
+        ],
+      },
       props: true,
     },
     {
       path: '/roster',
       name: 'roster',
       component: () => import('@/views/RosterView.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Roster', icon: 'fa-solid fa-users' }],
+      },
     },
     {
       path: '/servers',
       name: 'servers',
       component: () => import('@/views/ServersView.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Serveurs', icon: 'fa-solid fa-server' }],
+      },
     },
     {
       path: '/servers/:serverName',
       name: 'server-detail',
       component: () => import('@/views/ServerDetailView.vue'),
       props: true,
+      meta: {
+        breadcrumb: [
+          { label: 'Serveurs', to: 'servers', icon: 'fa-solid fa-server' },
+          { label: '' },
+        ],
+      },
     },
     {
       path: '/user/:nickname',
@@ -94,6 +123,9 @@ const router = createRouter({
       path: '/teamspeak',
       name: 'teamspeak',
       component: () => import('@/views/TeamSpeakView.vue'),
+      meta: {
+        breadcrumb: [{ label: 'TeamSpeak', icon: 'fa-brands fa-teamspeak' }],
+      },
     },
     {
       path: '/office',
@@ -112,6 +144,14 @@ const router = createRouter({
       name: 'metrics',
       component: () => import('@/views/MetricsView.vue'),
     },
+    {
+      path: '/design-system',
+      name: 'design-system',
+      component: () => import('@/views/DesignSystemView.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Design System', icon: 'fa-solid fa-palette' }],
+      },
+    },
     // Admin routes
     {
       path: '/admin',
@@ -122,7 +162,6 @@ const router = createRouter({
         requiresAdmin: true,
         breadcrumb: [
           { label: 'Administration', icon: 'fa-solid fa-screwdriver-wrench' },
-          { label: 'Dashboard' },
         ],
       },
     },

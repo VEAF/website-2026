@@ -128,6 +128,8 @@ npm run lint                         # ESLint
 
 **Tailwind**: Custom `veaf-*` color palette (blue gradient, primary: #5c7cfa). Config in `tailwind.config.js`.
 
+Original theme used: https://bootswatch.com/cerulean/
+
 **Vite**: `@` alias maps to `src/`. Dev proxy: `/api` → backend (via nginx at `http://veaf.localhost`).
 
 ### Infrastructure

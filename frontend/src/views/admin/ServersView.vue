@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { getAdminServers, createAdminServer, updateAdminServer, deleteAdminServer } from '@/api/servers'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { Server } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
@@ -146,7 +146,7 @@ onMounted(loadServers)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Search & Actions -->
     <div class="flex flex-wrap gap-4 mb-4">

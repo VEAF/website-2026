@@ -13,6 +13,7 @@ import type { EventUpdate } from '@/types/calendar'
 import type { Module } from '@/types/module'
 import type { Server } from '@/types/api'
 import { MODULE_TYPE_MAP, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_HELICOPTER, MODULE_TYPE_SPECIAL, FLYABLE_MODULE_TYPES } from '@/constants/modules'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -179,7 +180,7 @@ async function handleSubmit() {
 
 <template>
   <div class="page-container py-6">
-    <h1 class="text-2xl font-bold mb-6">{{ isEdit ? "Modifier l'événement" : 'Créer un événement' }}</h1>
+    <AppBreadcrumb :show-title="false" />
 
     <form @submit.prevent="handleSubmit" class="card space-y-4">
       <!-- Dates -->

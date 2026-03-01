@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import {
   getModules,
   getRoles,
@@ -326,7 +326,7 @@ onMounted(loadAll)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Tabs -->
     <div class="flex space-x-1 mb-6 border-b border-gray-200">
@@ -340,7 +340,7 @@ onMounted(loadAll)
         class="px-4 py-2 text-sm font-medium -mb-px"
         :class="
           currentTab === tab.key
-            ? 'border-b-2 border-veaf-600 text-veaf-600'
+            ? 'border-b-2 border-veaf-500 text-veaf-500'
             : 'text-gray-500 hover:text-gray-700'
         "
         @click="currentTab = tab.key"

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { RouterLink } from 'vue-router'
 import { getDcsBotServer } from '@/api/servers'
 import { formatMissionName, shortMissionName } from '@/utils/format'
 import type { DcsBotServerDetailPage } from '@/types/api'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const POLL_INTERVAL = 60_000
 
@@ -133,14 +133,17 @@ function visNm(m: number): string {
 
 <template>
   <div>
-    <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-4">
-      <RouterLink to="/servers" class="text-veaf-600 hover:text-veaf-800 hover:underline">
-        Serveurs DCS
-      </RouterLink>
-      <span class="mx-2">/</span>
-      <span class="text-gray-700">{{ props.serverName }}</span>
-    </nav>
+    <AppBreadcrumb :page-title="pageData?.server.name ?? props.serverName" :show-title="false">
+      <template v-if="pageData" #after>
+        <span
+          :class="statusBadgeClass(pageData.server.status)"
+          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-2"
+        >
+          <i :class="statusIcon(pageData.server.status)" class="mr-1"></i>
+          {{ pageData.server.status }}
+        </span>
+      </template>
+    </AppBreadcrumb>
 
     <!-- Loading -->
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
@@ -153,17 +156,6 @@ function visNm(m: number): string {
     </div>
 
     <template v-else-if="pageData">
-      <!-- Title + status badge -->
-      <h1 class="text-2xl font-bold mb-6">
-        <i class="fa-solid fa-server mr-2"></i>{{ pageData.server.name }}
-        <span
-          :class="statusBadgeClass(pageData.server.status)"
-          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-2 align-middle"
-        >
-          <i :class="statusIcon(pageData.server.status)" class="mr-1"></i>
-          {{ pageData.server.status }}
-        </span>
-      </h1>
 
       <!-- Server info + Mission (two-column) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -383,11 +375,11 @@ function visNm(m: number): string {
       </template>
 
       <!-- Online players -->
-      <div v-if="pageData.server.status === 'Running' && pageData.server.players.length > 0" class="mb-6">
+      <div v-if="pageData.server.status === 'Running' && pageData.server.players.length > 0" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-users mr-2"></i>Joueurs en ligne ({{ pageData.server.players.length }})
         </h2>
-        <div class="card overflow-x-auto">
+        <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b bg-gray-50">
@@ -423,26 +415,26 @@ function visNm(m: number): string {
       </div>
 
       <!-- Server statistics -->
-      <div v-if="pageData.stats" class="mb-6">
+      <div v-if="pageData.stats" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-chart-bar mr-2"></i>Statistiques du serveur
         </h2>
 
         <!-- Primary stats -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div class="rounded-lg p-4 text-center text-white bg-veaf-600">
+          <div class="stat-card text-white bg-veaf-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-users mr-1"></i>Joueurs total</div>
             <div class="text-3xl font-bold">{{ pageData.stats.total_players }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-green-600">
+          <div class="stat-card text-white bg-green-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-user-check mr-1"></i>Joueurs actifs</div>
             <div class="text-3xl font-bold">{{ pageData.stats.active_players }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-sky-600">
+          <div class="stat-card text-white bg-sky-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-plane-departure mr-1"></i>Sorties</div>
             <div class="text-3xl font-bold">{{ pageData.stats.total_sorties }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-gray-500">
+          <div class="stat-card text-white bg-gray-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-hourglass-half mr-1"></i>Temps moyen</div>
             <div class="text-3xl font-bold">{{ formatAvgPlaytime(pageData.stats.avg_playtime) }}</div>
           </div>
@@ -450,19 +442,19 @@ function visNm(m: number): string {
 
         <!-- Secondary stats -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1"></i>Kills</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_kills }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull mr-1"></i>Deaths</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_deaths }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1 text-red-600"></i>PvP Kills</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_pvp_kills }}</div>
           </div>
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull-crossbones mr-1 text-red-600"></i>PvP Deaths</div>
             <div class="text-2xl font-bold">{{ pageData.stats.total_pvp_deaths }}</div>
           </div>
@@ -470,33 +462,33 @@ function visNm(m: number): string {
       </div>
 
       <!-- Attendance -->
-      <template v-if="pageData.attendance">
+      <div v-if="pageData.attendance" class="card mb-6">
         <h2 class="text-xl font-bold mb-4">
           <i class="fa-solid fa-chart-line mr-2"></i>Fréquentation du serveur
         </h2>
 
         <!-- Summary cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="rounded-lg p-4 text-center text-white bg-veaf-600">
+          <div class="stat-card text-white bg-veaf-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-user-clock mr-1"></i>Joueurs actuels</div>
             <div class="text-3xl font-bold">{{ pageData.attendance.current_players }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-green-600">
+          <div class="stat-card text-white bg-green-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-calendar-day mr-1"></i>Uniques 24h</div>
             <div class="text-3xl font-bold">{{ pageData.attendance.unique_players_24h }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-sky-600">
+          <div class="stat-card text-white bg-sky-600">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-calendar-week mr-1"></i>Uniques 7j</div>
             <div class="text-3xl font-bold">{{ pageData.attendance.unique_players_7d }}</div>
           </div>
-          <div class="rounded-lg p-4 text-center text-white bg-gray-500">
+          <div class="stat-card text-white bg-gray-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-calendar mr-1"></i>Uniques 30j</div>
             <div class="text-3xl font-bold">{{ pageData.attendance.unique_players_30d }}</div>
           </div>
         </div>
 
         <!-- Period comparison table -->
-        <div class="card mb-6 overflow-x-auto">
+        <div class="mb-6 overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b bg-gray-50">
@@ -531,31 +523,31 @@ function visNm(m: number): string {
 
         <!-- Combat stats -->
         <div v-if="pageData.attendance.total_sorties != null" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-          <div class="card text-center">
+          <div class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-plane-departure mr-1"></i>Sorties</div>
             <div class="text-xl font-bold">{{ pageData.attendance.total_sorties }}</div>
           </div>
-          <div v-if="pageData.attendance.total_kills != null" class="card text-center">
+          <div v-if="pageData.attendance.total_kills != null" class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1"></i>Kills</div>
             <div class="text-xl font-bold">{{ pageData.attendance.total_kills }}</div>
           </div>
-          <div v-if="pageData.attendance.total_deaths != null" class="card text-center">
+          <div v-if="pageData.attendance.total_deaths != null" class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull mr-1"></i>Deaths</div>
             <div class="text-xl font-bold">{{ pageData.attendance.total_deaths }}</div>
           </div>
-          <div v-if="pageData.attendance.total_pvp_kills != null" class="card text-center">
+          <div v-if="pageData.attendance.total_pvp_kills != null" class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-crosshairs mr-1 text-red-600"></i>PvP Kills</div>
             <div class="text-xl font-bold">{{ pageData.attendance.total_pvp_kills }}</div>
           </div>
-          <div v-if="pageData.attendance.total_pvp_deaths != null" class="card text-center">
+          <div v-if="pageData.attendance.total_pvp_deaths != null" class="stat-card-light">
             <div class="text-sm text-gray-600 mb-1"><i class="fa-solid fa-skull-crossbones mr-1 text-red-600"></i>PvP Deaths</div>
             <div class="text-xl font-bold">{{ pageData.attendance.total_pvp_deaths }}</div>
           </div>
         </div>
 
         <!-- Top lists -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div v-if="pageData.attendance.top_theatres.length > 0" class="card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div v-if="pageData.attendance.top_theatres.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-globe mr-1"></i> Top Théâtres
             </h3>
@@ -569,7 +561,7 @@ function visNm(m: number): string {
             </table>
           </div>
 
-          <div v-if="pageData.attendance.top_missions.length > 0" class="card">
+          <div v-if="pageData.attendance.top_missions.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-list-check mr-1"></i> Top Missions
             </h3>
@@ -583,7 +575,7 @@ function visNm(m: number): string {
             </table>
           </div>
 
-          <div v-if="pageData.attendance.top_modules.length > 0" class="card">
+          <div v-if="pageData.attendance.top_modules.length > 0">
             <h3 class="font-bold mb-3 border-b pb-2">
               <i class="fa-solid fa-fighter-jet mr-1"></i> Top Modules
             </h3>
@@ -597,7 +589,7 @@ function visNm(m: number): string {
             </table>
           </div>
         </div>
-      </template>
+      </div>
     </template>
   </div>
 </template>

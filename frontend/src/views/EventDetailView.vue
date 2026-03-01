@@ -246,7 +246,7 @@ function formatShortDate(d: string) {
             @click="activeTab = 'description'"
             class="pb-2 text-sm font-medium border-b-2 transition-colors"
             :class="activeTab === 'description'
-              ? 'border-veaf-600 text-veaf-600'
+              ? 'border-veaf-500 text-veaf-500'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
           >
             Description
@@ -255,7 +255,7 @@ function formatShortDate(d: string) {
             @click="activeTab = 'debrief'"
             class="pb-2 text-sm font-medium border-b-2 transition-colors"
             :class="activeTab === 'debrief'
-              ? 'border-veaf-600 text-veaf-600'
+              ? 'border-veaf-500 text-veaf-500'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
           >
             Debrief
@@ -367,7 +367,7 @@ function formatShortDate(d: string) {
             @click="handleVote(null)"
             class="py-2 rounded-md font-medium text-sm transition-colors text-center"
             :class="userVote !== undefined && userVote.vote === null
-              ? 'bg-veaf-600 text-white hover:bg-veaf-700'
+              ? 'bg-veaf-500 text-white hover:bg-veaf-600'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
           >
             Peut-être

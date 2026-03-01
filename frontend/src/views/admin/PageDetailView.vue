@@ -12,7 +12,7 @@ import type { Page, PageBlock } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 import MarkdownEditor from '@/components/ui/MarkdownEditor.vue'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -180,7 +180,7 @@ onMounted(loadPage)
   <div>
     <!-- Header -->
     <div class="flex items-start justify-between">
-      <AdminBreadcrumb :page-title="page?.title ?? 'Chargement...'" />
+      <AppBreadcrumb :page-title="page?.title ?? 'Chargement...'" />
       <a v-if="page" :href="'/' + page.path" target="_blank" class="btn-secondary mt-5" title="Ouvrir la page dans un nouvel onglet">
         <i class="fa-solid fa-up-right-from-square mr-1"></i>Ouvrir la page
       </a>

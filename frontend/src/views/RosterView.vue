@@ -7,6 +7,7 @@ import RosterModuleList from '@/components/roster/RosterModuleList.vue'
 import RosterModuleDetail from '@/components/roster/RosterModuleDetail.vue'
 import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
 import { useAuthStore } from '@/stores/auth'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const authStore = useAuthStore()
 
@@ -58,7 +59,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">Roster</h1>
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Top bar: group selector + tabs -->
     <div

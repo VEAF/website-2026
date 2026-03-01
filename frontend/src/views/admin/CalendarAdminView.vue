@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { getAdminEvents, restoreAdminEvent } from '@/api/calendar'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { AdminEvent } from '@/types/calendar'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
@@ -132,7 +132,7 @@ onMounted(loadEvents)
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Search & Filters -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">

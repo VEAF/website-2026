@@ -210,7 +210,7 @@ async function onPaste(e: ClipboardEvent) {
           type="button"
           class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
           :class="activeTab === 'edit'
-            ? 'border-veaf-600 text-veaf-600'
+            ? 'border-veaf-500 text-veaf-500'
             : 'border-transparent text-gray-500 hover:text-gray-700'"
           @click="activeTab = 'edit'"
         >
@@ -220,7 +220,7 @@ async function onPaste(e: ClipboardEvent) {
           type="button"
           class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
           :class="activeTab === 'preview'
-            ? 'border-veaf-600 text-veaf-600'
+            ? 'border-veaf-500 text-veaf-500'
             : 'border-transparent text-gray-500 hover:text-gray-700'"
           @click="activeTab = 'preview'"
         >

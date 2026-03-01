@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { getTeamSpeakStatus } from '@/api/teamspeak'
 import type { TSStatus, TSChannel } from '@/types/teamspeak'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const POLL_INTERVAL = 60_000 // 60 seconds
 
@@ -51,6 +52,7 @@ const activeChannels = computed<TSChannel[]>(() => {
 
 <template>
   <div>
+    <AppBreadcrumb :show-title="false" />
     <h1 class="text-2xl font-bold mb-6">
       <i class="fa-brands fa-teamspeak mr-2"></i>Clients connectés sur TeamSpeak
     </h1>

@@ -326,7 +326,7 @@ function onKeydown(e: KeyboardEvent) {
                 type="button"
                 class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors border"
                 :class="selectedTask === t.value
-                  ? 'bg-veaf-600 text-white border-veaf-600'
+                  ? 'bg-veaf-500 text-white border-veaf-500'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'"
                 @click="selectedTask = t.value"
               >

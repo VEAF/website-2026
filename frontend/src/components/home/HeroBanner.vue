@@ -1,10 +1,10 @@
 <template>
   <section class="page-container pt-6 mb-6">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white shadow-lg rounded-lg p-4">
       <img
         src="/img/test_banniere_1.jpg"
         alt="VEAF Banner"
-        class="w-full"
+        class="w-full rounded-lg"
       />
       <div class="py-8 text-center">
         <p class="text-gray-600 text-lg mb-4">Bienvenue sur le site Internet de la</p>

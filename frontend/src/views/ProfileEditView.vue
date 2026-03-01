@@ -181,7 +181,7 @@ function levelClass(moduleId: number, level: number): string {
   if (currentLevel === level) {
     if (level === 1) return 'bg-yellow-500 text-white border-yellow-500'
     if (level === 2) return 'bg-green-600 text-white border-green-600'
-    if (level === 3) return 'bg-veaf-600 text-white border-veaf-600'
+    if (level === 3) return 'bg-veaf-500 text-white border-veaf-500'
   }
   return 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
 }

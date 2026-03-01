@@ -71,13 +71,13 @@ function getItemLink(item: MenuItem): string | null {
   <div ref="navRef" :class="mobile ? 'flex flex-col space-y-1' : 'flex items-center space-x-1'">
     <template v-for="item in items" :key="item.id">
       <!-- Divider -->
-      <div v-if="item.type === 5" :class="mobile ? 'border-t border-gray-700 my-2' : 'w-px h-6 bg-gray-600'" />
+      <div v-if="item.type === 5" :class="mobile ? 'border-t border-white/20 my-2' : 'w-px h-6 bg-white/30'" />
 
       <!-- Dropdown menu (desktop) -->
       <div v-else-if="item.type === 1 && item.items.length > 0 && !mobile" class="relative">
         <button
           @click="toggleDropdown(item.id)"
-          class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+          class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         >
           <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
           {{ item.label }}
@@ -96,14 +96,14 @@ function getItemLink(item: MenuItem): string | null {
         >
           <div
             v-if="openDropdownId === item.id"
-            class="absolute left-0 mt-1 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50"
+            class="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
           >
             <template v-for="child in item.items" :key="child.id">
-              <div v-if="child.type === 5" class="border-t border-gray-700 my-1" />
+              <div v-if="child.type === 5" class="border-t border-gray-200 my-1" />
               <RouterLink
                 v-else-if="getItemLink(child)"
                 :to="getItemLink(child)!"
-                class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700"
+                class="block px-4 py-2 text-sm text-gray-700 hover:text-veaf-600 hover:bg-gray-50"
               >
                 <span v-if="child.icon" class="mr-1"><i :class="child.icon" /></span>
                 {{ child.label }}
@@ -117,7 +117,7 @@ function getItemLink(item: MenuItem): string | null {
       <div v-else-if="item.type === 1 && item.items.length > 0 && mobile">
         <button
           @click="toggleDropdown(item.id)"
-          class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+          class="w-full text-left px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         >
           <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
           {{ item.label }}
@@ -128,11 +128,11 @@ function getItemLink(item: MenuItem): string | null {
         </button>
         <div v-if="openDropdownId === item.id" class="pl-4 space-y-1">
           <template v-for="child in item.items" :key="child.id">
-            <div v-if="child.type === 5" class="border-t border-gray-700 my-1" />
+            <div v-if="child.type === 5" class="border-t border-white/20 my-1" />
             <RouterLink
               v-else-if="getItemLink(child)"
               :to="getItemLink(child)!"
-              class="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+              class="block px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
             >
               <span v-if="child.icon" class="mr-1"><i :class="child.icon" /></span>
               {{ child.label }}
@@ -145,13 +145,13 @@ function getItemLink(item: MenuItem): string | null {
       <RouterLink
         v-else-if="item.type === 7"
         to="/servers"
-        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         :class="item.theme_classes"
         :title="headerStore.connectedPlayers > 0 ? `${headerStore.connectedPlayers} joueur(s) connecté(s)` : undefined"
       >
         <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
         <template v-if="headerStore.connectedPlayers > 0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
             {{ headerStore.connectedPlayers }}
           </span>
           <span class="ml-1">joueur(s)</span>
@@ -165,13 +165,13 @@ function getItemLink(item: MenuItem): string | null {
       <RouterLink
         v-else-if="item.type === 9"
         to="/calendar"
-        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         :class="item.theme_classes"
         :title="headerStore.nextEventsCount > 0 ? `${headerStore.nextEventsCount} événement(s) dans les 7 prochains jours` : undefined"
       >
         <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
         <template v-if="headerStore.nextEventsCount > 0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
             {{ headerStore.nextEventsCount }}
           </span>
           <span class="ml-1">événement(s)</span>
@@ -185,13 +185,13 @@ function getItemLink(item: MenuItem): string | null {
       <RouterLink
         v-else-if="item.type === 11"
         to="/teamspeak"
-        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         :class="item.theme_classes"
         :title="headerStore.tsClientCount > 0 ? `${headerStore.tsClientCount} client(s) connecté(s) sur TeamSpeak` : undefined"
       >
         <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
         <template v-if="headerStore.tsClientCount > 0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-white">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
             {{ headerStore.tsClientCount }}
           </span>
           <span class="ml-1">client(s)</span>
@@ -205,7 +205,7 @@ function getItemLink(item: MenuItem): string | null {
       <RouterLink
         v-else-if="getItemLink(item)"
         :to="getItemLink(item)!"
-        class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         :class="item.theme_classes"
       >
         <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>

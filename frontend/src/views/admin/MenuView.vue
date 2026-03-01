@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AdminBreadcrumb from '@/components/admin/AdminBreadcrumb.vue'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import MenuListView from '@/components/admin/MenuListView.vue'
 import MenuTreeView from '@/components/admin/MenuTreeView.vue'
 
@@ -9,7 +9,7 @@ const activeTab = ref<'list' | 'tree'>('list')
 
 <template>
   <div>
-    <AdminBreadcrumb />
+    <AppBreadcrumb />
 
     <!-- Tab switcher -->
     <div class="flex space-x-1 mb-6 border-b">
@@ -17,7 +17,7 @@ const activeTab = ref<'list' | 'tree'>('list')
         class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
         :class="
           activeTab === 'list'
-            ? 'border-veaf-500 text-veaf-600'
+            ? 'border-veaf-500 text-veaf-500'
             : 'border-transparent text-gray-500 hover:text-gray-700'
         "
         @click="activeTab = 'list'"
@@ -28,7 +28,7 @@ const activeTab = ref<'list' | 'tree'>('list')
         class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
         :class="
           activeTab === 'tree'
-            ? 'border-veaf-500 text-veaf-600'
+            ? 'border-veaf-500 text-veaf-500'
             : 'border-transparent text-gray-500 hover:text-gray-700'
         "
         @click="activeTab = 'tree'"

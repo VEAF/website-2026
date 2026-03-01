@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply font-sans text-gray-900 antialiased;
+    @apply font-sans antialiased;
+    color: #495057;
     background-image: url('/img/background-01-blur.jpg');
     background-attachment: fixed;
     background-size: cover;
@@ -22,23 +23,48 @@
   }
 
   .btn-primary {
-    @apply btn bg-veaf-600 text-white hover:bg-veaf-700 focus:ring-veaf-500;
+    @apply btn text-white focus:ring-veaf-400;
+    background-image: linear-gradient(#4fb3eb, #2fa4e7 60%, #2c9ad9);
+  }
+  .btn-primary:hover {
+    @apply text-white;
+    background-image: linear-gradient(#2fa4e7, #2d9cdb 60%, #288bc4);
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400;
+    @apply btn text-gray-700 focus:ring-gray-400;
+    background-image: linear-gradient(#edeff2, #e9ecef 60%, #dbdee1);
+  }
+  .btn-secondary:hover {
+    @apply text-gray-700;
+    background-image: linear-gradient(#e9ecef, #dde0e3 60%, #c6c9cb);
   }
 
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply btn text-white focus:ring-[#c71c22];
+    background-image: linear-gradient(#d04045, #c71c22 60%, #bb1a20);
+  }
+  .btn-danger:hover {
+    @apply text-white;
+    background-image: linear-gradient(#c71c22, #bd1b20 60%, #a9181d);
   }
 
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    @apply btn text-white focus:ring-[#73a839];
+    background-image: linear-gradient(#89b659, #73a839 60%, #6c9e36);
+  }
+  .btn-success:hover {
+    @apply text-white;
+    background-image: linear-gradient(#73a839, #6da036 60%, #628f30);
   }
 
   .btn-warning {
-    @apply btn bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-400;
+    @apply btn text-white focus:ring-[#dd5600];
+    background-image: linear-gradient(#e27129, #dd5600 60%, #d05100);
+  }
+  .btn-warning:hover {
+    @apply text-white;
+    background-image: linear-gradient(#dd5600, #d25200 60%, #bc4900);
   }
 
   .input {
@@ -68,6 +94,122 @@
   .module-special {
     @apply bg-amber-100 text-amber-800;
   }
+
+  .btn-info {
+    @apply btn text-white focus:ring-veaf-700;
+    background-image: linear-gradient(#2b5b89, #033c73 60%, #03386c);
+  }
+  .btn-info:hover {
+    @apply text-white;
+    background-image: linear-gradient(#033c73, #03396d 60%, #033362);
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .stat-card {
+    @apply rounded-lg p-6 text-center shadow-md border border-white/20;
+  }
+
+  .stat-card-light {
+    @apply rounded-lg p-6 text-center shadow-sm border border-gray-200 bg-white;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-veaf-100 text-veaf-800;
+  }
+
+  .badge-success {
+    @apply badge bg-[#e2edcc] text-[#4a6b25];
+  }
+
+  .badge-warning {
+    @apply badge bg-[#fde0c0] text-[#8e3700];
+  }
+
+  .badge-danger {
+    @apply badge bg-[#f7cdce] text-[#7f1216];
+  }
+
+  .badge-neutral {
+    @apply badge bg-gray-100 text-gray-800;
+  }
+
+  .alert {
+    @apply rounded-lg px-4 py-3 text-sm border;
+  }
+
+  .alert-info {
+    @apply alert bg-veaf-50 border-veaf-200 text-veaf-800;
+  }
+
+  .alert-success {
+    @apply alert bg-[#f3f8ec] border-[#c5db99] text-[#4a6b25];
+  }
+
+  .alert-warning {
+    @apply alert bg-[#fef3e6] border-[#fbc180] text-[#8e3700];
+  }
+
+  .alert-danger {
+    @apply alert bg-[#fceced] border-[#ef9b9e] text-[#7f1216];
+  }
+
+  /* Aviation-style arrow breadcrumb */
+  .breadcrumb-segment {
+    @apply inline-flex items-center h-8 text-sm font-medium text-white whitespace-nowrap;
+    padding-left: 20px;
+    padding-right: 16px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+    margin-left: -5px;
+  }
+
+  .breadcrumb-segment-first {
+    padding-left: 14px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+    margin-left: 0;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .breadcrumb-segment-primary {
+    background-image: linear-gradient(#4fb3eb, #2fa4e7 60%, #2c9ad9);
+    color: white;
+  }
+  .breadcrumb-segment-primary:hover {
+    background-image: linear-gradient(#2fa4e7, #2d9cdb 60%, #288bc4);
+    color: white;
+  }
+
+  .breadcrumb-segment-info {
+    background-image: linear-gradient(#2b5b89, #033c73 60%, #03386c);
+    color: white;
+  }
+  .breadcrumb-segment-info:hover {
+    background-image: linear-gradient(#033c73, #03396d 60%, #033362);
+    color: white;
+  }
+
+  .breadcrumb-segment-active {
+    @apply font-semibold;
+  }
+}
+
+/* Scrollbar hide utility for horizontal scroll breadcrumbs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Toast notification overrides */
@@ -133,13 +275,13 @@
 /* FullCalendar overrides — harmonize with VEAF Tailwind theme */
 .fc {
   --fc-border-color: #e5e7eb;
-  --fc-button-bg-color: #5c7cfa;
-  --fc-button-border-color: #4c6ef5;
-  --fc-button-hover-bg-color: #4263eb;
-  --fc-button-hover-border-color: #3b5bdb;
-  --fc-button-active-bg-color: #4263eb;
-  --fc-button-active-border-color: #3b5bdb;
-  --fc-today-bg-color: #f0f4ff;
+  --fc-button-bg-color: #2fa4e7;
+  --fc-button-border-color: #1e8cc7;
+  --fc-button-hover-bg-color: #1a75a8;
+  --fc-button-hover-border-color: #165e87;
+  --fc-button-active-bg-color: #2fa4e7;
+  --fc-button-active-border-color: #1e8cc7;
+  --fc-today-bg-color: #f0f8fd;
   --fc-event-text-color: #ffffff;
   font-size: 0.875rem;
 }
