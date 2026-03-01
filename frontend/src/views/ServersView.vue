@@ -160,7 +160,7 @@ function formatAvgPlaytime(seconds: number): string {
 
         <!-- Primary stats row -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div class="rounded-lg p-4 text-center text-white bg-veaf-600">
+          <div class="rounded-lg p-4 text-center text-white bg-veaf-500">
             <div class="text-sm font-medium mb-1"><i class="fa-solid fa-users mr-1"></i>Joueurs total</div>
             <div class="text-3xl font-bold">{{ pageData.stats.total_players }}</div>
           </div>

@@ -340,7 +340,7 @@ onMounted(loadAll)
         class="px-4 py-2 text-sm font-medium -mb-px"
         :class="
           currentTab === tab.key
-            ? 'border-b-2 border-veaf-600 text-veaf-600'
+            ? 'border-b-2 border-veaf-500 text-veaf-500'
             : 'text-gray-500 hover:text-gray-700'
         "
         @click="currentTab = tab.key"

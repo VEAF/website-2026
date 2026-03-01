@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply font-sans text-gray-900 antialiased;
+    @apply font-sans antialiased;
+    color: #495057;
     background-image: url('/img/background-01-blur.jpg');
     background-attachment: fixed;
     background-size: cover;
@@ -22,7 +23,7 @@
   }
 
   .btn-primary {
-    @apply btn bg-veaf-600 text-white hover:bg-veaf-700 focus:ring-veaf-500;
+    @apply btn bg-veaf-500 text-white hover:bg-veaf-600 focus:ring-veaf-400;
   }
 
   .btn-secondary {
@@ -67,6 +68,62 @@
   }
   .module-special {
     @apply bg-amber-100 text-amber-800;
+  }
+
+  .btn-info {
+    @apply btn bg-veaf-900 text-white hover:bg-veaf-800 focus:ring-veaf-700;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-veaf-100 text-veaf-800;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-800;
+  }
+
+  .badge-neutral {
+    @apply badge bg-gray-100 text-gray-800;
+  }
+
+  .alert {
+    @apply rounded-lg px-4 py-3 text-sm border;
+  }
+
+  .alert-info {
+    @apply alert bg-veaf-50 border-veaf-200 text-veaf-800;
+  }
+
+  .alert-success {
+    @apply alert bg-green-50 border-green-200 text-green-800;
+  }
+
+  .alert-warning {
+    @apply alert bg-yellow-50 border-yellow-200 text-yellow-800;
+  }
+
+  .alert-danger {
+    @apply alert bg-red-50 border-red-200 text-red-800;
   }
 }
 
@@ -133,13 +190,13 @@
 /* FullCalendar overrides — harmonize with VEAF Tailwind theme */
 .fc {
   --fc-border-color: #e5e7eb;
-  --fc-button-bg-color: #5c7cfa;
-  --fc-button-border-color: #4c6ef5;
-  --fc-button-hover-bg-color: #4263eb;
-  --fc-button-hover-border-color: #3b5bdb;
-  --fc-button-active-bg-color: #4263eb;
-  --fc-button-active-border-color: #3b5bdb;
-  --fc-today-bg-color: #f0f4ff;
+  --fc-button-bg-color: #2fa4e7;
+  --fc-button-border-color: #1e8cc7;
+  --fc-button-hover-bg-color: #1a75a8;
+  --fc-button-hover-border-color: #165e87;
+  --fc-button-active-bg-color: #1a75a8;
+  --fc-button-active-border-color: #165e87;
+  --fc-today-bg-color: #f0f8fd;
   --fc-event-text-color: #ffffff;
   font-size: 0.875rem;
 }

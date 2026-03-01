@@ -112,6 +112,11 @@ const router = createRouter({
       name: 'metrics',
       component: () => import('@/views/MetricsView.vue'),
     },
+    {
+      path: '/design-system',
+      name: 'design-system',
+      component: () => import('@/views/DesignSystemView.vue'),
+    },
     // Admin routes
     {
       path: '/admin',
