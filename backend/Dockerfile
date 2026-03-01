@@ -22,6 +22,9 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload
 # ---- Prod: deps + source ----
 FROM base AS prod
 
+LABEL org.opencontainers.image.source="https://github.com/VEAF/website-2026"
+LABEL org.opencontainers.image.description="VEAF Website 2026 - Backend API"
+
 COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-dev --no-install-project
 
@@ -31,6 +34,9 @@ RUN uv sync --frozen --no-dev
 RUN chown -R worker:worker /app
 USER worker
 EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')" || exit 1
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
