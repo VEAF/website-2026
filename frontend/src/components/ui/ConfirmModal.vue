@@ -2,7 +2,7 @@
 import { watch, nextTick, ref } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
 
-const { visible, message, handleResponse } = useConfirm()
+const { visible, message, button, handleResponse } = useConfirm()
 
 const confirmButtonRef = ref<HTMLButtonElement | null>(null)
 
@@ -73,7 +73,7 @@ function onKeydown(e: KeyboardEvent) {
               class="btn-danger"
               @click="handleResponse(true)"
             >
-              <i class="fa-solid fa-check mr-1"></i>Confirmer
+              <i :class="[button.icon, 'mr-1']"></i>{{ button.label }}
             </button>
           </div>
         </div>

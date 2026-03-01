@@ -49,6 +49,7 @@ async function markPresentation() {
   if (!user.value) return
   const ok = await confirm(
     `J'indique avoir présenté au cadet ${user.value.nickname} le fonctionnement de l'association, sans avoir oublié de préciser quelles sont nos valeurs et comment se déroule la période d'essai.`,
+    { button: { label: 'Confirmer', icon: 'fa-solid fa-check' } },
   )
   if (!ok) return
   actionLoading.value = true
