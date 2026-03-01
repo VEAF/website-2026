@@ -9,6 +9,19 @@ from app.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Run Alembic migrations if enabled (useful in production)
+    if settings.RUN_MIGRATIONS:
+        import logging
+        import subprocess
+
+        logger = logging.getLogger("app.startup")
+        logger.info("RUN_MIGRATIONS is enabled, running alembic upgrade head...")
+        result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
+        if result.returncode != 0:
+            logger.error("Migration failed: %s", result.stderr)
+            raise RuntimeError(f"Alembic migration failed: {result.stderr}")
+        logger.info("Migrations completed successfully")
+
     # Startup: initialize APScheduler
     from app.tasks.scheduler import start_scheduler
 
