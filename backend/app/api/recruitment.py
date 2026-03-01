@@ -20,7 +20,7 @@ async def get_recruitment_history(user_id: int, db: AsyncSession = Depends(get_d
         select(RecruitmentEvent)
         .where(RecruitmentEvent.user_id == user_id)
         .options(selectinload(RecruitmentEvent.validator))
-        .order_by(RecruitmentEvent.event_at.desc())
+        .order_by(RecruitmentEvent.event_at.asc())
     )
     events = result.scalars().all()
 

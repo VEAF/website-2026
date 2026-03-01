@@ -27,6 +27,8 @@ export interface UserPublic {
 
 export interface UserProfile extends UserPublic {
   modules: UserModule[]
+  need_presentation?: boolean | null
+  cadet_flights?: number | null
 }
 
 export interface UserMe extends UserPublic {

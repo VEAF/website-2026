@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import apiClient from '@/api/client'
+import { useRoute, useRouter } from 'vue-router'
+import { getRecruitmentHistory } from '@/api/recruitment'
+import type { RecruitmentEvent } from '@/api/recruitment'
 
 const route = useRoute()
+const router = useRouter()
 const userId = Number(route.params.userId)
-const events = ref<any[]>([])
+const events = ref<RecruitmentEvent[]>([])
 
 onMounted(async () => {
-  const { data } = await apiClient.get(`/recruitment/${userId}`)
-  events.value = data
+  events.value = await getRecruitmentHistory(userId)
 })
 </script>
 
 <template>
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6">Historique de recrutement</h1>
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Historique de recrutement</h1>
+      <button class="btn-secondary text-sm" @click="router.back()">
+        <i class="fa-solid fa-arrow-left mr-1"></i>Retour
+      </button>
+    </div>
 
     <div v-if="events.length === 0" class="text-center py-8 text-gray-500">Aucun événement</div>
 

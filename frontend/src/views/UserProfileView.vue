@@ -2,15 +2,27 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { getUser } from '@/api/users'
+import { addRecruitmentEvent, getRecruitmentHistory, TYPE_PRESENTATION, TYPE_ACTIVITY } from '@/api/recruitment'
+import type { RecruitmentEvent } from '@/api/recruitment'
 import { useAuthStore } from '@/stores/auth'
+import { useConfirm } from '@/composables/useConfirm'
+import AddActivityModal from '@/components/recruitment/AddActivityModal.vue'
 import type { UserProfile } from '@/types/user'
 import type { UserModule } from '@/types/user'
 import { TYPES_WITH_LEVEL, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_ORDER } from '@/constants/modules'
 
+const CADET_MIN_FLIGHTS = 5
+
 const route = useRoute()
 const auth = useAuthStore()
+const { confirm } = useConfirm()
 const user = ref<UserProfile | null>(null)
 const loading = ref(true)
+const showActivityModal = ref(false)
+const showHistoryModal = ref(false)
+const historyEvents = ref<RecruitmentEvent[]>([])
+const historyLoading = ref(false)
+const actionLoading = ref(false)
 
 interface PeriodGroup {
   period: number | null
@@ -28,6 +40,49 @@ interface TypeGroup {
 const isOwnProfile = computed(() => {
   return auth.user && user.value && auth.user.id === user.value.id
 })
+
+const showCadetSection = computed(() => {
+  return user.value && user.value.status === 1 && user.value.need_presentation != null && auth.isMember
+})
+
+async function markPresentation() {
+  if (!user.value) return
+  const ok = await confirm(
+    `J'indique avoir présenté au cadet ${user.value.nickname} le fonctionnement de l'association, sans avoir oublié de préciser quelles sont nos valeurs et comment se déroule la période d'essai.`,
+    { button: { label: 'Confirmer', icon: 'fa-solid fa-check' } },
+  )
+  if (!ok) return
+  actionLoading.value = true
+  try {
+    await addRecruitmentEvent(user.value.id, TYPE_PRESENTATION)
+    user.value.need_presentation = false
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function openHistory() {
+  if (!user.value) return
+  showHistoryModal.value = true
+  historyLoading.value = true
+  try {
+    historyEvents.value = await getRecruitmentHistory(user.value.id)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+async function handleAddActivity(comment: string) {
+  if (!user.value) return
+  showActivityModal.value = false
+  actionLoading.value = true
+  try {
+    await addRecruitmentEvent(user.value.id, TYPE_ACTIVITY, comment || undefined)
+    user.value.cadet_flights = (user.value.cadet_flights ?? 0) + 1
+  } finally {
+    actionLoading.value = false
+  }
+}
 
 const groupedModules = computed<TypeGroup[]>(() => {
   if (!user.value?.modules?.length) return []
@@ -166,6 +221,121 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <!-- Cadet integration section -->
+    <div v-if="showCadetSection" class="card mb-6">
+      <h2 class="text-lg font-semibold mb-4">Intégration du cadet</h2>
+
+      <div class="space-y-2 text-sm">
+        <p>
+          <i
+            :class="user.sim_dcs ? 'fa-solid fa-square-check text-green-600' : 'fa-regular fa-square text-red-500'"
+            class="mr-2"
+          ></i>
+          Simulateur DCS
+        </p>
+
+        <p>
+          <i
+            :class="!user.need_presentation ? 'fa-solid fa-square-check text-green-600' : 'fa-regular fa-square text-red-500'"
+            class="mr-2"
+          ></i>
+          <template v-if="user.need_presentation">
+            <button
+              class="text-veaf-600 hover:text-veaf-800 underline"
+              :disabled="actionLoading"
+              @click="markPresentation"
+            >
+              Présentation de l'association par un membre
+            </button>
+          </template>
+          <template v-else>
+            Présentation de l'association par un membre
+          </template>
+        </p>
+
+        <p>
+          <i
+            :class="(user.cadet_flights ?? 0) >= CADET_MIN_FLIGHTS ? 'fa-solid fa-square-check text-green-600' : 'fa-regular fa-square text-red-500'"
+            class="mr-2"
+          ></i>
+          {{ user.cadet_flights ?? 0 }} / {{ CADET_MIN_FLIGHTS }}
+          <button
+            class="text-veaf-600 hover:text-veaf-800 underline"
+            @click="openHistory"
+          >activité(s)</button>
+          <button
+            class="text-veaf-600 hover:text-veaf-800 underline ml-1"
+            :disabled="actionLoading"
+            @click="showActivityModal = true"
+          >
+            - ajouter une activité ...
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <AddActivityModal
+      v-if="user"
+      :visible="showActivityModal"
+      :nickname="user.nickname"
+      @submit="handleAddActivity"
+      @close="showActivityModal = false"
+    />
+
+    <!-- History modal -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showHistoryModal"
+          class="fixed inset-0 z-50 flex items-center justify-center"
+          @keydown.escape="showHistoryModal = false"
+        >
+          <div class="absolute inset-0 bg-black/50" @click="showHistoryModal = false" />
+          <div
+            role="dialog"
+            aria-modal="true"
+            class="relative bg-white rounded-lg shadow-lg border border-gray-200 p-6 max-w-lg w-full mx-4 max-h-[80vh] flex flex-col"
+          >
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              Evénements de {{ user?.nickname }}
+            </h3>
+
+            <div v-if="historyLoading" class="text-center py-6 text-gray-500">Chargement...</div>
+
+            <div v-else-if="historyEvents.length === 0" class="text-center py-6 text-gray-500">
+              Aucun événement
+            </div>
+
+            <div v-else class="overflow-y-auto space-y-2 text-sm">
+              <div v-for="e in historyEvents" :key="e.id" class="border-b border-gray-100 pb-2">
+                <span class="text-gray-500">{{ e.event_at ? new Date(e.event_at).toLocaleDateString('fr-FR') : '' }}</span>
+                - <span class="font-medium capitalize">{{ e.type_as_string }}</span>
+                <template v-if="e.validator_nickname">
+                  avec <span class="font-medium">{{ e.validator_nickname }}</span>
+                </template>
+                <template v-if="e.comment">
+                  - <span class="italic text-gray-600">{{ e.comment }}</span>
+                </template>
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+              <button class="btn-secondary" @click="showHistoryModal = false">
+                <i class="fa-solid fa-xmark mr-1"></i>Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Modules section -->
     <div v-if="groupedModules.length > 0" class="card">
