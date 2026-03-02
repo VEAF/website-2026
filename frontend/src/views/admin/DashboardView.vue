@@ -17,6 +17,22 @@ onMounted(async () => {
 <template>
   <div>
     <AppBreadcrumb :show-title="false" />
+    <!-- Cadet readiness notification -->
+    <RouterLink
+      v-if="stats?.cadets_ready_to_promote"
+      to="/admin/users?status=1"
+      class="card mb-4 flex items-center gap-3 hover:shadow-md transition-shadow border-green-200 bg-green-50"
+    >
+      <div class="text-green-600"><i class="fa-solid fa-circle-check text-2xl"></i></div>
+      <div>
+        <span class="text-lg font-bold text-green-700">{{ stats.cadets_ready_to_promote }}</span>
+        <span class="text-sm text-green-800 ml-1">
+          cadet{{ stats.cadets_ready_to_promote > 1 ? 's' : '' }}
+          prêt{{ stats.cadets_ready_to_promote > 1 ? 's' : '' }} à rejoindre l'association
+        </span>
+      </div>
+    </RouterLink>
+
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <RouterLink to="/admin/users" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-users text-2xl"></i></div>

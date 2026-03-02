@@ -8,6 +8,7 @@ export interface AdminStats {
   urls: number
   menu_items: number
   servers: number
+  cadets_ready_to_promote: number
 }
 
 export async function getAdminStats(): Promise<AdminStats> {

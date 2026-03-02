@@ -7,6 +7,7 @@ export interface RosterStats {
   cadets: number
   members: number
   cadets_need_presentation: number
+  cadets_ready_to_promote: number
 }
 
 export interface RosterUser {
@@ -16,6 +17,7 @@ export interface RosterUser {
   status_as_string: string | null
   active_module_count: number
   need_presentation: boolean
+  is_ready_to_promote: boolean
 }
 
 export interface RosterModule {

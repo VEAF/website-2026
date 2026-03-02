@@ -12,6 +12,128 @@ VEAF Website 2026 — community web app for the Virtual European Air Force (DCS 
 - **Frontend**: Vue 3 (Composition API) + TypeScript + Vite 6 + Tailwind CSS 3 + Pinia stores
 - **Infra**: Docker Compose, Nginx reverse proxy, single uvicorn worker (for in-memory cache consistency)
 
+## Project Tree
+
+```
+.
+├── CLAUDE.md                          # Instructions for Claude Code
+├── README.md
+├── docker-compose.yml                 # 4 services: backend, frontend, nginx, postgres
+├── backend/
+│   ├── Dockerfile
+│   ├── entrypoint.sh                  # Container entrypoint (migrations auto-run)
+│   ├── pyproject.toml / uv.lock       # Python dependencies (uv)
+│   ├── alembic.ini
+│   ├── alembic/
+│   │   └── versions/                  # Migration files
+│   ├── app/
+│   │   ├── main.py                    # FastAPI entry point
+│   │   ├── config.py                  # Pydantic Settings (env vars)
+│   │   ├── database.py                # Async engine, session, get_db()
+│   │   ├── console.py                 # CLI entry point (Typer)
+│   │   ├── dependencies.py            # Shared FastAPI dependencies
+│   │   ├── api/                       # Route handlers (/api prefix)
+│   │   │   ├── router.py              # Mounts all routes
+│   │   │   ├── auth.py                # Login, register, refresh, password reset
+│   │   │   ├── users.py, calendar.py, modules.py, pages.py, servers.py, ...
+│   │   │   ├── admin_users.py, admin_events.py, admin_modules.py, ...
+│   │   │   └── admin/                 # (sub-package, currently empty)
+│   │   ├── auth/                      # Auth layer
+│   │   │   ├── jwt.py                 # Token creation/validation
+│   │   │   ├── password.py            # Hashing (bcrypt)
+│   │   │   ├── dependencies.py        # get_current_user, require_admin, ...
+│   │   │   └── permissions.py         # Voter-pattern permission checks
+│   │   ├── models/                    # SQLAlchemy 2.0 ORM models
+│   │   │   ├── user.py               # User, UserModule
+│   │   │   ├── module.py             # Module, ModuleRole, ModuleSystem
+│   │   │   ├── calendar.py           # CalendarEvent, Flight, Slot, Choice, Vote, Notification
+│   │   │   ├── content.py            # Page, PageBlock, MenuItem, Url, File
+│   │   │   ├── dcs.py                # Server, Player, DcsBotSyncState
+│   │   │   └── recruitment.py        # RecruitmentEvent
+│   │   ├── schemas/                   # Pydantic v2 DTOs
+│   │   │   ├── auth.py, user.py, calendar.py, content.py, dcs.py, ...
+│   │   │   └── header.py, module.py, roster.py, teamspeak.py
+│   │   ├── services/                  # Business logic
+│   │   │   ├── dcsbot.py             # DCS bot integration
+│   │   │   ├── teamspeak.py          # TeamSpeak queries
+│   │   │   └── sun_position.py       # Sun position calculations
+│   │   ├── commands/                  # CLI commands (Typer)
+│   │   │   ├── database.py           # create, fixtures
+│   │   │   ├── import_yaml.py        # YAML data import
+│   │   │   └── maintenance.py        # Maintenance tasks
+│   │   ├── tasks/                     # Background tasks
+│   │   │   ├── scheduler.py          # Task scheduler
+│   │   │   └── teamspeak_scan.py     # Periodic TS scan
+│   │   └── utils/
+│   │       └── cache.py              # In-memory TTLCache
+│   ├── fixtures/                      # YAML seed data
+│   │   ├── users.py, modules.py, calendar.py, content.py, ...
+│   │   └── reference.py, user_modules.py
+│   ├── tests/
+│   │   ├── conftest.py               # Pytest fixtures (SQLite in-memory DB)
+│   │   ├── factories.py              # factory-boy model factories
+│   │   ├── unit/                     # Unit tests
+│   │   │   ├── test_permissions.py, test_sun_position.py, test_user_model.py
+│   │   │   └── services/test_teamspeak.py
+│   │   ├── integration/api/          # Integration tests (HTTP)
+│   │   │   ├── test_auth.py, test_admin_users.py, test_admin_events.py, ...
+│   │   │   └── test_calendar_events.py, test_teamspeak.py, ...
+│   │   └── functional/              # Functional tests (empty for now)
+│   ├── uploads/                      # User-uploaded files
+│   └── var/                          # Runtime data (logs, etc.)
+├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf                    # Production Nginx config
+│   ├── package.json / package-lock.json
+│   ├── vite.config.ts                # Vite config (@ alias, proxy)
+│   ├── tailwind.config.js            # Tailwind + veaf-* palette
+│   ├── tsconfig.json
+│   ├── index.html                    # SPA entry HTML
+│   ├── public/                       # Static assets (images, favicon)
+│   └── src/
+│       ├── main.ts                   # Vue app bootstrap (Pinia, Router, FA icons)
+│       ├── App.vue                   # Root component (ConfirmModal mounted here)
+│       ├── config.ts                 # Runtime config
+│       ├── api/                      # Axios API clients
+│       │   ├── client.ts             # Base Axios instance (JWT injection, 401 refresh)
+│       │   ├── auth.ts, admin.ts, users.ts, calendar.ts, modules.ts, ...
+│       │   └── pages.ts, servers.ts, files.ts, urls.ts, recruitment.ts, roster.ts
+│       ├── stores/                   # Pinia stores (Composition API)
+│       │   ├── auth.ts, calendar.ts, menu.ts, header.ts
+│       ├── composables/              # Vue composables
+│       │   ├── useConfirm.ts, useToast.ts, useMarkdown.ts, useRosterHelpers.ts
+│       ├── components/
+│       │   ├── layout/               # AppHeader, AppFooter, NavMenu
+│       │   ├── ui/                   # Shared: ConfirmModal, ChoiceModal, MarkdownEditor, ...
+│       │   ├── home/                 # HeroBanner, ModuleCard
+│       │   ├── admin/                # MenuTreeView, MenuTreeNode, MenuListView
+│       │   ├── roster/               # RosterModuleList, RosterModuleDetail, RosterPilotsList
+│       │   └── recruitment/          # AddActivityModal
+│       ├── views/                    # Page-level components
+│       │   ├── HomeView, LoginView, RegisterView, CalendarView, ...
+│       │   ├── RosterView, ServersView, MapView, MetricsView, ...
+│       │   └── admin/                # DashboardView, UsersView, ModulesView, PagesView, ...
+│       ├── router/                   # Vue Router (index.ts)
+│       ├── types/                    # TypeScript interfaces
+│       │   ├── api.ts, user.ts, calendar.ts, module.ts, teamspeak.ts
+│       ├── constants/                # Shared constants (modules.ts)
+│       ├── utils/                    # Utilities (format.ts)
+│       └── assets/css/               # Tailwind layers + custom components
+├── nginx/
+│   └── default.conf                  # Dev reverse proxy config
+├── scripts/                          # Docker helper scripts
+│   ├── alembic.sh, console.sh, python.sh, uv.sh, npm.sh
+│   ├── start.sh, stop.sh, build.sh, upgrade.sh
+│   └── dev/
+│       ├── fixtures.sh               # Migrations + seed data
+│       ├── test.sh                   # Run backend tests
+│       └── convert-webp.sh           # Image conversion
+├── doc/                              # Documentation
+│   └── migrate_from_legacy_website_v1.md
+└── plans/                            # Implementation plans
+    └── refonte_python.md
+```
+
 ## Common Commands
 
 ### Docker (primary development method)

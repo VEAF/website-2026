@@ -14,7 +14,7 @@ const authStore = useAuthStore()
 const group = ref('all')
 const tab = ref('pilots')
 const selectedModuleId = ref<number | null>(null)
-const stats = ref<RosterStats>({ all: 0, cadets: 0, members: 0, cadets_need_presentation: 0 })
+const stats = ref<RosterStats>({ all: 0, cadets: 0, members: 0, cadets_need_presentation: 0, cadets_ready_to_promote: 0 })
 const loading = ref(true)
 
 const groups = [
@@ -111,6 +111,19 @@ onMounted(async () => {
       cadet(s) n'ont pas encore eu la
       <i class="fa-solid fa-bullhorn text-yellow-500 mx-1"></i>
       présentation de l'association
+    </div>
+
+    <!-- Alert: cadets ready to promote -->
+    <div
+      v-if="authStore.isMember && stats.cadets_ready_to_promote > 0"
+      class="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800"
+    >
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-200 text-green-900 mr-2">
+        {{ stats.cadets_ready_to_promote }}
+      </span>
+      <i class="fa-solid fa-circle-check text-green-600 mr-1"></i>
+      cadet{{ stats.cadets_ready_to_promote > 1 ? 's' : '' }}
+      prêt{{ stats.cadets_ready_to_promote > 1 ? 's' : '' }} à rejoindre l'association
     </div>
 
     <!-- Content area -->

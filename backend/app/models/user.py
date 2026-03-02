@@ -111,6 +111,15 @@ class User(Base):
         return self.STATUSES.get(self.status, "inconnu")
 
     @property
+    def is_ready_to_promote(self) -> bool:
+        return (
+            self.status == self.STATUS_CADET
+            and self.sim_dcs
+            and not self.need_presentation
+            and self.cadet_flights >= self.CADET_MIN_FLIGHTS
+        )
+
+    @property
     def recruitment_status(self) -> str:
         if self.status == self.STATUS_CADET:
             return "cadet"

@@ -28,6 +28,7 @@ def _build_admin_user_out(user: User) -> AdminUserOut:
         forum=user.forum,
         need_presentation=user.need_presentation,
         cadet_flights=user.cadet_flights,
+        is_ready_to_promote=user.is_ready_to_promote,
         created_at=user.created_at,
         updated_at=user.updated_at,
     )

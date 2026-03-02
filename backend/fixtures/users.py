@@ -15,6 +15,7 @@ USERS_DATA = [
     {"key": "cadet", "email": "cadet@localhost.dev", "nickname": "cadet", "roles": "ROLE_USER,ROLE_CADET", "status": User.STATUS_CADET, "sim_dcs": True, "sim_bms": False},
     {"key": "cadet_need_presentation", "email": "cadet_need_presentation@localhost.dev", "nickname": "cadet_need_presentation", "roles": "ROLE_USER,ROLE_CADET", "status": User.STATUS_CADET, "sim_dcs": True, "sim_bms": False, "need_presentation": True},
     {"key": "cadet_with_presentation", "email": "cadet_with_presentation@localhost.dev", "nickname": "cadet_with_presentation", "roles": "ROLE_USER,ROLE_CADET", "status": User.STATUS_CADET, "sim_dcs": True, "sim_bms": False},
+    {"key": "cadet_ready", "email": "cadet_ready@localhost.dev", "nickname": "cadet_ready", "roles": "ROLE_USER,ROLE_CADET", "status": User.STATUS_CADET, "sim_dcs": True, "sim_bms": False, "need_presentation": False, "cadet_flights": 5},
     {"key": "membre", "email": "membre@localhost.dev", "nickname": "membre", "roles": "ROLE_USER", "status": User.STATUS_MEMBER, "sim_dcs": True, "sim_bms": False},
     {"key": "tresorier_adjoint", "email": "tresorier-adjoint@localhost.dev", "nickname": "trésorier adjoint", "roles": "ROLE_USER", "status": User.STATUS_TREASURER_DEPUTY, "sim_dcs": True, "sim_bms": False},
     {"key": "tresorier", "email": "tresorier@localhost.dev", "nickname": "trésorier", "roles": "ROLE_USER", "status": User.STATUS_TREASURER, "sim_dcs": True, "sim_bms": False},
@@ -45,6 +46,7 @@ async def load_users(session: AsyncSession) -> dict[str, User]:
             sim_dcs=item["sim_dcs"],
             sim_bms=item["sim_bms"],
             need_presentation=item.get("need_presentation", False),
+            cadet_flights=item.get("cadet_flights", 0),
             created_at=now,
             updated_at=now,
         )

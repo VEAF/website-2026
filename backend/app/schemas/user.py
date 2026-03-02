@@ -90,6 +90,7 @@ class AdminUserOut(BaseModel):
     forum: str | None = None
     need_presentation: bool
     cadet_flights: int
+    is_ready_to_promote: bool = False
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
