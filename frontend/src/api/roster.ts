@@ -47,7 +47,27 @@ export interface RosterModuleDetail {
   users: RosterModuleDetailUser[]
 }
 
+export interface OfficeMember {
+  nickname: string
+  status: number
+  status_as_string: string | null
+}
+
+export interface OfficeData {
+  president: OfficeMember | null
+  president_deputy: OfficeMember | null
+  treasurer: OfficeMember | null
+  treasurer_deputy: OfficeMember | null
+  secretary: OfficeMember | null
+  secretary_deputy: OfficeMember | null
+}
+
 // --- API functions ---
+
+export async function getOffice(): Promise<OfficeData> {
+  const { data } = await apiClient.get<OfficeData>('/roster/office')
+  return data
+}
 
 export async function getRosterStats(): Promise<RosterStats> {
   const { data } = await apiClient.get<RosterStats>('/roster/stats')

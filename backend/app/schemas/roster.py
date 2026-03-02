@@ -44,3 +44,18 @@ class RosterModuleDetailUserOut(BaseModel):
 class RosterModuleDetailOut(BaseModel):
     module: RosterModuleOut
     users: list[RosterModuleDetailUserOut] = Field(default_factory=list)
+
+
+class OfficeMemberOut(BaseModel):
+    nickname: str
+    status: int
+    status_as_string: str | None = None
+
+
+class OfficeOut(BaseModel):
+    president: OfficeMemberOut | None = None
+    president_deputy: OfficeMemberOut | None = None
+    treasurer: OfficeMemberOut | None = None
+    treasurer_deputy: OfficeMemberOut | None = None
+    secretary: OfficeMemberOut | None = None
+    secretary_deputy: OfficeMemberOut | None = None
