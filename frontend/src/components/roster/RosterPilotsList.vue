@@ -48,6 +48,13 @@ watch(() => props.group, fetchPilots, { immediate: true })
               {{ u.nickname }}
             </RouterLink>
             <span
+              v-if="authStore.isMember && u.is_ready_to_promote"
+              class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-green-100 text-green-700"
+              title="Prêt à rejoindre l'association"
+            >
+              <i class="fa-solid fa-circle-check"></i>
+            </span>
+            <span
               v-if="authStore.isMember && u.need_presentation"
               class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-700"
               title="Ce pilote a besoin d'une présentation de l'association"

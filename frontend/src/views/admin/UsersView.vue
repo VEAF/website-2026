@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { getAdminUsers, updateAdminUser } from '@/api/users'
+import { getAdminStats } from '@/api/admin'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { AdminUser, AdminUserUpdate } from '@/types/user'
 import { useToast } from '@/composables/useToast'
 
 const toast = useToast()
+const route = useRoute()
 
 // Data
 const users = ref<AdminUser[]>([])
 const total = ref(0)
 const loading = ref(false)
+const cadetsReadyCount = ref(0)
 
 // Search and filters
 const searchInput = ref('')
 const search = ref('')
-const statusFilter = ref<number | null>(null)
+const statusFilter = ref<number | null>(
+  route.query.status !== undefined ? Number(route.query.status) : null,
+)
 const currentPage = ref(1)
 const pageSize = 50
 
@@ -139,12 +145,40 @@ watch([search, statusFilter], () => {
   loadUsers()
 })
 
-onMounted(loadUsers)
+onMounted(async () => {
+  loadUsers()
+  try {
+    const stats = await getAdminStats()
+    cadetsReadyCount.value = stats.cadets_ready_to_promote
+  } catch {
+    // silently fail
+  }
+})
 </script>
 
 <template>
   <div>
     <AppBreadcrumb />
+
+    <!-- Cadet readiness notification -->
+    <div
+      v-if="cadetsReadyCount > 0"
+      class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex items-center justify-between"
+    >
+      <div class="flex items-center text-green-800 text-sm">
+        <i class="fa-solid fa-circle-check text-green-600 mr-2"></i>
+        <span class="font-medium">
+          {{ cadetsReadyCount }} cadet{{ cadetsReadyCount > 1 ? 's' : '' }}
+          prêt{{ cadetsReadyCount > 1 ? 's' : '' }} à rejoindre l'association
+        </span>
+      </div>
+      <button
+        class="text-green-700 hover:text-green-900 text-sm font-medium underline"
+        @click="statusFilter = 1"
+      >
+        Voir les cadets
+      </button>
+    </div>
 
     <!-- Search & Filter -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
@@ -279,7 +313,13 @@ onMounted(loadUsers)
             :key="u.id"
             class="border-b hover:bg-gray-50"
           >
-            <td class="p-2 font-medium">{{ u.nickname }}</td>
+            <td class="p-2 font-medium">
+              <i
+                v-if="u.is_ready_to_promote"
+                class="fa-solid fa-circle-check text-green-600 mr-1"
+                title="Prêt à rejoindre l'association"
+              ></i>{{ u.nickname }}
+            </td>
             <td class="p-2">{{ u.email }}</td>
             <td class="p-2">
               <span

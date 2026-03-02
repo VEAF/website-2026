@@ -69,6 +69,7 @@ export interface AdminUser {
   forum: string | null
   need_presentation: boolean
   cadet_flights: number
+  is_ready_to_promote: boolean
   created_at: string | null
   updated_at: string | null
 }

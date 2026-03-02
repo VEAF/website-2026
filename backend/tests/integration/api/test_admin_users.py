@@ -100,6 +100,32 @@ async def test_list_users_search_by_email(client: AsyncClient, db_session: Async
 
 
 @pytest.mark.asyncio
+async def test_list_users_includes_is_ready_to_promote(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    ready_cadet = UserFactory.build(
+        status=User.STATUS_CADET, sim_dcs=True, need_presentation=False, cadet_flights=5,
+    )
+    not_ready_cadet = UserFactory.build(
+        status=User.STATUS_CADET, sim_dcs=True, need_presentation=True, cadet_flights=3,
+    )
+    db_session.add_all([ready_cadet, not_ready_cadet])
+    await db_session.commit()
+    await db_session.refresh(ready_cadet)
+    await db_session.refresh(not_ready_cadet)
+
+    # WHEN
+    response = await client.get(f"/api/admin/users?status={User.STATUS_CADET}", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    items_by_id = {item["id"]: item for item in data["items"]}
+    assert items_by_id[ready_cadet.id]["is_ready_to_promote"] is True
+    assert items_by_id[not_ready_cadet.id]["is_ready_to_promote"] is False
+
+
+@pytest.mark.asyncio
 async def test_list_users_status_filter(client: AsyncClient, db_session: AsyncSession):
     # GIVEN
     _, headers = await _create_admin(db_session)

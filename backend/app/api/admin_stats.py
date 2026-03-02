@@ -22,6 +22,7 @@ class AdminStats(BaseModel):
     urls: int = 0
     menu_items: int = 0
     servers: int = 0
+    cadets_ready_to_promote: int = 0
 
 
 @router.get("", response_model=AdminStats)
@@ -50,4 +51,25 @@ async def get_stats(
     result = await db.execute(select(func.count()).select_from(Server))
     servers_count = result.scalar_one()
 
-    return AdminStats(modules=modules_count, users=users_count, events=events_count, pages=pages_count, urls=urls_count, menu_items=menu_items_count, servers=servers_count)
+    result = await db.execute(
+        select(func.count())
+        .select_from(User)
+        .where(
+            User.status == User.STATUS_CADET,
+            User.sim_dcs.is_(True),
+            User.need_presentation.is_(False),
+            User.cadet_flights >= User.CADET_MIN_FLIGHTS,
+        )
+    )
+    cadets_ready_count = result.scalar_one()
+
+    return AdminStats(
+        modules=modules_count,
+        users=users_count,
+        events=events_count,
+        pages=pages_count,
+        urls=urls_count,
+        menu_items=menu_items_count,
+        servers=servers_count,
+        cadets_ready_to_promote=cadets_ready_count,
+    )
