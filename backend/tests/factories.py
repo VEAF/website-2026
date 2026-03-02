@@ -1,6 +1,7 @@
 """Factory-boy factories for test data creation."""
 
 from datetime import UTC, datetime
+from uuid import uuid4
 
 import factory
 
@@ -135,3 +136,16 @@ class EventFactory(factory.Factory):
     registration = True
     created_at = factory.LazyFunction(lambda: datetime.now(UTC))
     updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
+class FileFactory(factory.Factory):
+    class Meta:
+        model = File
+
+    uuid = factory.LazyFunction(lambda: str(uuid4()))
+    mime_type = "image/png"
+    size = 1024
+    extension = "png"
+    type = File.TYPE_IMAGE
+    original_name = factory.Sequence(lambda n: f"file_{n}.png")
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
