@@ -7,6 +7,8 @@ from app.database import get_db
 from app.models.module import Module
 from app.models.user import User, UserModule
 from app.schemas.roster import (
+    OfficeMemberOut,
+    OfficeOut,
     RosterModuleDetailOut,
     RosterModuleDetailUserOut,
     RosterModuleOut,
@@ -55,6 +57,27 @@ async def get_roster_stats(db: AsyncSession = Depends(get_db)):
         members=members_count or 0,
         cadets_need_presentation=cadets_need_presentation or 0,
         cadets_ready_to_promote=cadets_ready or 0,
+    )
+
+
+@router.get("/office", response_model=OfficeOut)
+async def get_roster_office(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.status.in_(User.STATUSES_OFFICE)))
+    users_by_status = {u.status: u for u in result.scalars().all()}
+
+    def _member(status: int) -> OfficeMemberOut | None:
+        u = users_by_status.get(status)
+        if u is None:
+            return None
+        return OfficeMemberOut(nickname=u.nickname, status=u.status, status_as_string=u.status_as_string)
+
+    return OfficeOut(
+        president=_member(User.STATUS_PRESIDENT),
+        president_deputy=_member(User.STATUS_PRESIDENT_DEPUTY),
+        treasurer=_member(User.STATUS_TREASURER),
+        treasurer_deputy=_member(User.STATUS_TREASURER_DEPUTY),
+        secretary=_member(User.STATUS_SECRETARY),
+        secretary_deputy=_member(User.STATUS_SECRETARY_DEPUTY),
     )
 
 
