@@ -4,6 +4,7 @@ export interface AdminStats {
   modules: number
   users: number
   events: number
+  files: number
   pages: number
   urls: number
   menu_items: number

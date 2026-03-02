@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import require_admin
 from app.database import get_db
 from app.models.calendar import CalendarEvent
-from app.models.content import MenuItem, Page, Url
+from app.models.content import File, MenuItem, Page, Url
 from app.models.dcs import Server
 from app.models.module import Module
 from app.models.user import User
@@ -18,6 +18,7 @@ class AdminStats(BaseModel):
     modules: int = 0
     users: int = 0
     events: int = 0
+    files: int = 0
     pages: int = 0
     urls: int = 0
     menu_items: int = 0
@@ -38,6 +39,9 @@ async def get_stats(
 
     result = await db.execute(select(func.count()).select_from(CalendarEvent))
     events_count = result.scalar_one()
+
+    result = await db.execute(select(func.count()).select_from(File))
+    files_count = result.scalar_one()
 
     result = await db.execute(select(func.count()).select_from(Page))
     pages_count = result.scalar_one()
@@ -67,6 +71,7 @@ async def get_stats(
         modules=modules_count,
         users=users_count,
         events=events_count,
+        files=files_count,
         pages=pages_count,
         urls=urls_count,
         menu_items=menu_items_count,

@@ -199,6 +199,28 @@ class FileOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class AdminFileOut(BaseModel):
+    id: int
+    uuid: str
+    type: int | None = None
+    type_as_string: str | None = None
+    mime_type: str
+    size: int
+    original_name: str | None = None
+    description: str | None = None
+    extension: str
+    created_at: datetime | None = None
+    owner_id: int | None = None
+    owner_nickname: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class AdminFileListOut(BaseModel):
+    items: list[AdminFileOut]
+    total: int
+
+
 class UrlOut(BaseModel):
     id: int
     slug: str
