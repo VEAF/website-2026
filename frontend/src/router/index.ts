@@ -283,6 +283,31 @@ const router = createRouter({
         ],
       },
     },
+    // Error pages
+    {
+      path: '/error/404',
+      name: 'error-404',
+      component: () => import('@/views/Error404View.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Erreur 404', icon: 'fa-solid fa-plane-slash' }],
+      },
+    },
+    {
+      path: '/error/403',
+      name: 'error-403',
+      component: () => import('@/views/Error403View.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Erreur 403', icon: 'fa-solid fa-lock' }],
+      },
+    },
+    {
+      path: '/error/500',
+      name: 'error-500',
+      component: () => import('@/views/Error500View.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Erreur 500', icon: 'fa-solid fa-explosion' }],
+      },
+    },
     // Redirect old /pages/ URLs
     {
       path: '/pages/:slug(.*)',
@@ -311,7 +336,7 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'home' }
+    return { name: 'error-403' }
   }
 })
 

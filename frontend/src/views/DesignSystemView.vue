@@ -49,6 +49,7 @@ async function showConfirm() {
         <a href="#modale" class="btn-secondary btn btn-sm">Modale</a>
         <a href="#breadcrumb" class="btn-secondary btn btn-sm">Breadcrumb</a>
         <a href="#icones" class="btn-secondary btn btn-sm">Icones</a>
+        <a href="#erreurs" class="btn-secondary btn btn-sm">Pages d'erreur</a>
       </div>
     </nav>
 
@@ -588,6 +589,34 @@ async function showConfirm() {
             <i class="fa-solid fa-plane text-4xl text-veaf-500"></i>
             <p class="text-xs text-gray-500 mt-1">text-4xl</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pages d'erreur -->
+    <section id="erreurs" class="mb-12">
+      <h2 class="text-2xl font-bold mb-1 pb-2 border-b border-gray-200">Pages d'erreur</h2>
+      <p class="text-sm text-gray-500 mb-6">Pages d'erreur thématiques avec humour aviation militaire.</p>
+
+      <div class="card">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <RouterLink to="/error/404" class="block p-4 rounded-lg border border-gray-200 hover:border-veaf-300 hover:shadow-md transition-all text-center group">
+            <i class="fa-solid fa-plane-slash text-3xl text-gray-400 group-hover:text-veaf-500 mb-2 transition-colors"></i>
+            <div class="text-lg font-bold text-gray-700">404</div>
+            <div class="text-sm text-gray-500">Page non trouvée</div>
+          </RouterLink>
+
+          <RouterLink to="/error/403" class="block p-4 rounded-lg border border-gray-200 hover:border-danger-300 hover:shadow-md transition-all text-center group">
+            <i class="fa-solid fa-lock text-3xl text-danger-500 group-hover:text-danger-600 mb-2 transition-colors"></i>
+            <div class="text-lg font-bold text-gray-700">403</div>
+            <div class="text-sm text-gray-500">Accès interdit</div>
+          </RouterLink>
+
+          <RouterLink to="/error/500" class="block p-4 rounded-lg border border-gray-200 hover:border-warning-300 hover:shadow-md transition-all text-center group">
+            <i class="fa-solid fa-explosion text-3xl text-warning-500 group-hover:text-warning-600 mb-2 transition-colors"></i>
+            <div class="text-lg font-bold text-gray-700">500</div>
+            <div class="text-sm text-gray-500">Erreur serveur</div>
+          </RouterLink>
         </div>
       </div>
     </section>
