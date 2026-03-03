@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     API_DCSSERVERBOT_URL: str = "http://dcs.veaf.org:9876"
     API_TEAMSPEAK_URL: str = "serverquery://ts.veaf.org:10011/?server_port=9987"
 
+    # Discord OAuth2
+    DISCORD_CLIENT_ID: str = ""
+    DISCORD_CLIENT_SECRET: str = ""
+    DISCORD_REDIRECT_URI: str = "http://localhost/auth/discord/callback"
+
     # reCAPTCHA
     RECAPTCHA_SECRET_KEY: str = ""
 

@@ -321,6 +321,12 @@ const router = createRouter({
         breadcrumb: [{ label: 'Erreur 500', icon: 'fa-solid fa-explosion' }],
       },
     },
+    // Discord OAuth callback
+    {
+      path: '/auth/discord/callback',
+      name: 'discord-callback',
+      component: () => import('@/views/DiscordCallbackView.vue'),
+    },
     // Redirect old /pages/ URLs
     {
       path: '/pages/:slug(.*)',

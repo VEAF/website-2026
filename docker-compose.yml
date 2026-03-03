@@ -12,6 +12,9 @@ services:
       - API_TEAMSPEAK_URL=serverquery://ts.veaf.org:10011/?server_port=9987
       - APP_URL=http://${VIRTUAL_HOST:-veaf.localhost}
       - UPLOAD_DIR=/app/uploads
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID:-}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET:-}
+      - DISCORD_REDIRECT_URI=${DISCORD_REDIRECT_URI:-http://veaf.localhost/auth/discord/callback}
     volumes:
       - ./backend:/app
     depends_on:

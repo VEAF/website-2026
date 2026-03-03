@@ -1,20 +1,27 @@
+import secrets
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlencode
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Response, Cookie, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt import create_access_token, create_refresh_token, decode_token
 from app.auth.password import hash_password, verify_password
+from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.schemas.auth import (
+    DiscordAuthUrlResponse,
+    DiscordCallbackRequest,
     LoginRequest,
     RegisterRequest,
     ResetPasswordConfirm,
     ResetPasswordRequest,
     TokenResponse,
 )
+from app.utils.cache import discord_oauth_states
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -24,7 +31,7 @@ async def login(data: LoginRequest, response: Response, db: AsyncSession = Depen
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
 
-    if user is None or not verify_password(data.password, user.password):
+    if user is None or user.password is None or not verify_password(data.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     access_token = create_access_token(user.id, user.get_roles_list())
@@ -151,3 +158,150 @@ async def reset_password_confirm(data: ResetPasswordConfirm, db: AsyncSession = 
     await db.commit()
 
     return {"detail": "Password updated"}
+
+
+# --- Discord OAuth2 ---
+
+DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize"
+DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
+DISCORD_USER_URL = "https://discord.com/api/users/@me"
+
+
+@router.get("/discord/authorize", response_model=DiscordAuthUrlResponse)
+async def discord_authorize():
+    if not settings.DISCORD_CLIENT_ID:
+        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Discord SSO is not configured")
+
+    state = secrets.token_urlsafe(32)
+    discord_oauth_states[state] = True
+
+    params = urlencode({
+        "client_id": settings.DISCORD_CLIENT_ID,
+        "redirect_uri": settings.DISCORD_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "identify email",
+        "state": state,
+    })
+
+    return DiscordAuthUrlResponse(authorization_url=f"{DISCORD_AUTHORIZE_URL}?{params}")
+
+
+@router.post("/discord/callback", response_model=TokenResponse)
+async def discord_callback(data: DiscordCallbackRequest, response: Response, db: AsyncSession = Depends(get_db)):
+    # Validate Discord OAuth configuration before attempting token exchange
+    if (
+        not settings.DISCORD_CLIENT_ID
+        or not settings.DISCORD_CLIENT_SECRET
+        or not settings.DISCORD_REDIRECT_URI
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Discord SSO is not configured",
+        )
+
+    # Validate state (CSRF protection)
+    if data.state not in discord_oauth_states:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired state parameter")
+    del discord_oauth_states[data.state]
+
+    # Exchange code for Discord access token
+    async with httpx.AsyncClient() as client:
+        token_resp = await client.post(
+            DISCORD_TOKEN_URL,
+            data={
+                "client_id": settings.DISCORD_CLIENT_ID,
+                "client_secret": settings.DISCORD_CLIENT_SECRET,
+                "grant_type": "authorization_code",
+                "code": data.code,
+                "redirect_uri": settings.DISCORD_REDIRECT_URI,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+    if token_resp.status_code != 200:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to exchange Discord authorization code")
+
+    discord_access_token = token_resp.json()["access_token"]
+
+    # Fetch Discord user info
+    async with httpx.AsyncClient() as client:
+        user_resp = await client.get(
+            DISCORD_USER_URL,
+            headers={"Authorization": f"Bearer {discord_access_token}"},
+        )
+
+    if user_resp.status_code != 200:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to fetch Discord user info")
+
+    discord_user = user_resp.json()
+    discord_id = discord_user["id"]
+    discord_username = discord_user.get("global_name") or discord_user["username"]
+    discord_email = discord_user.get("email")
+    email_verified = discord_user.get("verified", False)
+
+    if not discord_email or not email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Votre email Discord n'est pas vérifié. Veuillez vérifier votre email Discord avant de vous connecter.",
+        )
+
+    # Find or create user
+    # 1. Try by discord_id
+    result = await db.execute(select(User).where(User.discord_id == discord_id))
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        # 2. Try by email
+        result = await db.execute(select(User).where(User.email == discord_email))
+        user = result.scalar_one_or_none()
+
+        if user is not None:
+            # Link discord_id to existing account
+            user.discord_id = discord_id
+            user.discord = discord_username
+            user.updated_at = datetime.now(UTC)
+        else:
+            # 3. Create new user
+            nickname = discord_username
+            for _ in range(5):
+                existing = await db.execute(select(User).where(User.nickname == nickname))
+                if existing.scalar_one_or_none() is None:
+                    break
+                nickname = f"{discord_username}_{secrets.randbelow(10000):04d}"
+
+            user = User(
+                email=discord_email,
+                password=None,
+                nickname=nickname,
+                discord_id=discord_id,
+                discord=discord_username,
+                roles="ROLE_USER",
+                status=User.STATUS_UNKNOWN,
+                sim_dcs=True,
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            db.add(user)
+    else:
+        # Update discord username if changed
+        if user.discord != discord_username:
+            user.discord = discord_username
+            user.updated_at = datetime.now(UTC)
+
+    await db.commit()
+    await db.refresh(user)
+
+    # Issue JWT tokens
+    access_token = create_access_token(user.id, user.get_roles_list())
+    refresh_token = create_refresh_token(user.id)
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=7 * 24 * 60 * 60,
+    )
+
+    return TokenResponse(access_token=access_token)

@@ -5,6 +5,7 @@ from cachetools import TTLCache
 # Shared in-memory caches (single worker uvicorn)
 teamspeak_cache = TTLCache(maxsize=100, ttl=1200)  # 20 min
 dcsbot_cache = TTLCache(maxsize=100, ttl=120)  # 2 min
+discord_oauth_states = TTLCache(maxsize=1000, ttl=300)  # 5 min
 
 
 def cached(cache: TTLCache):
