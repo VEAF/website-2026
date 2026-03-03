@@ -283,6 +283,19 @@ const router = createRouter({
         ],
       },
     },
+    {
+      path: '/admin/activities',
+      name: 'admin-activities',
+      component: () => import('@/views/admin/ActivitiesView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Activités' },
+        ],
+      },
+    },
     // Error pages
     {
       path: '/error/404',

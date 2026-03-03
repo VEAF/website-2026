@@ -9,6 +9,7 @@ from app.models.calendar import CalendarEvent
 from app.models.content import File, MenuItem, Page, Url
 from app.models.dcs import Server
 from app.models.module import Module
+from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
 
 router = APIRouter(prefix="/admin/stats", tags=["admin-stats"])
@@ -24,6 +25,7 @@ class AdminStats(BaseModel):
     menu_items: int = 0
     servers: int = 0
     cadets_ready_to_promote: int = 0
+    recruitment_events: int = 0
 
 
 @router.get("", response_model=AdminStats)
@@ -67,6 +69,9 @@ async def get_stats(
     )
     cadets_ready_count = result.scalar_one()
 
+    result = await db.execute(select(func.count()).select_from(RecruitmentEvent))
+    recruitment_events_count = result.scalar_one()
+
     return AdminStats(
         modules=modules_count,
         users=users_count,
@@ -77,4 +82,5 @@ async def get_stats(
         menu_items=menu_items_count,
         servers=servers_count,
         cadets_ready_to_promote=cadets_ready_count,
+        recruitment_events=recruitment_events_count,
     )
