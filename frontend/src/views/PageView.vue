@@ -5,6 +5,7 @@ import { getPage } from '@/api/pages'
 import { getUrlBySlug } from '@/api/urls'
 import { renderMarkdown } from '@/composables/useMarkdown'
 import type { Page, Url } from '@/types/api'
+import ErrorPage from '@/components/ui/ErrorPage.vue'
 
 const route = useRoute()
 const page = ref<Page | null>(null)
@@ -98,14 +99,15 @@ onUnmounted(clearCountdown)
   </div>
 
   <!-- 404 -->
-  <div v-else-if="error" class="text-center py-20">
-    <div class="text-6xl font-bold text-gray-300 mb-4">404</div>
-    <h1 class="text-2xl font-semibold text-gray-400 mb-2">Page non trouvée</h1>
-    <p class="text-gray-500 mb-6">La page que vous recherchez n'existe pas ou a été déplacée.</p>
-    <RouterLink to="/" class="btn-primary">
-      <i class="fa-solid fa-house mr-1"></i>Retour à l'accueil
-    </RouterLink>
-  </div>
+  <ErrorPage
+    v-else-if="error"
+    :code="404"
+    title="Cible non identifiée"
+    subtitle="« Houston, on a perdu la page... »"
+    description="L'appareil que vous cherchez ne figure plus sur nos radars. Il a peut-être été abattu, ou simplement il n'a jamais décollé."
+    icon="fa-solid fa-plane-slash"
+    icon-color="text-gray-400"
+  />
 
   <!-- CMS page content -->
   <div v-else-if="page" class="max-w-4xl mx-auto card">
