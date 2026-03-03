@@ -30,6 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
     await fetchUser()
   }
 
+  async function loginWithDiscord(code: string, state: string) {
+    const data = await authApi.discordCallback(code, state)
+    token.value = data.access_token
+    localStorage.setItem('access_token', data.access_token)
+    await fetchUser()
+  }
+
   async function logout() {
     await authApi.logout()
     token.value = null
@@ -48,5 +55,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { token, user, isAuthenticated, isAdmin, isMember, login, register, logout, fetchUser }
+  return { token, user, isAuthenticated, isAdmin, isMember, login, register, loginWithDiscord, logout, fetchUser }
 })

@@ -11,6 +11,7 @@ class User(Base):
     __table_args__ = (
         UniqueConstraint("email", name="email_idx"),
         UniqueConstraint("nickname", name="nickname_idx"),
+        UniqueConstraint("discord_id", name="discord_id_idx"),
     )
 
     # Status constants
@@ -55,7 +56,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(String(180), unique=True, nullable=False)
     roles: Mapped[str] = mapped_column(String(255), nullable=False, default="")  # comma-separated
-    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    password: Mapped[str | None] = mapped_column(String(255), nullable=True)
     password_request_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
     password_request_expired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     nickname: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
@@ -67,6 +68,7 @@ class User(Base):
     need_presentation: Mapped[bool] = mapped_column(Boolean, default=False)
     cadet_flights: Mapped[int] = mapped_column(Integer, default=0)
     discord: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    discord_id: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
     forum: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     # Relationships

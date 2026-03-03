@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { getDiscordAuthUrl } from '@/api/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -13,6 +14,7 @@ const nickname = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
 const loading = ref(false)
+const discordLoading = ref(false)
 
 async function handleRegister() {
   if (password.value !== passwordConfirm.value) {
@@ -33,6 +35,17 @@ async function handleRegister() {
     toast.error(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function handleDiscordRegister() {
+  discordLoading.value = true
+  try {
+    const { authorization_url } = await getDiscordAuthUrl()
+    window.location.href = authorization_url
+  } catch (e: unknown) {
+    toast.error(e)
+    discordLoading.value = false
   }
 }
 </script>
@@ -67,6 +80,26 @@ async function handleRegister() {
           <i class="fa-solid fa-user-plus mr-1"></i>{{ loading ? 'Inscription...' : "S'inscrire" }}
         </button>
       </form>
+
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="bg-white px-2 text-gray-500">ou</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn w-full text-white hover:opacity-90"
+        style="background-color: #5865F2;"
+        :disabled="discordLoading"
+        @click="handleDiscordRegister"
+      >
+        <i class="fa-brands fa-discord mr-2"></i>
+        {{ discordLoading ? 'Redirection...' : "S'inscrire avec Discord" }}
+      </button>
 
       <div class="mt-4 text-center text-sm">
         <p>

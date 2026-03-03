@@ -28,3 +28,12 @@ class ResetPasswordRequest(BaseModel):
 class ResetPasswordConfirm(BaseModel):
     token: str
     password: str
+
+
+class DiscordAuthUrlResponse(BaseModel):
+    authorization_url: str
+
+
+class DiscordCallbackRequest(BaseModel):
+    code: str
+    state: str
