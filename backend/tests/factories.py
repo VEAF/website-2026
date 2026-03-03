@@ -138,6 +138,17 @@ class EventFactory(factory.Factory):
     updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
 
 
+class RecruitmentEventFactory(factory.Factory):
+    class Meta:
+        model = RecruitmentEvent
+
+    type = RecruitmentEvent.TYPE_ACTIVITY
+    comment = factory.Sequence(lambda n: f"Activity {n}")
+    event_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    created_at = factory.LazyFunction(lambda: datetime.now(UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
 class FileFactory(factory.Factory):
     class Meta:
         model = File

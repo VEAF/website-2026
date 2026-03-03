@@ -74,6 +74,11 @@ onMounted(async () => {
         <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.menu_items ?? '-' }}</div>
         <div class="text-sm text-gray-900">Menu</div>
       </RouterLink>
+      <RouterLink to="/admin/activities" class="card text-center hover:shadow-md transition-shadow">
+        <div class="text-veaf-400 mb-2"><i class="fa-solid fa-clipboard-list text-2xl"></i></div>
+        <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.recruitment_events ?? '-' }}</div>
+        <div class="text-sm text-gray-900">Activités</div>
+      </RouterLink>
     </div>
   </div>
 </template>

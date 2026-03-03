@@ -10,6 +10,7 @@ export interface AdminStats {
   menu_items: number
   servers: number
   cadets_ready_to_promote: number
+  recruitment_events: number
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
