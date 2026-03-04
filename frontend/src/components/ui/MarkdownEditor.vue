@@ -129,9 +129,9 @@ async function handleFileSelect(event: Event) {
 }
 
 async function handleImageFile(file: File) {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    toast.error('Format accepté : JPG ou PNG uniquement')
+    toast.error('Format accepté : JPG, PNG ou WebP')
     return
   }
   if (file.size > 20 * 1024 * 1024) {
@@ -142,7 +142,7 @@ async function handleImageFile(file: File) {
   uploading.value = true
   try {
     const result = await uploadFile(file)
-    const markdown = `![${file.name}](/api/files/${result.uuid})`
+    const markdown = `![${file.name}](/api/files/${result.uuid}.${result.extension})`
     insertAtCursor(markdown + '\n')
     toast.success('Image uploadée')
   } catch (e) {
@@ -291,7 +291,7 @@ async function onPaste(e: ClipboardEvent) {
     <input
       ref="fileInput"
       type="file"
-      accept="image/jpeg,image/png"
+      accept="image/jpeg,image/png,image/webp"
       class="hidden"
       @change="handleFileSelect"
     />
