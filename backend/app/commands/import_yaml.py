@@ -1,6 +1,7 @@
 """Import data from Symfony YAML export into the current database."""
 
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 import typer
@@ -51,15 +52,22 @@ def parse_yaml_file(filepath: str) -> dict[str, list[dict]]:
 # ---------------------------------------------------------------------------
 
 
+PARIS_TZ = ZoneInfo("Europe/Paris")
+
+
 def parse_dt(value: str | None) -> datetime | None:
-    """Parse YAML datetime string to timezone-aware datetime."""
+    """Parse YAML datetime string to timezone-aware datetime.
+
+    Legacy Symfony app stored datetimes in Europe/Paris local time (CET/CEST).
+    We interpret naive timestamps as Paris local time and let PostgreSQL convert to UTC.
+    """
     if value is None:
         return None
     if isinstance(value, datetime):
         if value.tzinfo is None:
-            return value.replace(tzinfo=timezone.utc)
+            return value.replace(tzinfo=PARIS_TZ)
         return value
-    return datetime.strptime(str(value), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    return datetime.strptime(str(value), "%Y-%m-%d %H:%M:%S").replace(tzinfo=PARIS_TZ)
 
 
 def to_bool(value: int | bool | None) -> bool:

@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, time
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select, or_
@@ -44,11 +44,11 @@ async def list_events(
     query = select(CalendarEvent).where(CalendarEvent.deleted == False)  # noqa: E712
 
     if from_date:
-        dt_from = datetime.combine(from_date, datetime.min.time())
+        dt_from = datetime.combine(from_date, time.min, tzinfo=UTC)
         query = query.where(CalendarEvent.end_date >= dt_from)
 
     if to_date:
-        dt_to = datetime.combine(to_date, datetime.max.time())
+        dt_to = datetime.combine(to_date, time.max, tzinfo=UTC)
         query = query.where(CalendarEvent.start_date <= dt_to)
 
     query = query.options(selectinload(CalendarEvent.owner)).order_by(CalendarEvent.start_date)

@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class TaskOut(BaseModel):
@@ -110,6 +110,13 @@ class EventCreate(BaseModel):
     server_id: int | None = None
     image_id: int | None = None
     module_ids: list[int] = Field(default_factory=list)
+
+    @field_validator("start_date", "end_date", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v: datetime) -> datetime:
+        if isinstance(v, datetime) and v.tzinfo is None:
+            raise ValueError("Les dates doivent inclure un fuseau horaire (ex: 2026-03-15T21:00:00Z)")
+        return v
 
 
 class EventUpdate(EventCreate):
