@@ -20,6 +20,10 @@ def cached(cache: TTLCache):
             key = f"{func.__name__}:{args}:{kwargs}"
             if key in cache:
                 return cache[key]
+            # Prune timestamps for entries evicted by TTLCache
+            stale = [k for k in timestamps if k not in cache]
+            for k in stale:
+                del timestamps[k]
             result = await func(*args, **kwargs)
             cache[key] = result
             timestamps[key] = time.monotonic()
@@ -33,8 +37,15 @@ def cached(cache: TTLCache):
                 cache.pop(k, None)
                 timestamps.pop(k, None)
 
+        def clear():
+            """Remove all entries for this function from cache and timestamps."""
+            for k in list(timestamps):
+                cache.pop(k, None)
+            timestamps.clear()
+
         wrapper.cache = cache
         wrapper.invalidate_if_older = invalidate_if_older
+        wrapper.clear = clear
         return wrapper
 
     return decorator
