@@ -88,6 +88,82 @@ async def _fix_filenames(dry_run: bool) -> None:
         rprint("[bold]Run with --no-dry-run to apply changes.[/bold]")
 
 
+async def _fix_event_timezones(dry_run: bool) -> None:
+    """Reinterpret calendar event timestamps from UTC to Europe/Paris.
+
+    The legacy YAML import incorrectly assumed Paris local times were UTC.
+    For example, 21:00 CET was stored as 21:00 UTC instead of 20:00 UTC.
+    This command reinterprets existing UTC timestamps as Paris local time.
+    """
+    from datetime import UTC, datetime, timedelta
+    from zoneinfo import ZoneInfo
+
+    from sqlalchemy import select
+
+    from app.database import AsyncSessionLocal, engine
+    from app.models.calendar import CalendarEvent
+
+    PARIS_TZ = ZoneInfo("Europe/Paris")
+
+    def _reinterpret(dt: datetime | None) -> datetime | None:
+        """Reinterpret a UTC datetime as Europe/Paris local time. Skip if None or already non-UTC."""
+        if dt is None:
+            return None
+        if dt.tzinfo is not None and dt.tzinfo != UTC and dt.utcoffset() != timedelta(0):
+            return dt  # already non-UTC, skip to avoid double-shifting
+        return dt.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
+
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(CalendarEvent))
+        events = result.scalars().all()
+
+        fixed = 0
+        skipped = 0
+        for event in events:
+            if not event.start_date or not event.end_date:
+                skipped += 1
+                continue
+
+            new_start = _reinterpret(event.start_date)
+            new_end = _reinterpret(event.end_date)
+
+            # Skip if nothing changed (already fixed or non-UTC)
+            if new_start == event.start_date and new_end == event.end_date:
+                skipped += 1
+                continue
+
+            if dry_run:
+                rprint(
+                    f"  [bold cyan]\\[dry-run][/bold cyan] event {event.id}: "
+                    f"{event.start_date.isoformat()} -> {new_start.astimezone(UTC).isoformat()}"
+                )
+            else:
+                event.start_date = new_start
+                event.end_date = new_end
+                event.created_at = _reinterpret(event.created_at)
+                event.updated_at = _reinterpret(event.updated_at)
+                event.deleted_at = _reinterpret(event.deleted_at)
+                fixed += 1
+
+        if not dry_run:
+            await session.commit()
+            rprint(f"[bold green]Fixed {fixed} events, skipped {skipped}.[/bold green]")
+        else:
+            rprint(f"\n[bold]Dry run complete. {len(events) - skipped} events would be updated, {skipped} skipped.[/bold]")
+
+    await engine.dispose()
+
+
+@maintenance_app.command("fix-event-timezones")
+def fix_event_timezones(
+    dry_run: bool = typer.Option(True, help="Preview changes without updating the DB"),
+) -> None:
+    """Fix calendar event dates shifted by wrong timezone assumption during import."""
+    if not dry_run:
+        typer.confirm("This will update start_date/end_date for ALL calendar events. Continue?", abort=True)
+    asyncio.run(_fix_event_timezones(dry_run))
+
+
 @maintenance_app.command("fix-filenames")
 def fix_filenames(
     dry_run: bool = typer.Option(True, help="Preview changes without renaming files"),

@@ -78,6 +78,8 @@ async def list_events(
     if date_from:
         try:
             dt_from = datetime.fromisoformat(date_from)
+            if dt_from.tzinfo is None:
+                dt_from = dt_from.replace(tzinfo=UTC)
             query = query.where(CalendarEvent.start_date >= dt_from)
         except ValueError:
             pass
@@ -85,6 +87,8 @@ async def list_events(
     if date_to:
         try:
             dt_to = datetime.fromisoformat(date_to)
+            if dt_to.tzinfo is None:
+                dt_to = dt_to.replace(tzinfo=UTC)
             query = query.where(CalendarEvent.start_date <= dt_to)
         except ValueError:
             pass

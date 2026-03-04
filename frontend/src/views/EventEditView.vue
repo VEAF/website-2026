@@ -65,6 +65,18 @@ const maps = ref<Module[]>([])
 const aircraftModules = ref<Module[]>([])
 const servers = ref<Server[]>([])
 
+/** Convert UTC ISO string from API to local datetime string for datetime-local input */
+function utcIsoToLocalInput(isoString: string): string {
+  const d = new Date(isoString)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** Convert local datetime string from datetime-local input to UTC ISO string for API */
+function localInputToUtcIso(localDatetimeStr: string): string {
+  return new Date(localDatetimeStr).toISOString()
+}
+
 const MODULE_TYPE_COLORS: Record<number, string> = {
   [MODULE_TYPE_AIRCRAFT]: 'module-aircraft',
   [MODULE_TYPE_HELICOPTER]: 'module-helicopter',
@@ -100,8 +112,8 @@ onMounted(async () => {
     const event = await getEvent(id)
     form.value = {
       title: event.title,
-      start_date: event.start_date.slice(0, 16),
-      end_date: event.end_date.slice(0, 16),
+      start_date: utcIsoToLocalInput(event.start_date),
+      end_date: utcIsoToLocalInput(event.end_date),
       type: event.type,
       sim_dcs: event.sim_dcs,
       sim_bms: event.sim_bms,
@@ -163,13 +175,18 @@ function removeImage() {
 async function handleSubmit() {
   loading.value = true
   try {
+    const payload = {
+      ...form.value,
+      start_date: localInputToUtcIso(form.value.start_date),
+      end_date: localInputToUtcIso(form.value.end_date),
+    }
     if (isEdit.value && id) {
-      await updateEvent(id, form.value)
+      await updateEvent(id, payload)
       calendar.invalidate()
       toast.success('Événement modifié')
       router.push(`/calendar/${id}`)
     } else {
-      const event = await createEvent(form.value)
+      const event = await createEvent(payload)
       calendar.invalidate()
       toast.success('Événement créé')
       router.push(`/calendar/${event.id}`)
@@ -190,11 +207,11 @@ async function handleSubmit() {
       <!-- Dates -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="label">Début</label>
+          <label class="label">Début <span class="text-xs text-gray-400 font-normal">(heure locale)</span></label>
           <input v-model="form.start_date" type="datetime-local" class="input" required />
         </div>
         <div>
-          <label class="label">Fin</label>
+          <label class="label">Fin <span class="text-xs text-gray-400 font-normal">(heure locale)</span></label>
           <input v-model="form.end_date" type="datetime-local" class="input" required />
         </div>
       </div>
