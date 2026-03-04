@@ -95,7 +95,7 @@ async def _fix_event_timezones(dry_run: bool) -> None:
     For example, 21:00 CET was stored as 21:00 UTC instead of 20:00 UTC.
     This command reinterprets existing UTC timestamps as Paris local time.
     """
-    from datetime import UTC
+    from datetime import UTC, datetime, timedelta
     from zoneinfo import ZoneInfo
 
     from sqlalchemy import select
@@ -105,15 +105,32 @@ async def _fix_event_timezones(dry_run: bool) -> None:
 
     PARIS_TZ = ZoneInfo("Europe/Paris")
 
+    def _reinterpret(dt: datetime | None) -> datetime | None:
+        """Reinterpret a UTC datetime as Europe/Paris local time. Skip if None or already non-UTC."""
+        if dt is None:
+            return None
+        if dt.tzinfo is not None and dt.tzinfo != UTC and dt.utcoffset() != timedelta(0):
+            return dt  # already non-UTC, skip to avoid double-shifting
+        return dt.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
+
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(CalendarEvent))
         events = result.scalars().all()
 
         fixed = 0
+        skipped = 0
         for event in events:
-            # Reinterpret: the stored UTC value is actually a Paris local time
-            new_start = event.start_date.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
-            new_end = event.end_date.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
+            if not event.start_date or not event.end_date:
+                skipped += 1
+                continue
+
+            new_start = _reinterpret(event.start_date)
+            new_end = _reinterpret(event.end_date)
+
+            # Skip if nothing changed (already fixed or non-UTC)
+            if new_start == event.start_date and new_end == event.end_date:
+                skipped += 1
+                continue
 
             if dry_run:
                 rprint(
@@ -123,20 +140,16 @@ async def _fix_event_timezones(dry_run: bool) -> None:
             else:
                 event.start_date = new_start
                 event.end_date = new_end
-                # Also fix metadata timestamps if present
-                if event.created_at:
-                    event.created_at = event.created_at.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
-                if event.updated_at:
-                    event.updated_at = event.updated_at.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
-                if event.deleted_at:
-                    event.deleted_at = event.deleted_at.replace(tzinfo=None).replace(tzinfo=PARIS_TZ)
+                event.created_at = _reinterpret(event.created_at)
+                event.updated_at = _reinterpret(event.updated_at)
+                event.deleted_at = _reinterpret(event.deleted_at)
                 fixed += 1
 
         if not dry_run:
             await session.commit()
-            rprint(f"[bold green]Fixed {fixed} events.[/bold green]")
+            rprint(f"[bold green]Fixed {fixed} events, skipped {skipped}.[/bold green]")
         else:
-            rprint(f"\n[bold]Dry run complete. {len(events)} events would be updated.[/bold]")
+            rprint(f"\n[bold]Dry run complete. {len(events) - skipped} events would be updated, {skipped} skipped.[/bold]")
 
     await engine.dispose()
 
