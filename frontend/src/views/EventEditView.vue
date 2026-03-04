@@ -6,6 +6,7 @@ import { getModules } from '@/api/modules'
 import { getServers } from '@/api/servers'
 import { uploadFile } from '@/api/files'
 import { useToast } from '@/composables/useToast'
+import { useCalendarStore } from '@/stores/calendar'
 import MarkdownEditor from '@/components/ui/MarkdownEditor.vue'
 import MultiSelect from '@/components/ui/MultiSelect.vue'
 import type { MultiSelectOption } from '@/components/ui/MultiSelect.vue'
@@ -18,6 +19,7 @@ import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const calendar = useCalendarStore()
 
 const id = route.params.id ? Number(route.params.id) : null
 const isEdit = computed(() => id !== null)
@@ -163,10 +165,12 @@ async function handleSubmit() {
   try {
     if (isEdit.value && id) {
       await updateEvent(id, form.value)
+      calendar.invalidate()
       toast.success('Événement modifié')
       router.push(`/calendar/${id}`)
     } else {
       const event = await createEvent(form.value)
+      calendar.invalidate()
       toast.success('Événement créé')
       router.push(`/calendar/${event.id}`)
     }

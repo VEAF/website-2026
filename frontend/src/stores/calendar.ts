@@ -32,5 +32,10 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
-  return { events, currentRange, myEvents, tasks, fetchEvents, fetchMyEvents, fetchTasks }
+  function invalidate() {
+    currentRange.value = { from: '', to: '' }
+    myEvents.value = []
+  }
+
+  return { events, currentRange, myEvents, tasks, fetchEvents, fetchMyEvents, fetchTasks, invalidate }
 })
