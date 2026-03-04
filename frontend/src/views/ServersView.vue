@@ -8,6 +8,7 @@ import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const pageData = ref<DcsBotPage | null>(null)
 const loading = ref(true)
+const refreshing = ref(false)
 const error = ref(false)
 
 async function fetchData() {
@@ -19,6 +20,18 @@ async function fetchData() {
     error.value = true
   } finally {
     loading.value = false
+  }
+}
+
+async function refreshData() {
+  refreshing.value = true
+  error.value = false
+  try {
+    pageData.value = await getDcsBotServers(true)
+  } catch {
+    error.value = true
+  } finally {
+    refreshing.value = false
   }
 }
 
@@ -66,7 +79,18 @@ function formatAvgPlaytime(seconds: number): string {
 
 <template>
   <div>
-    <AppBreadcrumb :show-title="false" />
+    <AppBreadcrumb :show-title="false">
+      <template v-if="pageData && !loading" #after>
+        <button
+          @click="refreshData"
+          :disabled="refreshing"
+          class="btn-secondary text-sm ml-auto"
+        >
+          <i class="fa-solid fa-sync mr-1" :class="{ 'fa-spin': refreshing }"></i>
+          Rafraîchir
+        </button>
+      </template>
+    </AppBreadcrumb>
 
     <div v-if="loading" class="text-center py-8 text-gray-500">Chargement...</div>
 
