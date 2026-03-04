@@ -40,7 +40,11 @@ def _enrich_mission(mission_raw: dict | None) -> MissionInfoOut | None:
 
 
 @router.get("/servers", response_model=DcsBotPageOut)
-async def get_dcsbot_servers():
+async def get_dcsbot_servers(force_refresh: bool = False):
+    if force_refresh:
+        dcsbot_service.get_servers.invalidate_if_older(10)
+        dcsbot_service.get_server_stats.invalidate_if_older(10)
+
     servers_data = await dcsbot_service.get_servers()
     stats_data = await dcsbot_service.get_server_stats()
 

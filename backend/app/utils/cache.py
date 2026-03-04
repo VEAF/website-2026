@@ -1,3 +1,4 @@
+import time
 from functools import wraps
 
 from cachetools import TTLCache
@@ -12,6 +13,8 @@ def cached(cache: TTLCache):
     """Decorator for async functions with TTL caching."""
 
     def decorator(func):
+        timestamps: dict[str, float] = {}
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             key = f"{func.__name__}:{args}:{kwargs}"
@@ -19,9 +22,19 @@ def cached(cache: TTLCache):
                 return cache[key]
             result = await func(*args, **kwargs)
             cache[key] = result
+            timestamps[key] = time.monotonic()
             return result
 
+        def invalidate_if_older(min_age: float):
+            """Remove all cached entries older than min_age seconds."""
+            now = time.monotonic()
+            keys_to_remove = [k for k, ts in timestamps.items() if now - ts >= min_age]
+            for k in keys_to_remove:
+                cache.pop(k, None)
+                timestamps.pop(k, None)
+
         wrapper.cache = cache
+        wrapper.invalidate_if_older = invalidate_if_older
         return wrapper
 
     return decorator

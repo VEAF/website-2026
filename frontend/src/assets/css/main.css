@@ -166,7 +166,7 @@
 
   /* Aviation-style arrow breadcrumb */
   .breadcrumb-segment {
-    @apply inline-flex items-center h-8 text-sm font-medium text-white whitespace-nowrap;
+    @apply inline-flex items-center h-9 text-sm font-medium text-white whitespace-nowrap;
     padding-left: 20px;
     padding-right: 16px;
     clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);

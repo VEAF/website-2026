@@ -37,7 +37,7 @@ const lastItem = computed(() => items.value[items.value.length - 1] ?? null)
 
 <template>
   <div v-if="items.length > 1" class="mb-6">
-    <nav class="flex overflow-x-auto scrollbar-hide" aria-label="Fil d'Ariane">
+    <nav class="flex items-center overflow-x-auto scrollbar-hide" aria-label="Fil d'Ariane">
       <ol class="flex items-center flex-nowrap">
         <li v-for="(item, index) in items" :key="index" class="flex-shrink-0">
           <component

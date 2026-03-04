@@ -11,8 +11,10 @@ export async function getHeaderData(): Promise<HeaderData> {
   return data
 }
 
-export async function getDcsBotServers(): Promise<DcsBotPage> {
-  const { data } = await apiClient.get<DcsBotPage>('/dcsbot/servers')
+export async function getDcsBotServers(forceRefresh = false): Promise<DcsBotPage> {
+  const { data } = await apiClient.get<DcsBotPage>('/dcsbot/servers', {
+    params: forceRefresh ? { force_refresh: true } : undefined,
+  })
   return data
 }
 
