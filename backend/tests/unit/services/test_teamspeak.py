@@ -93,7 +93,7 @@ class TestGetCachedStatus:
 
 
 class TestFetchTsDataSync:
-    @patch("app.services.teamspeak.ts3.query.TS3Connection")
+    @patch("app.services.teamspeak.TS3Connection")
     @patch("app.services.teamspeak.settings")
     def test_fetches_and_filters_clients(self, mock_settings, mock_ts3_class):
         # GIVEN
@@ -103,13 +103,13 @@ class TestFetchTsDataSync:
         mock_ts3_class.return_value.__enter__ = MagicMock(return_value=mock_conn)
         mock_ts3_class.return_value.__exit__ = MagicMock(return_value=False)
 
-        mock_conn.clientlist.return_value.parsed = [
+        mock_conn.clientlist.return_value = [
             {"clid": "1", "cid": "10", "client_nickname": "Pilot1", "client_type": "0"},
             {"clid": "2", "cid": "10", "client_nickname": "Unknown from 1.2.3.4", "client_type": "0"},
             {"clid": "3", "cid": "20", "client_nickname": "ServerQuery", "client_type": "1"},
             {"clid": "4", "cid": "20", "client_nickname": "Pilot2", "client_type": "0"},
         ]
-        mock_conn.channellist.return_value.parsed = [
+        mock_conn.channellist.return_value = [
             {"cid": "10", "pid": "0", "channel_name": "Lobby"},
             {"cid": "20", "pid": "0", "channel_name": "Ops Room"},
         ]
@@ -132,7 +132,7 @@ class TestFetchTsDataSync:
         assert len(ops["clients"]) == 1
         assert ops["clients"][0]["nickname"] == "Pilot2"
 
-    @patch("app.services.teamspeak.ts3.query.TS3Connection")
+    @patch("app.services.teamspeak.TS3Connection")
     @patch("app.services.teamspeak.settings")
     def test_empty_server(self, mock_settings, mock_ts3_class):
         # GIVEN
@@ -142,8 +142,8 @@ class TestFetchTsDataSync:
         mock_ts3_class.return_value.__enter__ = MagicMock(return_value=mock_conn)
         mock_ts3_class.return_value.__exit__ = MagicMock(return_value=False)
 
-        mock_conn.clientlist.return_value.parsed = []
-        mock_conn.channellist.return_value.parsed = [
+        mock_conn.clientlist.return_value = []
+        mock_conn.channellist.return_value = [
             {"cid": "1", "pid": "0", "channel_name": "Default Channel"},
         ]
 

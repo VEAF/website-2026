@@ -2,9 +2,8 @@ import asyncio
 import logging
 from urllib.parse import parse_qs, urlparse
 
-import ts3.query
-
 from app.config import settings
+from app.services.ts3_client import TS3Connection, TS3QueryError
 from app.utils.cache import teamspeak_cache
 
 logger = logging.getLogger(__name__)
@@ -29,18 +28,18 @@ def _fetch_ts_data_sync() -> dict:
     """
     url_parts = _parse_ts_url(settings.API_TEAMSPEAK_URL)
 
-    with ts3.query.TS3Connection(url_parts["host"], url_parts["port"]) as ts3conn:
+    with TS3Connection(url_parts["host"], url_parts["port"]) as ts3conn:
         ts3conn.use(port=url_parts["server_port"])
 
         # Fetch clients
         try:
             raw_clients = ts3conn.clientlist()
-        except ts3.query.TS3QueryError:
+        except TS3QueryError:
             raw_clients = None
 
         clients = []
         if raw_clients is not None:
-            for c in raw_clients.parsed:
+            for c in raw_clients:
                 nickname = c.get("client_nickname", "")
                 # Filter out ServerQuery clients (client_type=1)
                 if str(c.get("client_type", "0")) == "1":
@@ -57,12 +56,12 @@ def _fetch_ts_data_sync() -> dict:
         # Fetch channels
         try:
             raw_channels = ts3conn.channellist()
-        except ts3.query.TS3QueryError:
+        except TS3QueryError:
             raw_channels = None
 
         channels = []
         if raw_channels is not None:
-            for ch in raw_channels.parsed:
+            for ch in raw_channels:
                 cid = int(ch.get("cid", 0))
                 channel_clients = [cl for cl in clients if cl["cid"] == cid]
                 channels.append({

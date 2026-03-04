@@ -188,6 +188,11 @@ async def discord_authorize():
 
 @router.post("/discord/callback", response_model=TokenResponse)
 async def discord_callback(data: DiscordCallbackRequest, response: Response, db: AsyncSession = Depends(get_db)):
+    # Validate state (CSRF protection) — check first to reject forged requests early
+    if data.state not in discord_oauth_states:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired state parameter")
+    del discord_oauth_states[data.state]
+
     # Validate Discord OAuth configuration before attempting token exchange
     if (
         not settings.DISCORD_CLIENT_ID
@@ -198,11 +203,6 @@ async def discord_callback(data: DiscordCallbackRequest, response: Response, db:
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="Discord SSO is not configured",
         )
-
-    # Validate state (CSRF protection)
-    if data.state not in discord_oauth_states:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired state parameter")
-    del discord_oauth_states[data.state]
 
     # Exchange code for Discord access token
     async with httpx.AsyncClient() as client:
