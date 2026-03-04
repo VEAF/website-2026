@@ -21,6 +21,7 @@ dependencies = [
     "email-validator>=2.2.0",
     "typer>=0.15.0",
     "pyyaml>=6.0.3",
+    "pillow>=10.0.0",
 ]
 
 [dependency-groups]

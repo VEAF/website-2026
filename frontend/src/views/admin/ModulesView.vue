@@ -157,9 +157,9 @@ async function handleImageUpload(event: Event, type: 'image' | 'image-header') {
   const file = input.files?.[0]
   if (!file || !editingModuleId.value) return
 
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    toast.error(new Error('Format accepté : uniquement les images jpg et png'))
+    toast.error(new Error('Format accepté : JPG, PNG ou WebP'))
     input.value = ''
     return
   }
@@ -497,12 +497,12 @@ onMounted(loadAll)
                 </div>
                 <input
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,image/webp"
                   class="input"
                   :disabled="imageUploading"
                   @change="handleImageUpload($event, 'image')"
                 />
-                <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo</p>
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP, max 20 Mo</p>
               </div>
 
               <!-- Image Header (5:1) -->
@@ -525,12 +525,12 @@ onMounted(loadAll)
                 </div>
                 <input
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,image/webp"
                   class="input"
                   :disabled="imageUploading"
                   @change="handleImageUpload($event, 'image-header')"
                 />
-                <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo, ratio 5:1 conseillé</p>
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP, max 20 Mo, ratio 5:1 conseillé</p>
               </div>
             </div>
           </div>

@@ -141,9 +141,9 @@ async function handleImageUpload(event: Event) {
   const file = input.files?.[0]
   if (!file) return
 
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    toast.error('Format accepté : JPG ou PNG uniquement')
+    toast.error('Format accepté : JPG, PNG ou WebP')
     input.value = ''
     return
   }
@@ -307,9 +307,9 @@ async function handleSubmit() {
             <i class="fa-solid fa-trash mr-1"></i>Supprimer l'image
           </button>
         </div>
-        <input type="file" accept="image/jpeg,image/png" class="input"
+        <input type="file" accept="image/jpeg,image/png,image/webp" class="input"
                :disabled="imageUploading" @change="handleImageUpload" />
-        <p class="text-xs text-gray-500 mt-1">JPG ou PNG, max 20 Mo</p>
+        <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP, max 20 Mo</p>
       </div>
 
       <!-- Server -->

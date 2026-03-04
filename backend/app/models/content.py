@@ -25,6 +25,7 @@ class File(Base):
         "image/jpg": TYPE_IMAGE,
         "image/jpeg": TYPE_IMAGE,
         "image/png": TYPE_IMAGE,
+        "image/webp": TYPE_IMAGE,
     }
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
