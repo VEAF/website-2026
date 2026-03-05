@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
     env_file: ./backend.env
     volumes:
-      - uploads:/app/uploads
+      - ./uploads:/app/uploads
     networks:
       - default
       - postgres
@@ -71,9 +71,6 @@ services:
     networks:
       - default
       - webproxy
-
-volumes:
-  uploads:
 
 networks:
   webproxy:
