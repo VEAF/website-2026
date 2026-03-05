@@ -1,0 +1,54 @@
+# VEAF Website — Production Docker Compose
+#
+# Deploy from pre-built images. Requires:
+#   - An external PostgreSQL database (accessible via the "database" network)
+#   - An external reverse proxy (e.g. nginx-proxy) on the "webproxy" network
+#
+# Quick start:
+#   cp backend.env.dist backend.env   # edit with real values
+#   docker compose up -d
+
+services:
+  backend:
+    image: ghcr.io/veaf/website-2026-backend:${TAG:-latest}
+    restart: unless-stopped
+    env_file: ./backend.env
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - default
+      - database
+    # Healthcheck is built into the image (GET /api/health)
+
+  frontend:
+    image: ghcr.io/veaf/website-2026-frontend:${TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - default
+    # Healthcheck is built into the image
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST:-veaf.org}
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - default
+      - webproxy
+
+volumes:
+  uploads:
+
+networks:
+  webproxy:
+    external: true
+  database:
+    external: true
