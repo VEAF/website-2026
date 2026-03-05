@@ -5,8 +5,14 @@
 #   - An external reverse proxy (e.g. nginx-proxy) on the "webproxy" network
 #
 # Quick start:
+#   cp .env.dist .env                 # edit with your values
 #   cp backend.env.dist backend.env   # edit with real values
 #   docker compose up -d
+#
+# Staging (with MailDev to catch outgoing emails):
+#   Set COMPOSE_PROFILES=staging in .env
+#   Set MAIL_SERVER=maildev, MAIL_PORT=1025, MAIL_TLS=false in backend.env
+#   MailDev UI: http://maildev.<VIRTUAL_HOST> (login/pass from .env)
 
 services:
   backend:
@@ -40,6 +46,24 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+      - default
+      - webproxy
+
+  # MailDev — SMTP catch-all for staging environments
+  # Activated via COMPOSE_PROFILES=staging in .env
+  # In backend.env, set: MAIL_SERVER=maildev  MAIL_PORT=1025  MAIL_TLS=false
+  maildev:
+    image: maildev/maildev:2.1.0
+    restart: unless-stopped
+    profiles:
+      - staging
+    environment:
+      VIRTUAL_HOST: maildev.${VIRTUAL_HOST:-veaf.org}
+      MAILDEV_WEB_USER: ${MAILDEV_WEB_USER:-veaf}
+      MAILDEV_WEB_PASS: ${MAILDEV_WEB_PASS:-changeme}
+      MAILDEV_SMTP_PORT: 1025
+      MAILDEV_WEB_PORT: 1080
     networks:
       - default
       - webproxy

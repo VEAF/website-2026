@@ -1,4 +1,5 @@
 *
+!.env.dist
 !nginx.conf
 !docker-compose.yml
 !backend.env.dist
