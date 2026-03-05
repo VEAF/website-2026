@@ -24,7 +24,12 @@ Your PostgreSQL container (or host) must be attached to the `database` network s
 You don't need to clone the entire repository. Use Git sparse checkout to fetch only the `deploy/` directory:
 
 ```bash
+# From the main branch (default)
 git clone --no-checkout --depth 1 https://github.com/VEAF/website-2026.git veaf-deploy
+
+# Or from a specific branch/tag
+git clone --no-checkout --depth 1 --branch v1.0.0 https://github.com/VEAF/website-2026.git veaf-deploy
+
 cd veaf-deploy
 git sparse-checkout set deploy
 git checkout
