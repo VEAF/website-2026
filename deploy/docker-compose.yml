@@ -1,7 +1,7 @@
 # VEAF Website — Production Docker Compose
 #
 # Deploy from pre-built images. Requires:
-#   - An external PostgreSQL database (accessible via the "database" network)
+#   - An external PostgreSQL database (accessible via the "postgres" network)
 #   - An external reverse proxy (e.g. nginx-proxy) on the "webproxy" network
 #
 # Quick start:
@@ -23,7 +23,7 @@ services:
       - uploads:/app/uploads
     networks:
       - default
-      - database
+      - postgres
     # Healthcheck is built into the image (GET /api/health)
 
   frontend:
@@ -73,6 +73,8 @@ volumes:
 
 networks:
   webproxy:
+    name: ${WEBPROXY_NETWORK:-webproxy}
     external: true
-  database:
+  postgres:
+    name: ${POSTGRES_NETWORK:-postgres}
     external: true
