@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { getRosterStats } from '@/api/roster'
 import type { RosterStats } from '@/api/roster'
 import RosterPilotsList from '@/components/roster/RosterPilotsList.vue'
@@ -9,6 +10,7 @@ import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
 import { useAuthStore } from '@/stores/auth'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
+const route = useRoute()
 const authStore = useAuthStore()
 
 const group = ref('all')
@@ -52,6 +54,14 @@ function changeTab(newTab: string) {
 }
 
 onMounted(async () => {
+  const queryTab = route.query.tab as string | undefined
+  const queryModuleId = route.query.moduleId as string | undefined
+  if (queryTab && queryTab in tabToModuleType) {
+    tab.value = queryTab
+  }
+  if (queryModuleId) {
+    selectedModuleId.value = Number(queryModuleId)
+  }
   await loadStats()
   loading.value = false
 })
