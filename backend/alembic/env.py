@@ -13,7 +13,7 @@ from app.database import Base
 import app.models  # noqa: F401
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.get_secret_value())
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
