@@ -62,6 +62,7 @@ services:
       - staging
     environment:
       VIRTUAL_HOST: maildev.${VIRTUAL_HOST:-veaf.org}
+      VIRTUAL_PORT: 1080
       LETSENCRYPT_HOST: maildev.${VIRTUAL_HOST:-veaf.org}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-}
       MAILDEV_WEB_USER: ${MAILDEV_WEB_USER:-veaf}
