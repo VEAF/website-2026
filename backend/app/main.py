@@ -5,11 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.config import settings
+from app.utils.startup import log_startup_banner
 from app.version import APP_VERSION
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    log_startup_banner()
+
     # Run Alembic migrations if enabled (useful in production)
     if settings.RUN_MIGRATIONS:
         import logging
