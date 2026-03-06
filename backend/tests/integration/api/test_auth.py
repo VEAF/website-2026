@@ -14,15 +14,38 @@ from tests.factories import UserFactory
 
 @pytest.mark.asyncio
 async def test_register(client: AsyncClient):
-    response = await client.post("/api/auth/register", json={
-        "email": "test@veaf.org",
-        "password": "Password123!",
-        "nickname": "TestPilot",
-    })
+    # WHEN
+    with patch("app.services.email._get_fastmail") as mock_fm:
+        mock_fm.return_value.send_message = AsyncMock()
+        response = await client.post("/api/auth/register", json={
+            "email": "test@veaf.org",
+            "password": "Password123!",
+            "nickname": "TestPilot",
+        })
+
+    # THEN
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer"
+
+
+@pytest.mark.asyncio
+async def test_reset_password_sends_email(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    user = UserFactory(email="reset@veaf.org", nickname="ResetUser")
+    db_session.add(user)
+    await db_session.flush()
+
+    # WHEN
+    with patch("app.services.email._get_fastmail") as mock_fm:
+        mock_fm.return_value.send_message = AsyncMock()
+        response = await client.post("/api/auth/reset-password", json={"email": "reset@veaf.org"})
+
+    # THEN
+    assert response.status_code == 200
+    await db_session.refresh(user)
+    assert user.password_request_token is not None
 
 
 @pytest.mark.asyncio

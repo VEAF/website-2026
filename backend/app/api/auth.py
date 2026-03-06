@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Response, Cookie, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, Cookie, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +21,7 @@ from app.schemas.auth import (
     ResetPasswordRequest,
     TokenResponse,
 )
+from app.services.email import send_password_reset_email, send_welcome_email
 from app.utils.cache import discord_oauth_states
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -50,7 +51,7 @@ async def login(data: LoginRequest, response: Response, db: AsyncSession = Depen
 
 
 @router.post("/register", response_model=TokenResponse)
-async def register(data: RegisterRequest, response: Response, db: AsyncSession = Depends(get_db)):
+async def register(data: RegisterRequest, response: Response, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     # Check uniqueness
     existing = await db.execute(select(User).where((User.email == data.email) | (User.nickname == data.nickname)))
     if existing.scalar_one_or_none():
@@ -69,6 +70,8 @@ async def register(data: RegisterRequest, response: Response, db: AsyncSession =
     db.add(user)
     await db.commit()
     await db.refresh(user)
+
+    background_tasks.add_task(send_welcome_email, user.email, user.nickname)
 
     access_token = create_access_token(user.id, user.get_roles_list())
     refresh_token = create_refresh_token(user.id)
@@ -121,7 +124,7 @@ async def logout(response: Response):
 
 
 @router.post("/reset-password")
-async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+async def reset_password(data: ResetPasswordRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
 
@@ -129,14 +132,12 @@ async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(
         # Don't reveal if email exists
         return {"detail": "If this email exists, a reset link has been sent."}
 
-    import secrets
-
     token = secrets.token_urlsafe(32)
     user.password_request_token = token
     user.password_request_expired_at = datetime.now(UTC) + timedelta(hours=24)
     await db.commit()
 
-    # TODO: Send email with reset link
+    background_tasks.add_task(send_password_reset_email, user.email, user.nickname or user.email, token)
     return {"detail": "If this email exists, a reset link has been sent."}
 
 
