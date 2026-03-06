@@ -3,10 +3,22 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
+import apiClient from '@/api/client'
 import NavMenu from './NavMenu.vue'
 
 const auth = useAuthStore()
 const menu = useMenuStore()
+const frontendVersion = __APP_SEMVER__
+const backendVersion = ref('')
+
+async function fetchBackendVersion() {
+  try {
+    const { data } = await apiClient.get('/')
+    backendVersion.value = data.version
+  } catch {
+    // silently ignore
+  }
+}
 const router = useRouter()
 const route = useRoute()
 const mobileMenuOpen = ref(false)
@@ -29,6 +41,7 @@ function onClickOutside(event: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener('mousedown', onClickOutside)
+  fetchBackendVersion()
 })
 
 onBeforeUnmount(() => {
@@ -53,7 +66,7 @@ async function handleLogout() {
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center space-x-2 text-white hover:text-white/80">
-          <span class="text-xl font-bold">VEAF</span>
+          <span class="text-xl font-bold" :title="`Frontend: ${frontendVersion}\nBackend: ${backendVersion || '...'}`">VEAF</span>
         </RouterLink>
 
         <!-- Desktop Navigation -->

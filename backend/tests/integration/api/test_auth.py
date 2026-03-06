@@ -38,7 +38,22 @@ async def test_login_wrong_password(client: AsyncClient):
 async def test_health(client: AsyncClient):
     response = await client.get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    data = response.json()
+    assert data["status"] == "ok"
+    assert "version" in data
+
+
+@pytest.mark.asyncio
+async def test_api_info(client: AsyncClient):
+    # WHEN
+    response = await client.get("/api")
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["title"] == "VEAF Website API"
+    assert "version" in data
+    assert "description" in data
 
 
 # --- Discord OAuth2 Tests ---

@@ -6,11 +6,12 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # Build stage: install deps + build
 FROM node:20-alpine AS build
+ARG APP_VERSION=dev
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN echo "$APP_VERSION" > ../VERSION && npm run build
 
 # Production stage: serve built assets with nginx
 FROM nginx:alpine AS prod

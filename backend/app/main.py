@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.config import settings
+from app.version import APP_VERSION
 
 
 @asynccontextmanager
@@ -39,7 +40,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="VEAF Website API",
-    version="2.0.0",
+    description="API du site communautaire de la Virtual European Air Force",
+    version=APP_VERSION,
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     lifespan=lifespan,
@@ -58,4 +60,9 @@ app.include_router(api_router)
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "version": APP_VERSION}
+
+
+@app.get("/api")
+async def api_info():
+    return {"title": app.title, "version": app.version, "description": app.description}

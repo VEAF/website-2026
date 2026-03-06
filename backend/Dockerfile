@@ -22,6 +22,8 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload
 # ---- Prod: deps + source ----
 FROM base AS prod
 
+ARG APP_VERSION=dev
+
 LABEL org.opencontainers.image.source="https://github.com/VEAF/website-2026"
 LABEL org.opencontainers.image.description="VEAF Website 2026 - Backend API"
 
@@ -29,6 +31,7 @@ COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 COPY . .
+RUN echo "$APP_VERSION" > VERSION
 RUN uv sync --frozen --no-dev
 
 RUN chown -R worker:worker /app
