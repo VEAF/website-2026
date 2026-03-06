@@ -65,4 +65,9 @@ async def health():
 
 @app.get("/api")
 async def api_info():
-    return {"title": app.title, "version": app.version, "description": app.description}
+    return {
+        "title": app.title,
+        "version": app.version,
+        "description": app.description,
+        "discord_support_url": settings.DISCORD_SUPPORT_URL or None,
+    }

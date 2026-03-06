@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { getDiscordAuthUrl } from '@/api/auth'
+import { useDiscordSupport } from '@/composables/useDiscordSupport'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -15,6 +16,7 @@ const password = ref('')
 const loading = ref(false)
 const discordLoading = ref(false)
 const showLocalLogin = ref(false)
+const { discordUrl, open: openDiscordSupport } = useDiscordSupport()
 
 async function handleLogin() {
   loading.value = true
@@ -112,6 +114,16 @@ async function handleDiscordLogin() {
           </p>
         </div>
       </template>
+
+      <div v-if="discordUrl" class="mt-6 pt-4 border-t border-gray-200 text-center">
+        <button
+          type="button"
+          class="text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+          @click="openDiscordSupport()"
+        >
+          <i class="fa-brands fa-discord mr-1"></i>Besoin d'aide ? Contactez-nous sur Discord
+        </button>
+      </div>
     </div>
   </div>
 </template>
