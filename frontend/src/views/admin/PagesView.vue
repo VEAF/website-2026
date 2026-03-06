@@ -209,7 +209,7 @@ onMounted(loadPages)
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Search & Filters -->
     <div class="flex flex-wrap gap-4 mb-4">
@@ -352,27 +352,27 @@ onMounted(loadPages)
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex items-center justify-between mt-4">
-      <span class="text-sm text-gray-600">{{ total }} page(s) au total</span>
-      <div class="flex items-center space-x-2">
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage <= 1"
-          @click="goToPage(currentPage - 1)"
-        >
-          <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
-        </button>
-        <span class="text-sm text-gray-600">Page {{ currentPage }} sur {{ totalPages }}</span>
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage >= totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
-        </button>
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="flex items-center justify-between p-3 border-t">
+        <span class="text-sm text-gray-600">{{ total }} page(s) au total</span>
+        <div class="flex items-center space-x-2">
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage <= 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
+          </button>
+          <span class="text-sm text-gray-600">Page {{ currentPage }} sur {{ totalPages }}</span>
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage >= totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
+            Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>

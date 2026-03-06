@@ -158,7 +158,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Cadet readiness notification -->
     <div
@@ -345,31 +345,31 @@ onMounted(async () => {
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex items-center justify-between mt-4">
-      <span class="text-sm text-gray-600">
-        {{ total }} utilisateur{{ total > 1 ? 's' : '' }}
-      </span>
-      <div class="flex items-center space-x-2">
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage <= 1"
-          @click="goToPage(currentPage - 1)"
-        >
-          <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
-        </button>
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="flex items-center justify-between p-3 border-t">
         <span class="text-sm text-gray-600">
-          Page {{ currentPage }} sur {{ totalPages }}
+          {{ total }} utilisateur{{ total > 1 ? 's' : '' }}
         </span>
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage >= totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
-        </button>
+        <div class="flex items-center space-x-2">
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage <= 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
+          </button>
+          <span class="text-sm text-gray-600">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </span>
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage >= totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
+            Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
