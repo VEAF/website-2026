@@ -40,6 +40,10 @@ watch(() => route.fullPath, () => {
   closeAllDropdowns()
 })
 
+function isExternalLink(link: string | null): boolean {
+  return !!link && link.includes('://')
+}
+
 function getItemLink(item: MenuItem): string | null {
   // Type-based routing
   switch (item.type) {
@@ -100,6 +104,16 @@ function getItemLink(item: MenuItem): string | null {
           >
             <template v-for="child in item.items" :key="child.id">
               <div v-if="child.type === 5" class="border-t border-gray-200 my-1" />
+              <a
+                v-else-if="isExternalLink(getItemLink(child))"
+                :href="getItemLink(child)!"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block px-4 py-2 text-sm text-gray-700 hover:text-veaf-600 hover:bg-gray-50"
+              >
+                <span v-if="child.icon" class="mr-1"><i :class="child.icon" /></span>
+                {{ child.label }}
+              </a>
               <RouterLink
                 v-else-if="getItemLink(child)"
                 :to="getItemLink(child)!"
@@ -129,6 +143,16 @@ function getItemLink(item: MenuItem): string | null {
         <div v-if="openDropdownId === item.id" class="pl-4 space-y-1">
           <template v-for="child in item.items" :key="child.id">
             <div v-if="child.type === 5" class="border-t border-white/20 my-1" />
+            <a
+              v-else-if="isExternalLink(getItemLink(child))"
+              :href="getItemLink(child)!"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
+            >
+              <span v-if="child.icon" class="mr-1"><i :class="child.icon" /></span>
+              {{ child.label }}
+            </a>
             <RouterLink
               v-else-if="getItemLink(child)"
               :to="getItemLink(child)!"
@@ -200,6 +224,19 @@ function getItemLink(item: MenuItem): string | null {
           {{ item.label }}
         </template>
       </RouterLink>
+
+      <!-- External link -->
+      <a
+        v-else-if="isExternalLink(getItemLink(item))"
+        :href="getItemLink(item)!"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
+        :class="item.theme_classes"
+      >
+        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
+        {{ item.label }}
+      </a>
 
       <!-- Regular link -->
       <RouterLink
