@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useCalendarStore } from '@/stores/calendar'
 import { getEvent, voteEvent, deleteEvent, copyEvent, addChoice, updateChoice, deleteChoice } from '@/api/calendar'
 import type { EventDetail, Choice } from '@/types/calendar'
 import { useConfirm } from '@/composables/useConfirm'
@@ -12,6 +13,7 @@ import { moduleTypeIcon } from '@/constants/modules'
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const calendar = useCalendarStore()
 const event = ref<EventDetail | null>(null)
 const loading = ref(true)
 const activeTab = ref<'description' | 'debrief'>('description')
@@ -141,6 +143,7 @@ async function handleCopy() {
 async function handleDelete() {
   if (!event.value || !(await confirm('Supprimer cet événement ?'))) return
   await deleteEvent(event.value.id)
+  calendar.invalidate()
   router.push('/calendar')
 }
 
