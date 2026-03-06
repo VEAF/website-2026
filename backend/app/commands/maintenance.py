@@ -4,41 +4,38 @@ import os
 import typer
 from rich import print as rprint
 
+from app.commands.database import _create_tables, _drop_tables, _has_data, _run_migrations
 from app.config import settings
 
 maintenance_app = typer.Typer(help="Maintenance commands", no_args_is_help=True)
 
 
-async def _drop_tables() -> None:
-    import app.models  # noqa: F401
-    from app.database import Base, engine
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    await engine.dispose()
-
-
-async def _create_tables() -> None:
-    import app.models  # noqa: F401
-    from app.database import Base, engine
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
-
-
 @maintenance_app.command("import-yaml")
 def import_yaml(
     filepath: str = typer.Option("var/website.yml", help="Path to the YAML fixture file"),
+    migrations: bool = typer.Option(True, "--migrations/--no-migrations", help="Use Alembic migrations (default) or create_all"),
 ) -> None:
     """Drop tables, recreate schema, and import data from Symfony YAML export."""
-    typer.confirm("This will DROP all tables and import from YAML. Continue?", abort=True)
+    if not os.path.isfile(filepath):
+        rprint(f"[bold red]File not found: {filepath}[/bold red]")
+        raise typer.Exit(1)
+
+    if asyncio.run(_has_data()):
+        typer.confirm("Users already exist in the database. This will DROP all data and import from YAML. Continue?", abort=True)
+    else:
+        typer.confirm("This will DROP all tables and import from YAML. Continue?", abort=True)
     asyncio.run(_drop_tables())
-    typer.echo("Tables dropped.")
-    asyncio.run(_create_tables())
-    typer.echo("Tables created.")
+    rprint("[bold green]Tables dropped.[/bold green]")
+    if migrations:
+        _run_migrations()
+    else:
+        asyncio.run(_create_tables())
+        rprint("[bold yellow]Tables created (without migration tracking).[/bold yellow]")
     asyncio.run(_import_from_yaml(filepath))
-    typer.echo("Import complete.")
+    rprint("[bold green]Import complete.[/bold green]")
+
+    rprint(f"\n[bold yellow]Warning: remember to delete the import file to avoid data leaks:[/bold yellow]")
+    rprint(f"[bold cyan]   rm {filepath}[/bold cyan]\n")
 
 
 async def _import_from_yaml(filepath: str) -> None:
