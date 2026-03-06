@@ -197,7 +197,7 @@ async def discord_callback(data: DiscordCallbackRequest, response: Response, db:
     # Validate Discord OAuth configuration before attempting token exchange
     if (
         not settings.DISCORD_CLIENT_ID
-        or not settings.DISCORD_CLIENT_SECRET
+        or not settings.DISCORD_CLIENT_SECRET.get_secret_value()
         or not settings.DISCORD_REDIRECT_URI
     ):
         raise HTTPException(
@@ -211,7 +211,7 @@ async def discord_callback(data: DiscordCallbackRequest, response: Response, db:
             DISCORD_TOKEN_URL,
             data={
                 "client_id": settings.DISCORD_CLIENT_ID,
-                "client_secret": settings.DISCORD_CLIENT_SECRET,
+                "client_secret": settings.DISCORD_CLIENT_SECRET.get_secret_value(),
                 "grant_type": "authorization_code",
                 "code": data.code,
                 "redirect_uri": settings.DISCORD_REDIRECT_URI,

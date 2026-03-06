@@ -13,7 +13,7 @@ def create_access_token(user_id: int, roles: list[str]) -> str:
         "exp": expire,
         "type": "access",
     }
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(payload, settings.JWT_SECRET.get_secret_value(), algorithm=settings.JWT_ALGORITHM)
 
 
 def create_refresh_token(user_id: int) -> str:
@@ -23,12 +23,12 @@ def create_refresh_token(user_id: int) -> str:
         "exp": expire,
         "type": "refresh",
     }
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(payload, settings.JWT_SECRET.get_secret_value(), algorithm=settings.JWT_ALGORITHM)
 
 
 def decode_token(token: str) -> dict | None:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET.get_secret_value(), algorithms=[settings.JWT_ALGORITHM])
         return payload
     except JWTError:
         return None

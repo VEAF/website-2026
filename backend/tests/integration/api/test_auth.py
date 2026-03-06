@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import AsyncClient
+from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -163,7 +164,7 @@ async def test_discord_callback_creates_new_user(client: AsyncClient, db_session
     original_id = settings.DISCORD_CLIENT_ID
     original_secret = settings.DISCORD_CLIENT_SECRET
     settings.DISCORD_CLIENT_ID = "test-client-id"
-    settings.DISCORD_CLIENT_SECRET = "test-secret"
+    settings.DISCORD_CLIENT_SECRET = SecretStr("test-secret")
 
     mock_client = AsyncMock()
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -204,7 +205,7 @@ async def test_discord_callback_links_existing_user_by_email(client: AsyncClient
     original_id = settings.DISCORD_CLIENT_ID
     original_secret = settings.DISCORD_CLIENT_SECRET
     settings.DISCORD_CLIENT_ID = "test-client-id"
-    settings.DISCORD_CLIENT_SECRET = "test-secret"
+    settings.DISCORD_CLIENT_SECRET = SecretStr("test-secret")
 
     mock_client = AsyncMock()
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -242,7 +243,7 @@ async def test_discord_callback_logs_in_existing_linked_user(client: AsyncClient
     original_id = settings.DISCORD_CLIENT_ID
     original_secret = settings.DISCORD_CLIENT_SECRET
     settings.DISCORD_CLIENT_ID = "test-client-id"
-    settings.DISCORD_CLIENT_SECRET = "test-secret"
+    settings.DISCORD_CLIENT_SECRET = SecretStr("test-secret")
 
     mock_client = AsyncMock()
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -274,7 +275,7 @@ async def test_discord_callback_rejects_unverified_email(client: AsyncClient):
     original_id = settings.DISCORD_CLIENT_ID
     original_secret = settings.DISCORD_CLIENT_SECRET
     settings.DISCORD_CLIENT_ID = "test-client-id"
-    settings.DISCORD_CLIENT_SECRET = "test-secret"
+    settings.DISCORD_CLIENT_SECRET = SecretStr("test-secret")
 
     unverified_user = {**DISCORD_USER_RESPONSE, "verified": False}
 
