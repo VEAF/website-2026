@@ -37,6 +37,17 @@ services:
       - backend
       - frontend
 
+  maildev:
+    image: maildev/maildev:2.1.0
+    environment:
+      MAILDEV_SMTP_PORT: 1025
+      MAILDEV_WEB_PORT: 1080
+      VIRTUAL_HOST: maildev.${VIRTUAL_HOST:-veaf.localhost}
+      VIRTUAL_PORT: 1080
+    networks:
+      - default
+      - webproxy
+
   postgres:
     image: postgres:16-alpine
     environment:

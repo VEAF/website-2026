@@ -13,11 +13,12 @@ class Settings(BaseSettings):
 
     # Email
     MAIL_FROM: str = "noreply@veaf.org"
-    MAIL_SERVER: str = "localhost"
-    MAIL_PORT: int = 587
+    MAIL_SERVER: str = "maildev"
+    MAIL_PORT: int = 1025
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
-    MAIL_TLS: bool = True
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = False
 
     # External APIs
     API_DCSSERVERBOT_URL: str = "http://dcs.veaf.org:9876"
