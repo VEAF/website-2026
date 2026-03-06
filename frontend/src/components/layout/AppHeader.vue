@@ -4,17 +4,22 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import apiClient from '@/api/client'
+import { useDiscordSupport } from '@/composables/useDiscordSupport'
 import NavMenu from './NavMenu.vue'
 
 const auth = useAuthStore()
 const menu = useMenuStore()
 const frontendVersion = __APP_SEMVER__
 const backendVersion = ref('')
+const { discordUrl, setUrl: setDiscordUrl, open: openDiscordSupport } = useDiscordSupport()
 
 async function fetchBackendVersion() {
   try {
     const { data } = await apiClient.get('/')
     backendVersion.value = data.version
+    if (data.discord_support_url) {
+      setDiscordUrl(data.discord_support_url)
+    }
   } catch {
     // silently ignore
   }
@@ -115,6 +120,13 @@ async function handleLogout() {
                 >
                   <i class="fa-solid fa-gear mr-1"></i>Administration
                 </RouterLink>
+                <button
+                  v-if="discordUrl"
+                  @click="openDiscordSupport(); closeUserDropdown()"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:text-veaf-600 hover:bg-gray-50"
+                >
+                  <i class="fa-brands fa-discord mr-1"></i>Support Discord
+                </button>
                 <div class="border-t border-gray-200 my-1"></div>
                 <button
                   @click="handleLogout"
@@ -158,6 +170,13 @@ async function handleLogout() {
             >
               <i class="fa-solid fa-gear mr-1"></i>Administration
             </RouterLink>
+            <button
+              v-if="discordUrl"
+              @click="openDiscordSupport(); mobileMenuOpen = false"
+              class="block w-full text-left px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
+            >
+              <i class="fa-brands fa-discord mr-1"></i>Support Discord
+            </button>
             <button
               @click="handleLogout"
               class="block w-full text-left px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-md"

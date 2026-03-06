@@ -7,6 +7,7 @@ import { useVersionCheck } from '@/composables/useVersionCheck'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
+import DiscordSupportModal from '@/components/ui/DiscordSupportModal.vue'
 import VersionNotification from '@/components/ui/VersionNotification.vue'
 
 const auth = useAuthStore()
@@ -38,5 +39,6 @@ onUnmounted(() => {
     <AppFooter />
   </div>
   <ConfirmModal />
+  <DiscordSupportModal />
   <VersionNotification />
 </template>

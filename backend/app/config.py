@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     DISCORD_CLIENT_ID: str = ""
     DISCORD_CLIENT_SECRET: str = ""
     DISCORD_REDIRECT_URI: str = "http://localhost/auth/discord/callback"
+    DISCORD_SUPPORT_URL: str = ""
 
     # reCAPTCHA
     RECAPTCHA_SECRET_KEY: str = ""

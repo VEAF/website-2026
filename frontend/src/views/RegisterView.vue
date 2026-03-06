@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { getDiscordAuthUrl } from '@/api/auth'
+import { useDiscordSupport } from '@/composables/useDiscordSupport'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -15,6 +16,7 @@ const password = ref('')
 const passwordConfirm = ref('')
 const loading = ref(false)
 const discordLoading = ref(false)
+const { discordUrl, open: openDiscordSupport } = useDiscordSupport()
 
 async function handleRegister() {
   if (password.value !== passwordConfirm.value) {
@@ -106,6 +108,16 @@ async function handleDiscordRegister() {
           Déjà un compte ?
           <RouterLink to="/login" class="text-veaf-600 hover:text-veaf-800">Se connecter</RouterLink>
         </p>
+      </div>
+
+      <div v-if="discordUrl" class="mt-6 pt-4 border-t border-gray-200 text-center">
+        <button
+          type="button"
+          class="text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+          @click="openDiscordSupport()"
+        >
+          <i class="fa-brands fa-discord mr-1"></i>Besoin d'aide ? Contactez-nous sur Discord
+        </button>
       </div>
     </div>
   </div>
