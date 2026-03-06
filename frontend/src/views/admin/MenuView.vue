@@ -9,7 +9,7 @@ const activeTab = ref<'list' | 'tree'>('list')
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Tab switcher -->
     <div class="flex space-x-1 mb-6 border-b">

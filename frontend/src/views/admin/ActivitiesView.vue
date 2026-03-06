@@ -13,6 +13,19 @@ import { useConfirm } from '@/composables/useConfirm'
 const toast = useToast()
 const { confirm } = useConfirm()
 
+// localStorage persistence helpers
+const STORAGE_PREFIX = 'admin.activities.'
+
+function loadStorage<T>(key: string, defaultValue: T): T {
+  const raw = localStorage.getItem(STORAGE_PREFIX + key)
+  if (raw === null) return defaultValue
+  try { return JSON.parse(raw) } catch { return defaultValue }
+}
+
+function saveStorage(key: string, value: unknown): void {
+  localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value))
+}
+
 // Data
 const events = ref<AdminRecruitmentEvent[]>([])
 const total = ref(0)
@@ -22,8 +35,9 @@ const loading = ref(false)
 const searchInput = ref('')
 const search = ref('')
 const typeFilter = ref<number | null>(null)
-const currentPage = ref(1)
-const pageSize = 50
+const currentPage = ref(loadStorage<number>('currentPage', 1))
+const pageSize = ref(loadStorage<number>('pageSize', 50))
+const pageSizeOptions = [10, 20, 50, 100]
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -42,7 +56,7 @@ const typeOptions = [
   { value: 5, label: 'Invité' },
 ]
 
-const totalPages = computed(() => Math.ceil(total.value / pageSize))
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
 // Edit form
 const showEditForm = ref(false)
@@ -86,8 +100,8 @@ async function loadEvents() {
   loading.value = true
   try {
     const params: Record<string, string | number> = {
-      skip: (currentPage.value - 1) * pageSize,
-      limit: pageSize,
+      skip: (currentPage.value - 1) * pageSize.value,
+      limit: pageSize.value,
     }
     if (search.value) params.search = search.value
     if (typeFilter.value !== null) params.type = typeFilter.value
@@ -149,9 +163,17 @@ function goToPage(page: number) {
   loadEvents()
 }
 
-watch([search, typeFilter], () => {
+watch([search, typeFilter, pageSize], () => {
   currentPage.value = 1
   loadEvents()
+})
+
+// Persist filter/pagination state to localStorage
+watch([search, typeFilter, currentPage, pageSize], () => {
+  saveStorage('search', search.value)
+  saveStorage('typeFilter', typeFilter.value)
+  saveStorage('currentPage', currentPage.value)
+  saveStorage('pageSize', pageSize.value)
 })
 
 onMounted(loadEvents)
@@ -159,7 +181,7 @@ onMounted(loadEvents)
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Search & Filters -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
@@ -268,31 +290,42 @@ onMounted(loadEvents)
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex items-center justify-between mt-4">
-      <span class="text-sm text-gray-600">
-        {{ total }} activité{{ total > 1 ? 's' : '' }}
-      </span>
-      <div class="flex items-center space-x-2">
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage <= 1"
-          @click="goToPage(currentPage - 1)"
-        >
-          <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
-        </button>
-        <span class="text-sm text-gray-600">
-          Page {{ currentPage }} sur {{ totalPages }}
-        </span>
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage >= totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
-        </button>
+      <!-- Pagination -->
+      <div class="flex items-center justify-between p-3 border-t">
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-gray-600">
+            {{ total }} activité{{ total > 1 ? 's' : '' }}
+          </span>
+          <select
+            :value="pageSize"
+            class="input text-sm py-1 w-auto"
+            @change="pageSize = Number(($event.target as HTMLSelectElement).value)"
+          >
+            <option v-for="size in pageSizeOptions" :key="size" :value="size">
+              {{ size }} / page
+            </option>
+          </select>
+        </div>
+        <div v-if="totalPages > 1" class="flex items-center space-x-2">
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage <= 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
+          </button>
+          <span class="text-sm text-gray-600">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </span>
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage >= totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
+            Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>

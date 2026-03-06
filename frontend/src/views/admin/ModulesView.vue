@@ -326,7 +326,7 @@ onMounted(loadAll)
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Tabs -->
     <div class="flex space-x-1 mb-6 border-b border-gray-200">

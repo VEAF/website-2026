@@ -132,7 +132,7 @@ onMounted(loadEvents)
 
 <template>
   <div>
-    <AppBreadcrumb />
+    <AppBreadcrumb :show-title="false" />
 
     <!-- Search & Filters -->
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
@@ -258,42 +258,42 @@ onMounted(loadEvents)
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- Pagination -->
-    <div class="flex items-center justify-between mt-4">
-      <div class="flex items-center gap-3">
-        <span class="text-sm text-gray-600">
-          {{ total }} événement{{ total > 1 ? 's' : '' }}
-        </span>
-        <select
-          :value="pageSize"
-          class="input text-sm py-1 w-auto"
-          @change="pageSize = Number(($event.target as HTMLSelectElement).value)"
-        >
-          <option v-for="size in pageSizeOptions" :key="size" :value="size">
-            {{ size }} / page
-          </option>
-        </select>
-      </div>
-      <div v-if="totalPages > 1" class="flex items-center space-x-2">
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage <= 1"
-          @click="goToPage(currentPage - 1)"
-        >
-          <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
-        </button>
-        <span class="text-sm text-gray-600">
-          Page {{ currentPage }} sur {{ totalPages }}
-        </span>
-        <button
-          class="btn-secondary text-sm"
-          :disabled="currentPage >= totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
-        </button>
+      <!-- Pagination -->
+      <div class="flex items-center justify-between p-3 border-t">
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-gray-600">
+            {{ total }} événement{{ total > 1 ? 's' : '' }}
+          </span>
+          <select
+            :value="pageSize"
+            class="input text-sm py-1 w-auto"
+            @change="pageSize = Number(($event.target as HTMLSelectElement).value)"
+          >
+            <option v-for="size in pageSizeOptions" :key="size" :value="size">
+              {{ size }} / page
+            </option>
+          </select>
+        </div>
+        <div v-if="totalPages > 1" class="flex items-center space-x-2">
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage <= 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left mr-1"></i>Précédent
+          </button>
+          <span class="text-sm text-gray-600">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </span>
+          <button
+            class="btn-secondary text-sm"
+            :disabled="currentPage >= totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
+            Suivant<i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
