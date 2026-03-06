@@ -51,15 +51,17 @@ watch([() => props.moduleId, () => props.group], fetchDetail, { immediate: true 
     <!-- Header image -->
     <div
       v-if="detail.module.image_header_uuid"
-      class="mb-4 relative rounded-lg overflow-hidden"
+      class="mb-4 bg-white shadow-lg rounded-lg p-4"
     >
-      <img
-        :src="`/api/files/${detail.module.image_header_uuid}`"
-        :alt="detail.module.long_name"
-        class="w-full h-48 object-cover"
-      />
-      <div class="absolute inset-0 bg-black/30 flex items-end p-4">
-        <h2 class="text-white text-xl font-bold">{{ detail.module.long_name }}</h2>
+      <div class="relative overflow-hidden rounded">
+        <img
+          :src="`/api/files/${detail.module.image_header_uuid}`"
+          :alt="detail.module.long_name"
+          class="w-full h-48 object-cover"
+        />
+        <div class="absolute inset-0 bg-black/30 flex items-end p-4">
+          <h2 class="text-white text-xl font-bold">{{ detail.module.long_name }}</h2>
+        </div>
       </div>
     </div>
     <h2 v-else class="text-lg font-semibold mb-4">{{ detail.module.long_name }}</h2>
