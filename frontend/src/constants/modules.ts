@@ -39,6 +39,11 @@ export const TAB_TO_MODULE_TYPE: Record<string, number> = {
   specials: MODULE_TYPE_SPECIAL,
 }
 
+// Module type → tab key (reverse mapping)
+export const MODULE_TYPE_TO_TAB: Record<number, string> = Object.fromEntries(
+  Object.entries(TAB_TO_MODULE_TYPE).map(([tab, type]) => [type, tab]),
+)
+
 // Module type → FontAwesome icon class
 export function moduleTypeIcon(moduleType: number | null): string {
   if (moduleType === MODULE_TYPE_HELICOPTER) return 'fa-solid fa-helicopter'

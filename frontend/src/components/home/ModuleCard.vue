@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Module } from '@/types/module'
+import { MODULE_TYPE_TO_TAB } from '@/constants/modules'
 
 const props = defineProps<{
   module: Module
@@ -13,10 +14,15 @@ const imageSrc = computed(() => {
 })
 
 const displayText = computed(() => props.module.code.toUpperCase())
+
+const rosterLink = computed(() => {
+  const tab = MODULE_TYPE_TO_TAB[props.module.type]
+  return tab ? `/roster?tab=${tab}&moduleId=${props.module.id}` : '/roster'
+})
 </script>
 
 <template>
-  <RouterLink to="/roster" class="block group">
+  <RouterLink :to="rosterLink" class="block group">
     <div class="relative overflow-hidden rounded">
       <img
         v-if="imageSrc"
