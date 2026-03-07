@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
@@ -132,7 +133,7 @@ async def reset_password(data: ResetPasswordRequest, background_tasks: Backgroun
         # Don't reveal if email exists
         return {"detail": "If this email exists, a reset link has been sent."}
 
-    token = secrets.token_urlsafe(32)
+    token = str(uuid.uuid4())
     user.password_request_token = token
     user.password_request_expired_at = datetime.now(UTC) + timedelta(hours=24)
     await db.commit()
