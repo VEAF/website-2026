@@ -4,3 +4,4 @@
 !docker-compose.yml
 !backend.env.dist
 !README.md
+!*.sh
