@@ -27,6 +27,8 @@ USERS_DATA = [
     {"key": "shark", "email": "shark@localhost.dev", "nickname": "shark", "roles": "ROLE_USER", "status": User.STATUS_MEMBER, "sim_dcs": True, "sim_bms": False},
     {"key": "polo", "email": "polo@localhost.dev", "nickname": "polo", "roles": "ROLE_USER", "status": User.STATUS_CADET, "sim_dcs": True, "sim_bms": False},
     {"key": "mge", "email": "mge@localhost.dev", "nickname": "mge", "roles": "ROLE_USER", "status": User.STATUS_MEMBER, "sim_dcs": True, "sim_bms": True},
+    {"key": "michel", "email": "michel.naud26400@gmail.com", "nickname": "michel", "roles": "ROLE_USER,ROLE_ADMIN", "status": User.STATUS_MEMBER, "sim_dcs": True, "sim_bms": False},
+    {"key": "disabled", "email": "disabled@veaf.int", "nickname": "disabled", "roles": "", "status": User.STATUS_UNKNOWN, "sim_dcs": False, "sim_bms": False, "admin_comment": "compte disabled@localhost.dev désactivé le 01/01/2026 par mitch"},
 ]
 
 
@@ -47,6 +49,7 @@ async def load_users(session: AsyncSession) -> dict[str, User]:
             sim_bms=item["sim_bms"],
             need_presentation=item.get("need_presentation", False),
             cadet_flights=item.get("cadet_flights", 0),
+            admin_comment=item.get("admin_comment"),
             created_at=now,
             updated_at=now,
         )

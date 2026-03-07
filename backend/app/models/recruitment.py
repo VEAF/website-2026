@@ -14,6 +14,7 @@ class RecruitmentEvent(Base):
     TYPE_PROMOTE = 3
     TYPE_ACTIVITY = 4
     TYPE_GUEST = 5
+    TYPE_DISABLED = 6
 
     TYPES = {
         TYPE_TO_APPLY: "candidature",
@@ -21,6 +22,7 @@ class RecruitmentEvent(Base):
         TYPE_PROMOTE: "promotion",
         TYPE_ACTIVITY: "activité",
         TYPE_GUEST: "invité",
+        TYPE_DISABLED: "compte désactivé",
     }
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { getAdminUsers, updateAdminUser } from '@/api/users'
+import { getAdminUsers, updateAdminUser, disableAdminUser } from '@/api/users'
 import { getAdminStats } from '@/api/admin'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { AdminUser, AdminUserUpdate } from '@/types/user'
 import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const route = useRoute()
 
 // localStorage persistence helpers
@@ -82,6 +84,7 @@ const editForm = ref<AdminUserUpdate>({
   sim_dcs: false,
   sim_bms: false,
   need_presentation: false,
+  admin_comment: null,
 })
 
 async function loadUsers() {
@@ -97,6 +100,13 @@ async function loadUsers() {
     const result = await getAdminUsers(params)
     users.value = result.items
     total.value = result.total
+    // Auto-correct if current page is beyond results
+    const maxPage = Math.max(1, Math.ceil(result.total / pageSize.value))
+    if (currentPage.value > maxPage) {
+      currentPage.value = maxPage
+      await loadUsers()
+      return
+    }
   } catch (e) {
     toast.error(e)
   } finally {
@@ -116,6 +126,7 @@ function openEditUser(u: AdminUser) {
     sim_dcs: u.sim_dcs,
     sim_bms: u.sim_bms,
     need_presentation: u.need_presentation,
+    admin_comment: u.admin_comment,
   }
   showEditForm.value = true
 }
@@ -126,6 +137,26 @@ async function handleEditSubmit() {
   try {
     await updateAdminUser(editingUserId.value, editForm.value)
     toast.success('Utilisateur modifié avec succès')
+    showEditForm.value = false
+    await loadUsers()
+  } catch (e) {
+    toast.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleDisableUser(u: AdminUser) {
+  const confirmed = await confirm(
+    `Êtes-vous sûr de vouloir désactiver le compte de "${u.nickname}" (${u.email}) ? Cette action est irréversible.`,
+    { button: { label: 'Désactiver', icon: 'fa-solid fa-ban' } },
+  )
+  if (!confirmed) return
+
+  loading.value = true
+  try {
+    await disableAdminUser(u.id)
+    toast.success(`Le compte de "${u.nickname}" a été désactivé`)
     showEditForm.value = false
     await loadUsers()
   } catch (e) {
@@ -296,6 +327,11 @@ onMounted(async () => {
           </label>
         </div>
 
+        <div>
+          <label class="label">Commentaire admin</label>
+          <textarea v-model="editForm.admin_comment" class="input w-full" rows="3"></textarea>
+        </div>
+
         <div class="flex justify-end space-x-3">
           <button type="button" class="btn-secondary" @click="showEditForm = false">
             <i class="fa-solid fa-xmark mr-1"></i>Annuler
@@ -342,7 +378,12 @@ onMounted(async () => {
                 title="Prêt à rejoindre l'association"
               ></i>{{ u.nickname }}
             </td>
-            <td class="p-2">{{ u.email }}</td>
+            <td class="p-2">
+              <span v-if="u.email.endsWith('@veaf.int')" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                <i class="fa-solid fa-ban mr-1"></i>désactivé
+              </span>
+              <span v-else>{{ u.email }}</span>
+            </td>
             <td class="p-2">
               <span
                 class="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
@@ -356,12 +397,28 @@ onMounted(async () => {
             <td class="p-2">{{ u.sim_dcs ? 'oui' : 'non' }}</td>
             <td class="p-2">{{ u.sim_bms ? 'oui' : 'non' }}</td>
             <td class="p-2">{{ formatDate(u.created_at) }}</td>
-            <td class="p-2">
-              <button
+            <td class="p-2 whitespace-nowrap">
+              <router-link
+                :to="{ name: 'admin-activities', query: { search: u.nickname } }"
                 class="text-veaf-600 hover:text-veaf-800 text-sm"
+                title="Voir les activités"
+              >
+                <i class="fa-solid fa-list-check"></i>
+              </router-link>
+              <button
+                class="text-veaf-600 hover:text-veaf-800 text-sm ml-2"
+                title="Modifier"
                 @click="openEditUser(u)"
               >
-                <i class="fa-solid fa-edit mr-1"></i>Modifier
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button
+                v-if="!u.email.endsWith('@veaf.int')"
+                class="text-red-600 hover:text-red-800 text-sm ml-2"
+                title="Désactiver"
+                @click="handleDisableUser(u)"
+              >
+                <i class="fa-solid fa-ban"></i>
               </button>
             </td>
           </tr>

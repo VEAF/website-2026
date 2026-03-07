@@ -4,7 +4,10 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sqlalchemy import select
+
 from app.auth.jwt import create_access_token
+from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
 from tests.factories import AdminFactory, UserFactory
 
@@ -377,3 +380,110 @@ async def test_update_user_unauthorized(client: AsyncClient, db_session: AsyncSe
 
     # THEN
     assert response.status_code == 403
+
+
+# =============================================================================
+# Disable user
+# =============================================================================
+
+
+@pytest.mark.asyncio
+async def test_disable_user_success(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    target, _ = await _create_user(db_session, email="victim@test.com", nickname="victim")
+
+    # WHEN
+    response = await client.post(f"/api/admin/users/{target.id}/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"].endswith("@veaf.int")
+    assert data["status"] == User.STATUS_UNKNOWN
+    assert "victim@test.com" in data["admin_comment"]
+    assert admin.nickname in data["admin_comment"]
+
+
+@pytest.mark.asyncio
+async def test_disable_user_creates_recruitment_event(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    target, _ = await _create_user(db_session)
+
+    # WHEN
+    response = await client.post(f"/api/admin/users/{target.id}/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    result = await db_session.execute(
+        select(RecruitmentEvent).where(
+            RecruitmentEvent.user_id == target.id,
+            RecruitmentEvent.type == RecruitmentEvent.TYPE_DISABLED,
+        )
+    )
+    event = result.scalar_one()
+    assert admin.nickname in event.comment
+
+
+@pytest.mark.asyncio
+async def test_disable_user_cannot_disable_self(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.post(f"/api/admin/users/{admin.id}/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_disable_user_already_disabled(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    target, _ = await _create_user(db_session, email="already@veaf.int")
+
+    # WHEN
+    response = await client.post(f"/api/admin/users/{target.id}/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_disable_user_not_found(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.post("/api/admin/users/9999/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_disable_user_unauthorized(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_user(db_session)
+
+    # WHEN
+    response = await client.post("/api/admin/users/1/disable", headers=headers)
+
+    # THEN
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_disabled_user_cannot_authenticate(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, admin_headers = await _create_admin(db_session)
+    target, target_headers = await _create_user(db_session)
+    await client.post(f"/api/admin/users/{target.id}/disable", headers=admin_headers)
+
+    # WHEN
+    response = await client.get("/api/users/me", headers=target_headers)
+
+    # THEN
+    assert response.status_code == 401

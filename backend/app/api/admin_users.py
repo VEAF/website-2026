@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, or_, select
@@ -7,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import require_admin
 from app.database import get_db
+from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
 from app.schemas.user import AdminUserListOut, AdminUserOut, AdminUserUpdate
 
@@ -29,6 +31,7 @@ def _build_admin_user_out(user: User) -> AdminUserOut:
         need_presentation=user.need_presentation,
         cadet_flights=user.cadet_flights,
         is_ready_to_promote=user.is_ready_to_promote,
+        admin_comment=user.admin_comment,
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
@@ -102,6 +105,7 @@ async def update_user(
     target.sim_dcs = data.sim_dcs
     target.sim_bms = data.sim_bms
     target.need_presentation = data.need_presentation
+    target.admin_comment = data.admin_comment
     target.updated_at = datetime.now(UTC)
 
     try:
@@ -113,5 +117,63 @@ async def update_user(
             status_code=status.HTTP_409_CONFLICT,
             detail="Un utilisateur avec cet email ou ce pseudo existe déjà",
         )
+
+    return _build_admin_user_out(target)
+
+
+@router.post("/{user_id}/disable", response_model=AdminUserOut)
+async def disable_user(
+    user_id: int,
+    user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    if user.id == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Vous ne pouvez pas désactiver votre propre compte",
+        )
+
+    target = await db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé")
+
+    if target.email.endswith("@veaf.int"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ce compte est déjà désactivé",
+        )
+
+    original_email = target.email
+    now = datetime.now(UTC)
+
+    # Replace email and clear credentials
+    target.email = f"{uuid4()}@veaf.int"
+    target.password = None
+    target.password_request_token = None
+    target.password_request_expired_at = None
+    target.status = User.STATUS_UNKNOWN
+    target.roles = ""
+    target.discord_id = None
+    target.updated_at = now
+
+    # Build admin comment
+    disable_comment = f"compte {original_email} désactivé le {now.strftime('%d/%m/%Y')} par {user.nickname}"
+    if target.admin_comment:
+        target.admin_comment = f"{target.admin_comment}\n{disable_comment}"
+    else:
+        target.admin_comment = disable_comment
+
+    # Add recruitment event for audit trail
+    recruitment_event = RecruitmentEvent(
+        type=RecruitmentEvent.TYPE_DISABLED,
+        comment=f"compte désactivé par {user.nickname}",
+        event_at=now,
+        user_id=target.id,
+        validator_id=user.id,
+    )
+    db.add(recruitment_event)
+
+    await db.commit()
+    await db.refresh(target)
 
     return _build_admin_user_out(target)

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   getAdminRecruitmentEvents,
   updateAdminRecruitmentEvent,
@@ -12,6 +13,7 @@ import { useConfirm } from '@/composables/useConfirm'
 
 const toast = useToast()
 const { confirm } = useConfirm()
+const route = useRoute()
 
 // localStorage persistence helpers
 const STORAGE_PREFIX = 'admin.activities.'
@@ -32,10 +34,11 @@ const total = ref(0)
 const loading = ref(false)
 
 // Search and filters
-const searchInput = ref('')
-const search = ref('')
+const initialSearch = typeof route.query.search === 'string' ? route.query.search : ''
+const searchInput = ref(initialSearch)
+const search = ref(initialSearch)
 const typeFilter = ref<number | null>(null)
-const currentPage = ref(loadStorage<number>('currentPage', 1))
+const currentPage = ref(initialSearch ? 1 : loadStorage<number>('currentPage', 1))
 const pageSize = ref(loadStorage<number>('pageSize', 50))
 const pageSizeOptions = [10, 20, 50, 100]
 
@@ -54,6 +57,7 @@ const typeOptions = [
   { value: 3, label: 'Promotion' },
   { value: 4, label: 'Activité' },
   { value: 5, label: 'Invité' },
+  { value: 6, label: 'Compte désactivé' },
 ]
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
@@ -73,6 +77,7 @@ function typeClass(type: number): string {
     case 3: return 'bg-green-100 text-green-800'
     case 4: return 'bg-yellow-100 text-yellow-800'
     case 5: return 'bg-gray-100 text-gray-800'
+    case 6: return 'bg-red-100 text-red-800'
     default: return 'bg-gray-100 text-gray-800'
   }
 }
@@ -109,6 +114,13 @@ async function loadEvents() {
     const result = await getAdminRecruitmentEvents(params)
     events.value = result.items
     total.value = result.total
+    // Auto-correct if current page is beyond results
+    const maxPage = Math.max(1, Math.ceil(result.total / pageSize.value))
+    if (currentPage.value > maxPage) {
+      currentPage.value = maxPage
+      await loadEvents()
+      return
+    }
   } catch (e) {
     toast.error(e)
   } finally {
@@ -191,7 +203,7 @@ onMounted(loadEvents)
           :value="searchInput"
           type="text"
           class="input pl-9 w-full"
-          placeholder="Rechercher par pseudo du cadet..."
+          placeholder="Rechercher par pseudo..."
           @input="searchInput = ($event.target as HTMLInputElement).value; onSearchInput()"
         />
       </div>
@@ -237,7 +249,7 @@ onMounted(loadEvents)
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b text-left">
-            <th class="p-2">Cadet</th>
+            <th class="p-2">Utilisateur</th>
             <th class="p-2">Type</th>
             <th class="p-2">Date</th>
             <th class="p-2">Commentaire</th>

@@ -590,9 +590,10 @@ onMounted(loadAll)
               <td class="p-2">
                 <button
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
+                  title="Modifier"
                   @click="openEditModule(m)"
                 >
-                  <i class="fa-solid fa-edit mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit"></i>
                 </button>
               </td>
             </tr>
@@ -661,15 +662,17 @@ onMounted(loadAll)
               <td class="p-2 space-x-3">
                 <button
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
+                  title="Modifier"
                   @click="openEditRole(r)"
                 >
-                  <i class="fa-solid fa-edit mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit"></i>
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"
+                  title="Supprimer"
                   @click="handleDeleteRole(r)"
                 >
-                  <i class="fa-solid fa-trash mr-1"></i>Supprimer
+                  <i class="fa-solid fa-trash"></i>
                 </button>
               </td>
             </tr>
@@ -738,15 +741,17 @@ onMounted(loadAll)
               <td class="p-2 space-x-3">
                 <button
                   class="text-veaf-600 hover:text-veaf-800 text-sm"
+                  title="Modifier"
                   @click="openEditSystem(s)"
                 >
-                  <i class="fa-solid fa-edit mr-1"></i>Modifier
+                  <i class="fa-solid fa-edit"></i>
                 </button>
                 <button
                   class="text-red-600 hover:text-red-800 text-sm"
+                  title="Supprimer"
                   @click="handleDeleteSystem(s)"
                 >
-                  <i class="fa-solid fa-trash mr-1"></i>Supprimer
+                  <i class="fa-solid fa-trash"></i>
                 </button>
               </td>
             </tr>

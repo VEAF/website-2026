@@ -256,13 +256,13 @@ onMounted(loadUrls)
             <td class="p-2 text-xs">{{ formatDate(u.updated_at) }}</td>
             <td class="p-2 space-x-3">
               <a :href="'/' + u.slug" target="_blank" class="text-veaf-600 hover:text-veaf-800 text-sm" title="Tester la redirection">
-                <i class="fa-solid fa-up-right-from-square mr-1"></i>Tester
+                <i class="fa-solid fa-up-right-from-square"></i>
               </a>
-              <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openEdit(u)">
-                <i class="fa-solid fa-edit mr-1"></i>Modifier
+              <button class="text-veaf-600 hover:text-veaf-800 text-sm" title="Modifier" @click="openEdit(u)">
+                <i class="fa-solid fa-edit"></i>
               </button>
-              <button class="text-red-600 hover:text-red-800 text-sm" @click="handleDelete(u)">
-                <i class="fa-solid fa-trash mr-1"></i>Supprimer
+              <button class="text-red-600 hover:text-red-800 text-sm" title="Supprimer" @click="handleDelete(u)">
+                <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>
