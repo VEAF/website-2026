@@ -1,0 +1,16 @@
+{% extends "default.html" %}
+{% block title %}Bienvenue sur le site de la VEAF{% endblock %}
+{% block content %}
+<h2 style="margin:0 0 16px;font-size:22px;color:#033c73;">Bienvenue sur le site de la VEAF, {{ nickname }} !</h2>
+<p style="margin:0 0 12px;">Votre compte a bien &eacute;t&eacute; cr&eacute;&eacute;.</p>
+<p style="margin:0 0 24px;">Vous pouvez d&egrave;s &agrave; pr&eacute;sent vous connecter sur le site :</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
+  <tr>
+    <td align="center" style="background-color:#2fa4e7;border-radius:6px;">
+      <a href="{{ app_url }}" style="display:inline-block;padding:12px 28px;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;border-radius:6px;">Acc&eacute;der au site</a>
+    </td>
+  </tr>
+</table>
+<p style="margin:0 0 8px;">&Agrave; bient&ocirc;t sur nos serveurs !</p>
+<p style="margin:0;color:#666666;font-style:italic;">L'&eacute;quipe VEAF</p>
+{% endblock %}
