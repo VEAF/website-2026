@@ -431,30 +431,21 @@ function formatShortDate(d: string) {
           <span class="text-green-600 font-medium">Oui</span> :
           <template v-for="(v, idx) in votesYes" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>
-              {{ v.user_nickname }}
-              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
-            </span>
+            <span>{{ v.user_nickname }}</span>
           </template>
         </div>
         <div>
           <span class="text-gray-500 font-medium">Peut-être</span> :
           <template v-for="(v, idx) in votesMaybe" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>
-              {{ v.user_nickname }}
-              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
-            </span>
+            <span>{{ v.user_nickname }}</span>
           </template>
         </div>
         <div>
           <span class="text-red-600 font-medium">Non</span> :
           <template v-for="(v, idx) in votesNo" :key="v.id">
             <span v-if="idx > 0">, </span>
-            <span>
-              {{ v.user_nickname }}
-              <span v-if="v.created_at" class="text-xs text-gray-400" :title="formatDate(v.created_at)">({{ formatShortDate(v.created_at) }})</span>
-            </span>
+            <span>{{ v.user_nickname }}</span>
           </template>
         </div>
       </div>
@@ -490,7 +481,7 @@ function formatShortDate(d: string) {
                 {{ v.user_nickname }}
                 <i v-if="v.vote === null" class="fa-solid fa-exclamation-circle text-yellow-500 ml-1" title="peut-être absent"></i>
                 <i v-if="v.comment" class="fa-solid fa-comment text-gray-400 ml-1" :title="v.comment"></i>
-                <span v-if="v.created_at" class="text-xs text-gray-400 ml-1">{{ formatShortDate(v.created_at) }}</span>
+                <span v-if="v.created_at" class="text-xs text-gray-400 ml-1" :title="formatDate(v.created_at)">{{ formatShortDate(v.created_at) }}</span>
               </td>
               <template v-for="n in [1, 2, 3]" :key="n">
                 <template v-if="usersChoicesMap.get(v.user_id)?.[n]">
