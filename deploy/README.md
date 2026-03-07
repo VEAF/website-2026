@@ -44,17 +44,21 @@ cp backend.env.dist backend.env
 # Edit backend.env — at minimum set DATABASE_URL and JWT_SECRET
 
 # 2. Pull images and start
-docker compose pull
-docker compose up -d
-
-# 3. Run database migrations
-docker compose exec backend uv run alembic upgrade head
-
-# 4. (Optional) Load seed data
-docker compose exec backend python -m app.console database fixtures
+./start.sh
 ```
 
+Migrations run automatically on startup when `RUN_MIGRATIONS=true` is set in `backend.env` (default in `backend.env.dist`).
+
 The application is now running. The nginx service is exposed to the `webproxy` network with `VIRTUAL_HOST` set (default: `veaf.org`). Your reverse proxy should pick it up automatically.
+
+### Helper Scripts
+
+| Script | Description |
+|---|---|
+| `./start.sh` | Start all services |
+| `./stop.sh` | Stop all services |
+| `./update.sh` | Pull latest images and restart services |
+| `./console.sh <cmd>` | Run a backend CLI command (e.g. `./console.sh database create`) |
 
 ## Configuration
 
@@ -84,15 +88,10 @@ These can be set in a `.env` file next to `docker-compose.yml` or exported in yo
 ## Updating
 
 ```bash
-# Pull the latest images
-docker compose pull
-
-# Restart services
-docker compose up -d
-
-# Apply any new database migrations
-docker compose exec backend uv run alembic upgrade head
+./update.sh
 ```
+
+This pulls the latest images and restarts services. Migrations run automatically on startup.
 
 ## Architecture
 
