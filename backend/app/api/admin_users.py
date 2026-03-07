@@ -32,6 +32,7 @@ def _build_admin_user_out(user: User) -> AdminUserOut:
         cadet_flights=user.cadet_flights,
         is_ready_to_promote=user.is_ready_to_promote,
         admin_comment=user.admin_comment,
+        disabled=user.disabled,
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
@@ -137,7 +138,7 @@ async def disable_user(
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé")
 
-    if target.email.endswith("@veaf.int"):
+    if target.disabled:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ce compte est déjà désactivé",
@@ -147,6 +148,7 @@ async def disable_user(
     now = datetime.now(UTC)
 
     # Replace email and clear credentials
+    target.disabled = True
     target.email = f"{uuid4()}@veaf.int"
     target.password = None
     target.password_request_token = None

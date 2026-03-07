@@ -399,6 +399,7 @@ async def test_disable_user_success(client: AsyncClient, db_session: AsyncSessio
     # THEN
     assert response.status_code == 200
     data = response.json()
+    assert data["disabled"] is True
     assert data["email"].endswith("@veaf.int")
     assert data["status"] == User.STATUS_UNKNOWN
     assert "victim@test.com" in data["admin_comment"]
@@ -442,7 +443,7 @@ async def test_disable_user_cannot_disable_self(client: AsyncClient, db_session:
 async def test_disable_user_already_disabled(client: AsyncClient, db_session: AsyncSession):
     # GIVEN
     _, headers = await _create_admin(db_session)
-    target, _ = await _create_user(db_session, email="already@veaf.int")
+    target, _ = await _create_user(db_session, email="already@veaf.int", disabled=True)
 
     # WHEN
     response = await client.post(f"/api/admin/users/{target.id}/disable", headers=headers)

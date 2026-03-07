@@ -379,7 +379,7 @@ onMounted(async () => {
               ></i>{{ u.nickname }}
             </td>
             <td class="p-2">
-              <span v-if="u.email.endsWith('@veaf.int')" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              <span v-if="u.disabled" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                 <i class="fa-solid fa-ban mr-1"></i>désactivé
               </span>
               <span v-else>{{ u.email }}</span>
@@ -413,13 +413,20 @@ onMounted(async () => {
                 <i class="fa-solid fa-edit"></i>
               </button>
               <button
-                v-if="!u.email.endsWith('@veaf.int')"
+                v-if="!u.disabled"
                 class="text-red-600 hover:text-red-800 text-sm ml-2"
                 title="Désactiver"
                 @click="handleDisableUser(u)"
               >
                 <i class="fa-solid fa-ban"></i>
               </button>
+              <span
+                v-else
+                class="text-gray-300 text-sm ml-2"
+                title="Déjà désactivé"
+              >
+                <i class="fa-solid fa-ban"></i>
+              </span>
             </td>
           </tr>
         </tbody>

@@ -92,6 +92,7 @@ class AdminUserOut(BaseModel):
     cadet_flights: int
     is_ready_to_promote: bool = False
     admin_comment: str | None = None
+    disabled: bool = False
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

@@ -71,6 +71,7 @@ class User(Base):
     discord_id: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
     forum: Mapped[str | None] = mapped_column(String(64), nullable=True)
     admin_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    disabled: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Relationships
     player_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("player.id"), nullable=True)

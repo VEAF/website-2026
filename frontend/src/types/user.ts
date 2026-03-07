@@ -71,6 +71,7 @@ export interface AdminUser {
   cadet_flights: number
   is_ready_to_promote: boolean
   admin_comment: string | null
+  disabled: boolean
   created_at: string | null
   updated_at: string | null
 }
