@@ -91,6 +91,8 @@ class AdminUserOut(BaseModel):
     need_presentation: bool
     cadet_flights: int
     is_ready_to_promote: bool = False
+    admin_comment: str | None = None
+    disabled: bool = False
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
@@ -107,6 +109,7 @@ class AdminUserUpdate(BaseModel):
     sim_dcs: bool = False
     sim_bms: bool = False
     need_presentation: bool = False
+    admin_comment: str | None = None
 
 
 class AdminUserListOut(BaseModel):

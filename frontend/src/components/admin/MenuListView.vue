@@ -436,11 +436,11 @@ onMounted(async () => {
             </td>
             <td class="p-2 text-xs">{{ restrictionLabels[item.restriction] ?? '-' }}</td>
             <td class="p-2 space-x-3">
-              <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openEdit(item)">
-                <i class="fa-solid fa-edit mr-1"></i>Modifier
+              <button class="text-veaf-600 hover:text-veaf-800 text-sm" title="Modifier" @click="openEdit(item)">
+                <i class="fa-solid fa-edit"></i>
               </button>
-              <button class="text-red-600 hover:text-red-800 text-sm" @click="handleDelete(item)">
-                <i class="fa-solid fa-trash mr-1"></i>Supprimer
+              <button class="text-red-600 hover:text-red-800 text-sm" title="Supprimer" @click="handleDelete(item)">
+                <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>

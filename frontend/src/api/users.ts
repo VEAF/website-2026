@@ -68,3 +68,8 @@ export async function updateAdminUser(userId: number, payload: AdminUserUpdate):
   const { data } = await apiClient.put<AdminUser>(`/admin/users/${userId}`, payload)
   return data
 }
+
+export async function disableAdminUser(userId: number): Promise<AdminUser> {
+  const { data } = await apiClient.post<AdminUser>(`/admin/users/${userId}/disable`)
+  return data
+}

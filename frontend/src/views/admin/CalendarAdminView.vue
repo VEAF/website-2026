@@ -74,6 +74,13 @@ async function loadEvents() {
     const result = await getAdminEvents(params)
     events.value = result.items
     total.value = result.total
+    // Auto-correct if current page is beyond results
+    const maxPage = Math.max(1, Math.ceil(result.total / pageSize.value))
+    if (currentPage.value > maxPage) {
+      currentPage.value = maxPage
+      await loadEvents()
+      return
+    }
   } catch (e) {
     toast.error(e)
   } finally {

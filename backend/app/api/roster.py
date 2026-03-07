@@ -20,31 +20,34 @@ router = APIRouter(prefix="/roster", tags=["roster"])
 
 
 def _apply_group_filter(query: Select, group: str) -> Select:
-    """Apply group filter on User.status."""
+    """Apply group filter on User.status, always excluding disabled users."""
+    query = query.where(User.disabled.is_(False))
     if group == "cadets":
         query = query.where(User.status == User.STATUS_CADET)
     elif group == "members":
         query = query.where(User.status.in_(User.STATUSES_MEMBER))
-    # "all" = no filter
+    # "all" = no filter (beyond disabled exclusion)
     return query
 
 
 @router.get("/stats", response_model=RosterStatsOut)
 async def get_roster_stats(db: AsyncSession = Depends(get_db)):
-    all_count = await db.scalar(select(func.count()).select_from(User))
-    cadets_count = await db.scalar(select(func.count()).select_from(User).where(User.status == User.STATUS_CADET))
+    active_users = User.disabled.is_(False)
+    all_count = await db.scalar(select(func.count()).select_from(User).where(active_users))
+    cadets_count = await db.scalar(select(func.count()).select_from(User).where(active_users, User.status == User.STATUS_CADET))
     members_count = await db.scalar(
-        select(func.count()).select_from(User).where(User.status.in_(User.STATUSES_MEMBER))
+        select(func.count()).select_from(User).where(active_users, User.status.in_(User.STATUSES_MEMBER))
     )
     cadets_need_presentation = await db.scalar(
         select(func.count())
         .select_from(User)
-        .where(User.status == User.STATUS_CADET, User.need_presentation.is_(True))
+        .where(active_users, User.status == User.STATUS_CADET, User.need_presentation.is_(True))
     )
     cadets_ready = await db.scalar(
         select(func.count())
         .select_from(User)
         .where(
+            active_users,
             User.status == User.STATUS_CADET,
             User.sim_dcs.is_(True),
             User.need_presentation.is_(False),
@@ -62,7 +65,7 @@ async def get_roster_stats(db: AsyncSession = Depends(get_db)):
 
 @router.get("/office", response_model=OfficeOut)
 async def get_roster_office(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.status.in_(User.STATUSES_OFFICE)))
+    result = await db.execute(select(User).where(User.disabled.is_(False), User.status.in_(User.STATUSES_OFFICE)))
     users_by_status = {u.status: u for u in result.scalars().all()}
 
     def _member(status: int) -> OfficeMemberOut | None:

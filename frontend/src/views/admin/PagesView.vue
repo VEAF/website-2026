@@ -337,16 +337,16 @@ onMounted(loadPages)
             <td class="p-2 text-xs">{{ formatDate(p.updated_at) }}</td>
             <td class="p-2 space-x-3">
               <a :href="'/' + p.path" target="_blank" class="text-veaf-600 hover:text-veaf-800 text-sm" title="Ouvrir la page">
-                <i class="fa-solid fa-up-right-from-square mr-1"></i>Ouvrir
+                <i class="fa-solid fa-up-right-from-square"></i>
               </a>
-              <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="goToDetail(p)">
-                <i class="fa-solid fa-eye mr-1"></i>Voir
+              <button class="text-veaf-600 hover:text-veaf-800 text-sm" title="Voir" @click="goToDetail(p)">
+                <i class="fa-solid fa-eye"></i>
               </button>
-              <button class="text-veaf-600 hover:text-veaf-800 text-sm" @click="openEdit(p)">
-                <i class="fa-solid fa-edit mr-1"></i>Modifier
+              <button class="text-veaf-600 hover:text-veaf-800 text-sm" title="Modifier" @click="openEdit(p)">
+                <i class="fa-solid fa-edit"></i>
               </button>
-              <button class="text-red-600 hover:text-red-800 text-sm" @click="handleDelete(p)">
-                <i class="fa-solid fa-trash mr-1"></i>Supprimer
+              <button class="text-red-600 hover:text-red-800 text-sm" title="Supprimer" @click="handleDelete(p)">
+                <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>
