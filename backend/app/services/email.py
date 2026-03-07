@@ -55,7 +55,7 @@ async def send_welcome_email(email: str, nickname: str) -> None:
 
 async def send_password_reset_email(email: str, nickname: str, token: str) -> None:
     """Send password reset link."""
-    reset_url = f"{settings.APP_URL}/reset-password?token={token}"
+    reset_url = f"{settings.APP_URL}/reset-password/{token}"
     message = MessageSchema(
         subject="Réinitialisation de votre mot de passe - VEAF",
         recipients=[email],

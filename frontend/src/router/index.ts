@@ -26,6 +26,11 @@ const router = createRouter({
       component: () => import('@/views/ResetPasswordView.vue'),
     },
     {
+      path: '/reset-password/:token',
+      name: 'reset-password-confirm',
+      component: () => import('@/views/ResetPasswordConfirmView.vue'),
+    },
+    {
       path: '/calendar',
       name: 'calendar',
       component: () => import('@/views/CalendarView.vue'),
