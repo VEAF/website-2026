@@ -33,16 +33,27 @@ def check() -> None:
     rprint(f"  SSL/TLS:  {settings.MAIL_SSL_TLS}")
     rprint(f"  Username: {settings.MAIL_USERNAME or '(none)'}")
     rprint()
+    if settings.MAIL_SSL_TLS and settings.MAIL_STARTTLS:
+        rprint("[bold red]Error[/bold red] — MAIL_SSL_TLS and MAIL_STARTTLS are mutually exclusive.")
+        raise typer.Exit(1)
+
     rprint("[bold]Connecting to SMTP server...[/bold]")
     try:
-        with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10) as smtp:
-            smtp.ehlo()
-            if settings.MAIL_STARTTLS:
-                smtp.starttls()
+        if settings.MAIL_SSL_TLS:
+            with smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10) as smtp:
                 smtp.ehlo()
-            if settings.MAIL_USERNAME:
-                smtp.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD.get_secret_value())
-            rprint("[bold green]OK[/bold green] — SMTP server is reachable and ready.")
+                if settings.MAIL_USERNAME:
+                    smtp.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD.get_secret_value())
+                rprint("[bold green]OK[/bold green] — SMTP server is reachable and ready.")
+        else:
+            with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10) as smtp:
+                smtp.ehlo()
+                if settings.MAIL_STARTTLS:
+                    smtp.starttls()
+                    smtp.ehlo()
+                if settings.MAIL_USERNAME:
+                    smtp.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD.get_secret_value())
+                rprint("[bold green]OK[/bold green] — SMTP server is reachable and ready.")
     except Exception as e:
         rprint(f"[bold red]Error[/bold red] — {e}")
 
