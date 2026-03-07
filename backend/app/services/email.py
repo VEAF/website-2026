@@ -1,10 +1,14 @@
 import logging
+from datetime import UTC, datetime
+from pathlib import Path
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates" / "email"
 
 
 def _get_mail_config() -> ConnectionConfig:
@@ -17,6 +21,7 @@ def _get_mail_config() -> ConnectionConfig:
         MAIL_STARTTLS=settings.MAIL_STARTTLS,
         MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
         USE_CREDENTIALS=bool(settings.MAIL_USERNAME),
+        TEMPLATE_FOLDER=TEMPLATE_DIR,
     )
 
 
@@ -30,23 +35,20 @@ def _get_fastmail() -> FastMail:
     return _fm
 
 
+def _base_template_vars() -> dict:
+    return {"app_url": settings.APP_URL, "year": datetime.now(UTC).year}
+
+
 async def send_welcome_email(email: str, nickname: str) -> None:
     """Send welcome email after registration."""
-    html = f"""\
-<h2>Bienvenue sur le site de la VEAF, {nickname} !</h2>
-<p>Votre compte a bien été créé.</p>
-<p>Vous pouvez dès à présent vous connecter sur <a href="{settings.APP_URL}">{settings.APP_URL}</a>.</p>
-<p>À bientôt sur nos serveurs !</p>
-<p>L'équipe VEAF</p>"""
-
     message = MessageSchema(
         subject="Bienvenue sur le site de la VEAF",
         recipients=[email],
-        body=html,
+        template_body={**_base_template_vars(), "nickname": nickname},
         subtype=MessageType.html,
     )
     try:
-        await _get_fastmail().send_message(message)
+        await _get_fastmail().send_message(message, template_name="register.html")
     except Exception:
         logger.exception("Failed to send welcome email to %s", email)
 
@@ -54,23 +56,33 @@ async def send_welcome_email(email: str, nickname: str) -> None:
 async def send_password_reset_email(email: str, nickname: str, token: str) -> None:
     """Send password reset link."""
     reset_url = f"{settings.APP_URL}/reset-password?token={token}"
-    html = f"""\
-<h2>Réinitialisation de votre mot de passe</h2>
-<p>Bonjour {nickname},</p>
-<p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-<p>Cliquez sur le lien ci-dessous pour choisir un nouveau mot de passe :</p>
-<p><a href="{reset_url}">{reset_url}</a></p>
-<p>Ce lien est valable pendant 24 heures.</p>
-<p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
-<p>L'équipe VEAF</p>"""
-
     message = MessageSchema(
         subject="Réinitialisation de votre mot de passe - VEAF",
         recipients=[email],
-        body=html,
+        template_body={**_base_template_vars(), "nickname": nickname, "reset_url": reset_url},
         subtype=MessageType.html,
     )
     try:
-        await _get_fastmail().send_message(message)
+        await _get_fastmail().send_message(message, template_name="reset_password.html")
     except Exception:
         logger.exception("Failed to send password reset email to %s", email)
+
+
+async def send_email_with_template(
+    to: str,
+    subject: str,
+    template: str = "default",
+    body: str = "",
+    template_vars: dict | None = None,
+) -> None:
+    """Send an email using a named template."""
+    context = {**_base_template_vars(), "body": body}
+    if template_vars:
+        context.update(template_vars)
+    message = MessageSchema(
+        subject=subject,
+        recipients=[to],
+        template_body=context,
+        subtype=MessageType.html,
+    )
+    await _get_fastmail().send_message(message, template_name=f"{template}.html")

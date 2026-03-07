@@ -9,18 +9,16 @@ from app.config import settings
 email_app = typer.Typer(help="Email commands", no_args_is_help=True)
 
 
-async def _send(to: str, subject: str, body: str) -> None:
-    from fastapi_mail import MessageSchema, MessageType
+async def _send_with_template(to: str, subject: str, body: str, template: str) -> None:
+    from app.services.email import send_email_with_template
 
-    from app.services.email import _get_fastmail
+    template_vars: dict[str, str] = {}
+    if template == "register":
+        template_vars = {"nickname": "Pilote"}
+    elif template == "reset_password":
+        template_vars = {"nickname": "Pilote", "reset_url": f"{settings.APP_URL}/reset-password?token=test-token"}
 
-    message = MessageSchema(
-        subject=subject,
-        recipients=[to],
-        body=body,
-        subtype=MessageType.html,
-    )
-    await _get_fastmail().send_message(message)
+    await send_email_with_template(to=to, subject=subject, template=template, body=body, template_vars=template_vars)
 
 
 @email_app.command("check")
@@ -63,11 +61,12 @@ def send(
     to: str = typer.Option(..., "--to", help="Recipient email address"),
     subject: str = typer.Option("Test VEAF", "--subject", help="Email subject"),
     body: str = typer.Option("Ceci est un email de test.", "--body", help="Email body (HTML supported)"),
+    template: str = typer.Option("default", "--template", help="Template name: default, register, reset_password"),
 ) -> None:
-    """Send a test email."""
-    rprint(f"[bold]Sending email to {to}...[/bold]")
+    """Send a test email using a template."""
+    rprint(f"[bold]Sending email to {to} (template: {template})...[/bold]")
     try:
-        asyncio.run(_send(to, subject, body))
+        asyncio.run(_send_with_template(to, subject, body, template))
         rprint(f"[bold green]OK[/bold green] — Email sent to {to}.")
     except Exception as e:
         rprint(f"[bold red]Error[/bold red] — {e}")
