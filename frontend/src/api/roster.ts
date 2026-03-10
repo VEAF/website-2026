@@ -79,6 +79,11 @@ export async function getRosterPilots(group: string = 'all'): Promise<RosterUser
   return data
 }
 
+export async function getRosterBmsPlayers(group: string = 'all'): Promise<RosterUser[]> {
+  const { data } = await apiClient.get<RosterUser[]>('/roster/bms', { params: { group } })
+  return data
+}
+
 export async function getRosterModules(type: number, group: string = 'all'): Promise<RosterModule[]> {
   const { data } = await apiClient.get<RosterModule[]>('/roster/modules', { params: { type, group } })
   return data

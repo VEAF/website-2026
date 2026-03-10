@@ -112,6 +112,34 @@ async def get_roster_pilots(group: str = "all", db: AsyncSession = Depends(get_d
     ]
 
 
+@router.get("/bms", response_model=list[RosterUserOut])
+async def get_roster_bms(group: str = "all", db: AsyncSession = Depends(get_db)):
+    """List users who have Falcon BMS (sim_bms=True)."""
+    active_module_count = (
+        select(func.count())
+        .where(UserModule.user_id == User.id, UserModule.active.is_(True))
+        .correlate(User)
+        .scalar_subquery()
+    )
+    query = select(User, active_module_count.label("active_module_count")).where(User.sim_bms.is_(True))
+    query = _apply_group_filter(query, group)
+    query = query.order_by(User.nickname)
+    result = await db.execute(query)
+
+    return [
+        RosterUserOut(
+            id=u.id,
+            nickname=u.nickname,
+            status=u.status,
+            status_as_string=u.status_as_string,
+            active_module_count=count or 0,
+            need_presentation=u.need_presentation,
+            is_ready_to_promote=u.is_ready_to_promote,
+        )
+        for u, count in result.all()
+    ]
+
+
 @router.get("/modules/{module_id}", response_model=RosterModuleDetailOut)
 async def get_roster_module_detail(module_id: int, group: str = "all", db: AsyncSession = Depends(get_db)):
     # Get module

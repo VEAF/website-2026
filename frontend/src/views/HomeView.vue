@@ -90,7 +90,14 @@ onMounted(async () => {
       <!-- Bottom Banners -->
       <section class="page-container mb-6">
         <div class="bg-white shadow-lg rounded-lg p-4">
-          <img src="/img/bms.webp" alt="BMS" class="w-full rounded-lg" />
+          <RouterLink to="/roster?tab=bms" class="block group">
+            <div class="relative overflow-hidden rounded-lg">
+              <img src="/img/bms.webp" alt="BMS" class="w-full" />
+              <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span class="text-white font-bold text-xl md:text-3xl translate-y-3 group-hover:translate-y-0 transition-transform duration-200">BMS</span>
+              </div>
+            </div>
+          </RouterLink>
         </div>
       </section>
 
