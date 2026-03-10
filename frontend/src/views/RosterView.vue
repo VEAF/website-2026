@@ -6,6 +6,7 @@ import type { RosterStats } from '@/api/roster'
 import RosterPilotsList from '@/components/roster/RosterPilotsList.vue'
 import RosterModuleList from '@/components/roster/RosterModuleList.vue'
 import RosterModuleDetail from '@/components/roster/RosterModuleDetail.vue'
+import RosterBmsList from '@/components/roster/RosterBmsList.vue'
 import { TAB_TO_MODULE_TYPE } from '@/constants/modules'
 import { useAuthStore } from '@/stores/auth'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
@@ -31,6 +32,7 @@ const tabs = [
   { value: 'aircrafts', label: 'Avions', icon: 'fa-solid fa-plane' },
   { value: 'helicopters', label: 'Hélicoptères', icon: 'fa-solid fa-helicopter' },
   { value: 'specials', label: 'Spéciaux', icon: 'fa-solid fa-ship' },
+  { value: 'bms', label: 'BMS', icon: 'fa-solid fa-jet-fighter' },
 ]
 
 const tabToModuleType = TAB_TO_MODULE_TYPE
@@ -56,7 +58,8 @@ function changeTab(newTab: string) {
 onMounted(async () => {
   const queryTab = route.query.tab as string | undefined
   const queryModuleId = route.query.moduleId as string | undefined
-  if (queryTab && queryTab in tabToModuleType) {
+  const validTabs = tabs.map(t => t.value)
+  if (queryTab && validTabs.includes(queryTab)) {
     tab.value = queryTab
   }
   if (queryModuleId) {
@@ -144,6 +147,9 @@ onMounted(async () => {
     <template v-else>
       <!-- Pilots tab -->
       <RosterPilotsList v-if="tab === 'pilots'" :group="group" />
+
+      <!-- BMS tab -->
+      <RosterBmsList v-else-if="tab === 'bms'" :group="group" />
 
       <!-- Module tabs -->
       <template v-else>
