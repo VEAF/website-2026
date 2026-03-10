@@ -439,6 +439,45 @@ async function showConfirm() {
       </div>
     </section>
 
+    <!-- Barres de progression -->
+    <section id="progress" class="mb-12">
+      <h2 class="text-2xl font-bold mb-1 pb-2 border-b border-gray-200">Barres de progression</h2>
+      <p class="text-sm text-gray-500 mb-6">Barres de progression pour indiquer un pourcentage d'adoption. Style inspiré de Bootswatch Cerulean.</p>
+
+      <div class="card space-y-4">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-2">0%</p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-2">25%</p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 25%">25%</div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-2">50%</p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 50%">50%</div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-2">75%</p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 75%">75%</div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-2">100%</p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 100%">100%</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Modale -->
     <section id="modale" class="mb-12">
       <h2 class="text-2xl font-bold mb-1 pb-2 border-b border-gray-200">Modale</h2>

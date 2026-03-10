@@ -30,6 +30,7 @@ export interface RosterModule {
   period_as_string: string | null
   image_header_uuid: string | null
   user_count: number
+  total_group_count: number
 }
 
 export interface RosterModuleDetailUser {

@@ -216,6 +216,11 @@ async def get_roster_modules(type: int, group: str = "all", db: AsyncSession = D
     count_result = await db.execute(count_query)
     counts = {row.module_id: row.cnt for row in count_result}
 
+    # Total users in the selected group (for adoption percentage)
+    total_query = select(func.count()).select_from(User)
+    total_query = _apply_group_filter(total_query, group)
+    total_group_count = await db.scalar(total_query) or 0
+
     return [
         RosterModuleOut(
             id=m.id,
@@ -227,6 +232,7 @@ async def get_roster_modules(type: int, group: str = "all", db: AsyncSession = D
             period_as_string=m.period_as_string,
             image_header_uuid=m.image_header.uuid if m.image_header else None,
             user_count=counts.get(m.id, 0),
+            total_group_count=total_group_count,
         )
         for m in modules
     ]

@@ -29,6 +29,7 @@ class RosterModuleOut(BaseModel):
     period_as_string: str | None = None
     image_header_uuid: str | None = None
     user_count: int = 0
+    total_group_count: int = 0
 
 
 class RosterModuleDetailUserOut(BaseModel):
