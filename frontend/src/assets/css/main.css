@@ -164,6 +164,19 @@
     @apply alert bg-[#fceced] border-[#ef9b9e] text-[#7f1216];
   }
 
+  /* Progress bar — inspired by Bootswatch Cerulean */
+  .progress {
+    @apply w-full rounded-full overflow-hidden;
+    height: 20px;
+    background-color: #e9ecef;
+  }
+
+  .progress-bar {
+    @apply h-full rounded-full text-xs font-semibold text-white flex items-center justify-center transition-all duration-300;
+    min-width: 2em;
+    background-image: linear-gradient(#4fb3eb, #2fa4e7 60%, #2c9ad9);
+  }
+
   /* Aviation-style arrow breadcrumb */
   .breadcrumb-segment {
     @apply inline-flex items-center h-9 text-sm font-medium text-white whitespace-nowrap;
