@@ -86,10 +86,10 @@ async def get_roster_office(db: AsyncSession = Depends(get_db)):
 
 @router.get("/pilots", response_model=list[RosterUserOut])
 async def get_roster_pilots(group: str = "all", db: AsyncSession = Depends(get_db)):
-    # Query users with a subquery count of active modules (active=true, level>0)
+    # Query users with a subquery count of active modules
     active_module_count = (
         select(func.count())
-        .where(UserModule.user_id == User.id, UserModule.active.is_(True), UserModule.level > 0)
+        .where(UserModule.user_id == User.id, UserModule.active.is_(True))
         .correlate(User)
         .scalar_subquery()
     )
