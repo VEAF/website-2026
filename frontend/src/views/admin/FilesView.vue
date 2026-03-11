@@ -25,12 +25,14 @@ function saveStorage(key: string, value: unknown): void {
 // Data
 const files = ref<AdminFile[]>([])
 const total = ref(0)
+const totalSize = ref(0)
 const loading = ref(false)
 
 // Search and filters (restored from localStorage)
 const searchInput = ref(loadStorage<string>('search', ''))
 const search = ref(loadStorage<string>('search', ''))
 const typeFilter = ref(loadStorage<number | null>('typeFilter', null))
+const sort = ref(loadStorage<string>('sort', '-created_at'))
 const currentPage = ref(loadStorage<number>('currentPage', 1))
 const pageSize = ref(loadStorage<number>('pageSize', 50))
 const pageSizeOptions = [10, 20, 50, 100]
@@ -75,12 +77,56 @@ function fileUrl(uuid: string): string {
   return `/api/files/${uuid}`
 }
 
+// Sort helpers
+function toggleSort(column: string) {
+  if (sort.value === column) {
+    sort.value = '-' + column
+  } else if (sort.value === '-' + column) {
+    sort.value = column
+  } else {
+    sort.value = '-' + column
+  }
+}
+
+function sortIcon(column: string): string {
+  if (sort.value === column) return 'fa-solid fa-sort-up'
+  if (sort.value === '-' + column) return 'fa-solid fa-sort-down'
+  return 'fa-solid fa-sort'
+}
+
+function sortClass(column: string): string {
+  if (sort.value === column || sort.value === '-' + column) return 'text-veaf-600'
+  return 'text-gray-400'
+}
+
+// Image preview hover
+const hoveredFile = ref<AdminFile | null>(null)
+const previewPos = ref({ x: 0, y: 0 })
+
+function onImageMouseEnter(event: MouseEvent, file: AdminFile) {
+  hoveredFile.value = file
+  updatePreviewPos(event)
+}
+
+function onImageMouseMove(event: MouseEvent) {
+  updatePreviewPos(event)
+}
+
+function onImageMouseLeave() {
+  hoveredFile.value = null
+}
+
+function updatePreviewPos(event: MouseEvent) {
+  previewPos.value = { x: event.clientX + 16, y: event.clientY + 16 }
+}
+
 async function loadFiles() {
   loading.value = true
   try {
     const params: Record<string, string | number> = {
       skip: (currentPage.value - 1) * pageSize.value,
       limit: pageSize.value,
+      sort: sort.value,
     }
     if (search.value) params.search = search.value
     if (typeFilter.value !== null) params.type = typeFilter.value
@@ -88,6 +134,7 @@ async function loadFiles() {
     const result = await getAdminFiles(params)
     files.value = result.items
     total.value = result.total
+    totalSize.value = result.total_size
   } catch (e) {
     toast.error(e)
   } finally {
@@ -114,17 +161,18 @@ function goToPage(page: number) {
   loadFiles()
 }
 
-watch([search, typeFilter, pageSize], () => {
+watch([search, typeFilter, pageSize, sort], () => {
   currentPage.value = 1
   loadFiles()
 })
 
 // Persist all filter/pagination state to localStorage
-watch([search, typeFilter, currentPage, pageSize], () => {
+watch([search, typeFilter, currentPage, pageSize, sort], () => {
   saveStorage('search', search.value)
   saveStorage('typeFilter', typeFilter.value)
   saveStorage('currentPage', currentPage.value)
   saveStorage('pageSize', pageSize.value)
+  saveStorage('sort', sort.value)
 })
 
 onMounted(loadFiles)
@@ -167,9 +215,15 @@ onMounted(loadFiles)
             <th class="p-2">Nom original</th>
             <th class="p-2">UUID</th>
             <th class="p-2">Type</th>
-            <th class="p-2">Taille</th>
+            <th class="p-2 cursor-pointer select-none" @click="toggleSort('size')">
+              Taille
+              <i :class="[sortIcon('size'), sortClass('size')]" class="ml-1 text-xs"></i>
+            </th>
             <th class="p-2">Propriétaire</th>
-            <th class="p-2">Créé le</th>
+            <th class="p-2 cursor-pointer select-none" @click="toggleSort('created_at')">
+              Créé le
+              <i :class="[sortIcon('created_at'), sortClass('created_at')]" class="ml-1 text-xs"></i>
+            </th>
             <th class="p-2">Actions</th>
           </tr>
         </thead>
@@ -186,12 +240,16 @@ onMounted(loadFiles)
             class="border-b hover:bg-gray-50"
           >
             <td class="p-2">
-              <img
-                v-if="file.type === 1"
-                :src="fileUrl(file.uuid)"
-                class="w-10 h-10 object-cover rounded"
-                loading="lazy"
-              />
+              <div v-if="file.type === 1" class="relative">
+                <img
+                  :src="fileUrl(file.uuid)"
+                  class="w-10 h-10 object-cover rounded cursor-pointer"
+                  loading="lazy"
+                  @mouseenter="onImageMouseEnter($event, file)"
+                  @mousemove="onImageMouseMove"
+                  @mouseleave="onImageMouseLeave"
+                />
+              </div>
               <i v-else-if="file.type === 2" class="fa-solid fa-file-pdf text-red-500 text-xl"></i>
               <i v-else class="fa-solid fa-file text-gray-400 text-xl"></i>
             </td>
@@ -240,6 +298,7 @@ onMounted(loadFiles)
         <div class="flex items-center gap-3">
           <span class="text-sm text-gray-600">
             {{ total }} fichier{{ total > 1 ? 's' : '' }}
+            <span v-if="totalSize > 0" class="text-gray-400">&mdash; {{ formatFileSize(totalSize) }}</span>
           </span>
           <select
             :value="pageSize"
@@ -272,5 +331,19 @@ onMounted(loadFiles)
         </div>
       </div>
     </div>
+
+    <!-- Image preview tooltip -->
+    <Teleport to="body">
+      <div
+        v-if="hoveredFile"
+        class="fixed z-50 pointer-events-none rounded-lg shadow-xl border border-gray-200 bg-white p-1 overflow-hidden"
+        :style="{ left: previewPos.x + 'px', top: previewPos.y + 'px' }"
+      >
+        <img
+          :src="fileUrl(hoveredFile.uuid)"
+          class="max-w-xs max-h-64 object-contain rounded"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>

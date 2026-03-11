@@ -42,10 +42,19 @@ def _build_admin_file_out(file: File) -> AdminFileOut:
     )
 
 
+ALLOWED_SORTS = {
+    "created_at": File.created_at.asc(),
+    "-created_at": File.created_at.desc(),
+    "size": File.size.asc(),
+    "-size": File.size.desc(),
+}
+
+
 @router.get("", response_model=AdminFileListOut)
 async def list_files(
     search: str | None = Query(None),
     type_filter: int | None = Query(None, alias="type"),
+    sort: str = Query("-created_at"),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     user: User = Depends(require_admin),
@@ -65,14 +74,19 @@ async def list_files(
     if type_filter is not None:
         query = query.where(File.type == type_filter)
 
-    # Count total
-    count_query = select(func.count()).select_from(query.subquery())
-    total = (await db.execute(count_query)).scalar_one()
+    # Count total + total size
+    sub = query.subquery()
+    count_query = select(func.count(), func.coalesce(func.sum(sub.c.size), 0)).select_from(sub)
+    row = (await db.execute(count_query)).one()
+    total, total_size = row[0], row[1]
+
+    # Ordering
+    order_clause = ALLOWED_SORTS.get(sort, File.created_at.desc())
 
     # Fetch page
     query = (
         query.options(selectinload(File.owner))
-        .order_by(File.created_at.desc())
+        .order_by(order_clause)
         .offset(skip)
         .limit(limit)
     )
@@ -82,6 +96,7 @@ async def list_files(
     return AdminFileListOut(
         items=[_build_admin_file_out(f) for f in files],
         total=total,
+        total_size=total_size,
     )
 
 

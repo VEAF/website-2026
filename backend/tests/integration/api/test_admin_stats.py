@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt import create_access_token
 from app.models.user import User
-from tests.factories import AdminFactory, UserFactory
+from tests.factories import AdminFactory, FileFactory, UserFactory
 
 
 async def _create_admin(db: AsyncSession) -> tuple:
@@ -39,6 +39,39 @@ async def test_stats_includes_cadets_ready_to_promote(client: AsyncClient, db_se
     assert response.status_code == 200
     data = response.json()
     assert data["cadets_ready_to_promote"] == 1
+
+
+@pytest.mark.asyncio
+async def test_stats_includes_files_total_size(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    f1 = FileFactory.build(owner_id=admin.id, size=1500)
+    f2 = FileFactory.build(owner_id=admin.id, size=3000)
+    db_session.add_all([f1, f2])
+    await db_session.commit()
+
+    # WHEN
+    response = await client.get("/api/admin/stats", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["files"] == 2
+    assert data["files_total_size"] == 4500
+
+
+@pytest.mark.asyncio
+async def test_stats_files_total_size_zero_when_no_files(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.get("/api/admin/stats", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["files_total_size"] == 0
 
 
 @pytest.mark.asyncio

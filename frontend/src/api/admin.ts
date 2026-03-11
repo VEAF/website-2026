@@ -5,6 +5,7 @@ export interface AdminStats {
   users: number
   events: number
   files: number
+  files_total_size: number
   pages: number
   urls: number
   menu_items: number

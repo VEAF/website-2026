@@ -20,6 +20,7 @@ class AdminStats(BaseModel):
     users: int = 0
     events: int = 0
     files: int = 0
+    files_total_size: int = 0
     pages: int = 0
     urls: int = 0
     menu_items: int = 0
@@ -44,6 +45,9 @@ async def get_stats(
 
     result = await db.execute(select(func.count()).select_from(File))
     files_count = result.scalar_one()
+
+    result = await db.execute(select(func.coalesce(func.sum(File.size), 0)))
+    files_total_size = result.scalar_one()
 
     result = await db.execute(select(func.count()).select_from(Page))
     pages_count = result.scalar_one()
@@ -77,6 +81,7 @@ async def get_stats(
         users=users_count,
         events=events_count,
         files=files_count,
+        files_total_size=files_total_size,
         pages=pages_count,
         urls=urls_count,
         menu_items=menu_items_count,

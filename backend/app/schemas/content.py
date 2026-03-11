@@ -219,6 +219,7 @@ class AdminFileOut(BaseModel):
 class AdminFileListOut(BaseModel):
     items: list[AdminFileOut]
     total: int
+    total_size: int
 
 
 class UrlOut(BaseModel):

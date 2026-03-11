@@ -154,6 +154,79 @@ async def test_list_files_pagination(client: AsyncClient, db_session: AsyncSessi
 
 
 @pytest.mark.asyncio
+async def test_list_files_total_size(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    await _create_file(db_session, owner_id=admin.id, size=1000)
+    await _create_file(db_session, owner_id=admin.id, size=2500)
+
+    # WHEN
+    response = await client.get("/api/admin/files", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 2
+    assert data["total_size"] == 3500
+
+
+@pytest.mark.asyncio
+async def test_list_files_sort_by_size_asc(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    await _create_file(db_session, owner_id=admin.id, size=3000, original_name="big.png")
+    await _create_file(db_session, owner_id=admin.id, size=500, original_name="small.png")
+    await _create_file(db_session, owner_id=admin.id, size=1500, original_name="medium.png")
+
+    # WHEN
+    response = await client.get("/api/admin/files?sort=size", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    sizes = [item["size"] for item in data["items"]]
+    assert sizes == sorted(sizes)
+
+
+@pytest.mark.asyncio
+async def test_list_files_sort_by_size_desc(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    await _create_file(db_session, owner_id=admin.id, size=3000, original_name="big.png")
+    await _create_file(db_session, owner_id=admin.id, size=500, original_name="small.png")
+    await _create_file(db_session, owner_id=admin.id, size=1500, original_name="medium.png")
+
+    # WHEN
+    response = await client.get("/api/admin/files?sort=-size", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    sizes = [item["size"] for item in data["items"]]
+    assert sizes == sorted(sizes, reverse=True)
+
+
+@pytest.mark.asyncio
+async def test_list_files_total_size_with_type_filter(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    admin, headers = await _create_admin(db_session)
+    await _create_file(db_session, owner_id=admin.id, size=1000, type=File.TYPE_IMAGE)
+    await _create_file(db_session, owner_id=admin.id, size=2000, type=File.TYPE_IMAGE)
+    await _create_file(
+        db_session, owner_id=admin.id, size=5000, type=File.TYPE_PDF, mime_type="application/pdf", extension="pdf"
+    )
+
+    # WHEN — filter by image only
+    response = await client.get(f"/api/admin/files?type={File.TYPE_IMAGE}", headers=headers)
+
+    # THEN — total_size should only include images
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 2
+    assert data["total_size"] == 3000
+
+
+@pytest.mark.asyncio
 async def test_list_files_unauthenticated(client: AsyncClient):
     # GIVEN — no auth headers
 
