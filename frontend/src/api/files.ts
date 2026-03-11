@@ -38,6 +38,7 @@ export interface AdminFile {
 export interface AdminFileListResponse {
   items: AdminFile[]
   total: number
+  total_size: number
 }
 
 // --- Admin File API functions ---
@@ -45,6 +46,7 @@ export interface AdminFileListResponse {
 export async function getAdminFiles(params?: {
   search?: string
   type?: number
+  sort?: string
   skip?: number
   limit?: number
 }): Promise<AdminFileListResponse> {

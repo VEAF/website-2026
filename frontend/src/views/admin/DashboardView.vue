@@ -5,6 +5,13 @@ import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const stats = ref<AdminStats | null>(null)
 
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 o'
+  const units = ['o', 'Ko', 'Mo', 'Go']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + ' ' + units[i]
+}
+
 onMounted(async () => {
   try {
     stats.value = await getAdminStats()
@@ -58,6 +65,7 @@ onMounted(async () => {
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-folder-open text-2xl"></i></div>
         <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.files ?? '-' }}</div>
         <div class="text-sm text-gray-900">Fichiers</div>
+        <div v-if="stats?.files_total_size" class="text-xs text-gray-500 mt-1">{{ formatFileSize(stats.files_total_size) }}</div>
       </RouterLink>
       <RouterLink to="/admin/servers" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-server text-2xl"></i></div>
