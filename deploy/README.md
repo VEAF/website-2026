@@ -101,7 +101,7 @@ DISCORD_BOT_TOKEN=your-bot-token
 DISCORD_GUILD_ID=123456789012345678
 ```
 
-The backend will poll the Discord API every 5 minutes. If these variables are not set, the feature is simply disabled.
+The backend runs a Discord Gateway bot that receives voice state updates in real-time. If these variables are not set, the feature is simply disabled.
 
 ## Updating
 

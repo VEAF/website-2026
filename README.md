@@ -138,8 +138,8 @@ DISCORD_GUILD_ID=123456789012345678
 
 ### How it works
 
-- The backend polls the Discord API every 5 minutes to fetch voice channel members
-- Results are cached in memory (20-minute TTL) and exposed via `GET /api/discord-voice/status`
+- The backend runs a Discord Gateway bot that receives voice state updates in real-time via WebSocket
+- Voice channel presence is cached in memory and exposed via `GET /api/discord-voice/status`
 - The `/discord` page displays active voice channels with connected users
 - A badge in the navigation menu shows the number of users currently in voice channels
 - If `DISCORD_BOT_TOKEN` or `DISCORD_GUILD_ID` are not set, the feature is disabled

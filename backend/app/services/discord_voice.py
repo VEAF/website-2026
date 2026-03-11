@@ -91,7 +91,7 @@ class DiscordVoiceMonitor:
         channel_users: dict[int, list[dict]] = {}
         all_users: list[dict] = []
 
-        for user_id, state in self._voice_states.items():
+        for user_id, state in list(self._voice_states.items()):
             if state["bot"]:
                 continue
             user_dict = {"user_id": str(user_id), "nickname": state["nickname"]}
@@ -175,11 +175,6 @@ async def stop_monitor() -> None:
     if _monitor:
         await _monitor.stop()
         _monitor = None
-
-
-async def scan_and_cache() -> None:
-    """No-op: the Gateway bot updates the cache in real time."""
-    pass
 
 
 def get_cached_status() -> dict | None:

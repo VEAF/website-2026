@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import apiClient from '@/api/client'
 import { getDiscordVoiceStatus } from '@/api/discord-voice'
 import type { DiscordVoiceStatus, DiscordVoiceChannel } from '@/types/discord-voice'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
@@ -14,8 +15,7 @@ let pollTimer: ReturnType<typeof setInterval> | null = null
 
 async function fetchDiscordSupportUrl() {
   try {
-    const resp = await fetch('/api')
-    const data = await resp.json()
+    const { data } = await apiClient.get('/')
     discordSupportUrl.value = data.discord_support_url || null
   } catch {
     // Ignore
