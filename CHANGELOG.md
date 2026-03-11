@@ -1,5 +1,6 @@
 # pending changes
 
+- ADDED licence about code and content
 - ADDED open graphs metadata
 - FIXED roster - modules count
 - ADDED favicon
