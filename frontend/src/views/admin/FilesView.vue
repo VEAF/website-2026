@@ -117,8 +117,29 @@ function onImageMouseLeave() {
 }
 
 function updatePreviewPos(event: MouseEvent) {
-  previewPos.value = { x: event.clientX + 16, y: event.clientY + 16 }
+  const offset = 16
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+
+  // Reasonable maximum bounds for the preview size to keep it on-screen.
+  // Adjust these if the preview is known to be larger/smaller.
+  const previewMaxWidth = 400
+  const previewMaxHeight = 400
+
+  const rawX = event.clientX + offset
+  const rawY = event.clientY + offset
+
+  const minX = offset
+  const minY = offset
+  const maxX = Math.max(minX, viewportWidth - previewMaxWidth)
+  const maxY = Math.max(minY, viewportHeight - previewMaxHeight)
+
+  const clampedX = Math.min(Math.max(rawX, minX), maxX)
+  const clampedY = Math.min(Math.max(rawY, minY), maxY)
+
+  previewPos.value = { x: clampedX, y: clampedY }
 }
+
 
 async function loadFiles() {
   loading.value = true
