@@ -37,8 +37,22 @@ async def lifespan(app: FastAPI):
 
         await scan_and_cache()
 
+    # Start Discord voice Gateway bot (populates cache in real time)
+    if settings.DISCORD_BOT_TOKEN and settings.DISCORD_GUILD_ID:
+        from app.services.discord_voice import start_monitor
+
+        start_monitor()
+        print("🤖 Discord voice bot starting...")
+    else:
+        print("🤖 Discord voice bot disabled (DISCORD_BOT_TOKEN or DISCORD_GUILD_ID not set)")
+
     yield
+
     # Shutdown: cleanup
+    if settings.DISCORD_BOT_TOKEN and settings.DISCORD_GUILD_ID:
+        from app.services.discord_voice import stop_monitor
+
+        await stop_monitor()
 
 
 app = FastAPI(

@@ -74,6 +74,8 @@ All backend configuration is in `backend.env`. See `backend.env.dist` for the fu
 | `MAIL_SERVER` | No | SMTP server for outgoing emails |
 | `DISCORD_CLIENT_ID` | No | Discord OAuth2 client ID |
 | `DISCORD_CLIENT_SECRET` | No | Discord OAuth2 client secret |
+| `DISCORD_BOT_TOKEN` | No | Discord bot token — enables voice channel display (see below) |
+| `DISCORD_GUILD_ID` | No | Discord server (guild) ID — required with `DISCORD_BOT_TOKEN` |
 | `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret |
 
 ### Compose Variables
@@ -84,6 +86,22 @@ These can be set in a `.env` file next to `docker-compose.yml` or exported in yo
 |---|---|---|
 | `TAG` | `latest` | Docker image tag to use |
 | `VIRTUAL_HOST` | `veaf.org` | Hostname for reverse proxy auto-discovery |
+
+### Discord Bot (Voice Channels)
+
+To display active users in Discord voice channels on the website:
+
+1. In the [Discord Developer Portal](https://discord.com/developers/applications), select your application
+2. Under **Bot**: generate a token and enable **Server Members Intent** and **Presence Intent**
+3. Invite the bot to your server (scope: `bot`, no special permissions needed)
+4. Set the variables in `backend.env`:
+
+```env
+DISCORD_BOT_TOKEN=your-bot-token
+DISCORD_GUILD_ID=123456789012345678
+```
+
+The backend will poll the Discord API every 5 minutes. If these variables are not set, the feature is simply disabled.
 
 ## Updating
 

@@ -108,6 +108,7 @@ async def load_content(session: AsyncSession) -> tuple[dict[str, Page], dict[str
         {"key": "roster", "label": "Pilotes", "icon": "fa fa-plane", "type": MenuItem.TYPE_ROSTER, "enabled": True, "position": 5},
         {"key": "calendar", "label": "Calendrier", "icon": "fa fa-calendar", "type": MenuItem.TYPE_CALENDAR, "enabled": True, "position": 6},
         {"key": "teamspeak", "label": "Teamspeak", "icon": "fab fa-teamspeak", "type": MenuItem.TYPE_TEAMSPEAK, "enabled": True, "position": 7},
+        {"key": "discord-voice", "label": "Discord", "icon": "fab fa-discord", "type": MenuItem.TYPE_DISCORD_VOICE, "enabled": True, "position": 8},
     ]
     for item in top_menu_data:
         key = item.pop("key")

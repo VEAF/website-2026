@@ -65,6 +65,8 @@ function getItemLink(item: MenuItem): string | null {
       return '/mission-maker'
     case 11: // TYPE_TEAMSPEAK
       return '/teamspeak'
+    case 12: // TYPE_DISCORD_VOICE
+      return '/discord'
     default:
       return null
   }
@@ -219,6 +221,26 @@ function getItemLink(item: MenuItem): string | null {
             {{ headerStore.tsClientCount }}
           </span>
           <span class="ml-1">client(s)</span>
+        </template>
+        <template v-else>
+          {{ item.label }}
+        </template>
+      </RouterLink>
+
+      <!-- Discord voice link with user count badge -->
+      <RouterLink
+        v-else-if="item.type === 12"
+        to="/discord"
+        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
+        :class="item.theme_classes"
+        :title="headerStore.discordVoiceCount > 0 ? `${headerStore.discordVoiceCount} utilisateur(s) en vocal sur Discord` : undefined"
+      >
+        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
+        <template v-if="headerStore.discordVoiceCount > 0">
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+            {{ headerStore.discordVoiceCount }}
+          </span>
+          <span class="ml-1">en vocal</span>
         </template>
         <template v-else>
           {{ item.label }}
