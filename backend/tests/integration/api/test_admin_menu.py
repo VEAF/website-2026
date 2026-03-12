@@ -33,6 +33,63 @@ async def _create_menu_item(db: AsyncSession, **overrides) -> MenuItem:
     return item
 
 
+# ── Types ─────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_types_returns_all_menu_types(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.get("/api/admin/menu/types", headers=headers)
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == len(MenuItem.TYPES)
+    values = {entry["value"] for entry in data}
+    assert values == set(MenuItem.TYPES.keys())
+    for entry in data:
+        assert entry["label"] == MenuItem.TYPES[entry["value"]]
+
+
+@pytest.mark.asyncio
+async def test_types_includes_discord_voice(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.get("/api/admin/menu/types", headers=headers)
+
+    # THEN
+    data = response.json()
+    discord_entries = [e for e in data if e["value"] == MenuItem.TYPE_DISCORD_VOICE]
+    assert len(discord_entries) == 1
+    assert discord_entries[0]["label"] == "Discord (vocal)"
+
+
+@pytest.mark.asyncio
+async def test_types_unauthenticated(client: AsyncClient):
+    # WHEN
+    response = await client.get("/api/admin/menu/types")
+
+    # THEN
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_types_unauthorized(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_user(db_session)
+
+    # WHEN
+    response = await client.get("/api/admin/menu/types", headers=headers)
+
+    # THEN
+    assert response.status_code == 403
+
+
 # ── List ──────────────────────────────────────────────────────────────
 
 

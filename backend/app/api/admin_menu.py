@@ -14,14 +14,15 @@ from app.schemas.content import (
     MenuItemCreate,
     MenuItemReorderRequest,
     MenuItemUpdate,
+    MenuTypeOut,
 )
 
 router = APIRouter(prefix="/admin/menu", tags=["admin-menu"])
 
 
-@router.get("/types")
+@router.get("/types", response_model=list[MenuTypeOut])
 async def get_menu_types(user: User = Depends(require_admin)):
-    return [{"value": k, "label": v} for k, v in MenuItem.TYPES.items()]
+    return [MenuTypeOut(value=k, label=v) for k, v in MenuItem.TYPES.items()]
 
 
 def _build_admin_item_out(item: MenuItem) -> AdminMenuItemOut:
