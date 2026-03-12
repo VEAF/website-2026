@@ -1,3 +1,7 @@
+## 2.1.1
+
+- FIXED system - html and js frontend cache cause failures
+
 ## 2.1.0
 
 - ADDED roster - BMS section (available also from Landing page)
