@@ -1,3 +1,5 @@
+name: ${COMPOSE_PROJECT_NAME:-veaf-website}
+
 # VEAF Website — Production Docker Compose
 #
 # Deploy from pre-built images. Requires:
