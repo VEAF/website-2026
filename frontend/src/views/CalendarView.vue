@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
+import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
 import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventClickArg, DatesSetArg } from '@fullcalendar/core'
@@ -38,15 +39,21 @@ const calendarEvents = computed(() =>
   }))
 )
 
+const isMobile = ref(window.innerWidth < 640)
+
+function onResize() {
+  isMobile.value = window.innerWidth < 640
+}
+window.addEventListener('resize', onResize)
+onUnmounted(() => window.removeEventListener('resize', onResize))
+
 const calendarOptions = computed(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth' as const,
+  plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+  initialView: isMobile.value ? 'listWeek' : 'dayGridMonth',
   locale: frLocale,
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-  },
+  headerToolbar: isMobile.value
+    ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
+    : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
   eventTimeFormat: {
     hour: '2-digit' as const,
     minute: '2-digit' as const,
@@ -121,7 +128,7 @@ onMounted(() => {
     <AppBreadcrumb :show-title="false">
       <template v-if="auth.isMember" #after>
         <RouterLink to="/calendar/new" class="btn-primary ml-auto">
-          <i class="fa-solid fa-plus mr-1"></i>Créer un événement
+          <i class="fa-solid fa-plus mr-1"></i><span class="hidden sm:inline">Créer un événement</span><span class="sm:hidden">Créer</span>
         </RouterLink>
       </template>
     </AppBreadcrumb>

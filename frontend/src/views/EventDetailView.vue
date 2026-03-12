@@ -196,7 +196,7 @@ function formatShortDate(d: string) {
 
     <!-- Bloc 1 : En-tête -->
     <div class="card">
-      <div class="flex items-start justify-between">
+      <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
         <div>
           <h1 class="text-2xl font-bold">
             <i class="fa-solid fa-circle text-sm mr-2" :style="{ color: event.type_color || '#999' }"></i>
@@ -219,7 +219,7 @@ function formatShortDate(d: string) {
             Organisé par {{ event.owner_nickname }}
           </div>
         </div>
-        <div v-if="canEdit" class="flex space-x-2 flex-shrink-0">
+        <div v-if="canEdit" class="flex flex-wrap gap-2 flex-shrink-0">
           <button @click="handleCopy" class="btn-secondary text-sm"><i class="fa-solid fa-copy mr-1"></i>Copier</button>
           <RouterLink :to="`/calendar/${event.id}/edit`" class="btn-secondary text-sm"><i class="fa-solid fa-edit mr-1"></i>Modifier</RouterLink>
           <button @click="handleDelete" class="btn-danger text-sm"><i class="fa-solid fa-trash mr-1"></i>Supprimer</button>
@@ -307,31 +307,33 @@ function formatShortDate(d: string) {
     <!-- Bloc 4 : ATO -->
     <div v-if="event.ato && event.flights.length" class="card">
       <h2 class="text-lg font-semibold mb-4">ATO</h2>
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b text-left">
-            <th class="py-2">Flight</th>
-            <th class="py-2">Appareil</th>
-            <th class="py-2">Mission</th>
-            <th class="py-2">Joueurs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="f in event.flights" :key="f.id" class="border-b">
-            <td class="py-2">{{ f.name }}</td>
-            <td class="py-2">
-              <span v-if="f.aircraft_name">{{ f.aircraft_name }} x{{ f.nb_slots }}</span>
-            </td>
-            <td class="py-2">{{ f.mission }}</td>
-            <td class="py-2">
-              <template v-for="(s, idx) in f.slots" :key="s.id">
-                <span v-if="idx > 0">, </span>
-                <span>{{ s.user_nickname || s.username || '= vide =' }}</span>
-              </template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b text-left">
+              <th class="py-2">Flight</th>
+              <th class="py-2">Appareil</th>
+              <th class="py-2">Mission</th>
+              <th class="py-2">Joueurs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="f in event.flights" :key="f.id" class="border-b">
+              <td class="py-2">{{ f.name }}</td>
+              <td class="py-2">
+                <span v-if="f.aircraft_name">{{ f.aircraft_name }} x{{ f.nb_slots }}</span>
+              </td>
+              <td class="py-2">{{ f.mission }}</td>
+              <td class="py-2">
+                <template v-for="(s, idx) in f.slots" :key="s.id">
+                  <span v-if="idx > 0">, </span>
+                  <span>{{ s.user_nickname || s.username || '= vide =' }}</span>
+                </template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Bloc 5 : Participation (Vote + Choix) -->
@@ -458,48 +460,50 @@ function formatShortDate(d: string) {
         >
           {{ showAllChoices ? 'masquer' : 'voir plus ...' }}
         </button>
-        <table v-if="showAllChoices" class="w-full text-sm mt-3">
-          <thead>
-            <tr class="border-b">
-              <th rowspan="2" class="text-left py-2 align-top">Joueurs</th>
-              <th colspan="2" class="text-left py-1">Choix 1</th>
-              <th colspan="2" class="text-left py-1">Choix 2</th>
-              <th colspan="2" class="text-left py-1">Choix 3</th>
-            </tr>
-            <tr class="border-b text-xs text-gray-500">
-              <th class="text-left py-1">Module</th>
-              <th class="text-left py-1">Tâche</th>
-              <th class="text-left py-1">Module</th>
-              <th class="text-left py-1">Tâche</th>
-              <th class="text-left py-1">Module</th>
-              <th class="text-left py-1">Tâche</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="v in [...votesYes, ...votesMaybe]" :key="v.id" class="border-b">
-              <td class="py-2">
-                {{ v.user_nickname }}
-                <i v-if="v.vote === null" class="fa-solid fa-exclamation-circle text-yellow-500 ml-1" title="peut-être absent"></i>
-                <i v-if="v.comment" class="fa-solid fa-comment text-gray-400 ml-1" :title="v.comment"></i>
-                <span v-if="v.created_at" class="text-xs text-gray-400 ml-1" :title="formatDate(v.created_at)">{{ formatShortDate(v.created_at) }}</span>
-              </td>
-              <template v-for="n in [1, 2, 3]" :key="n">
-                <template v-if="usersChoicesMap.get(v.user_id)?.[n]">
-                  <td class="py-2">{{ usersChoicesMap.get(v.user_id)![n]!.module_name }}</td>
-                  <td class="py-2">
-                    {{ usersChoicesMap.get(v.user_id)![n]!.task_as_string }}
-                    <i
-                      v-if="usersChoicesMap.get(v.user_id)![n]!.comment"
-                      class="fa-solid fa-circle-question text-gray-400 ml-1"
-                      :title="usersChoicesMap.get(v.user_id)![n]!.comment ?? ''"
-                    ></i>
-                  </td>
+        <div v-if="showAllChoices" class="overflow-x-auto mt-3">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th rowspan="2" class="text-left py-2 align-top">Joueurs</th>
+                <th colspan="2" class="text-left py-1">Choix 1</th>
+                <th colspan="2" class="text-left py-1">Choix 2</th>
+                <th colspan="2" class="text-left py-1">Choix 3</th>
+              </tr>
+              <tr class="border-b text-xs text-gray-500">
+                <th class="text-left py-1">Module</th>
+                <th class="text-left py-1">Tâche</th>
+                <th class="text-left py-1">Module</th>
+                <th class="text-left py-1">Tâche</th>
+                <th class="text-left py-1">Module</th>
+                <th class="text-left py-1">Tâche</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="v in [...votesYes, ...votesMaybe]" :key="v.id" class="border-b">
+                <td class="py-2">
+                  {{ v.user_nickname }}
+                  <i v-if="v.vote === null" class="fa-solid fa-exclamation-circle text-yellow-500 ml-1" title="peut-être absent"></i>
+                  <i v-if="v.comment" class="fa-solid fa-comment text-gray-400 ml-1" :title="v.comment"></i>
+                  <span v-if="v.created_at" class="text-xs text-gray-400 ml-1" :title="formatDate(v.created_at)">{{ formatShortDate(v.created_at) }}</span>
+                </td>
+                <template v-for="n in [1, 2, 3]" :key="n">
+                  <template v-if="usersChoicesMap.get(v.user_id)?.[n]">
+                    <td class="py-2">{{ usersChoicesMap.get(v.user_id)![n]!.module_name }}</td>
+                    <td class="py-2">
+                      {{ usersChoicesMap.get(v.user_id)![n]!.task_as_string }}
+                      <i
+                        v-if="usersChoicesMap.get(v.user_id)![n]!.comment"
+                        class="fa-solid fa-circle-question text-gray-400 ml-1"
+                        :title="usersChoicesMap.get(v.user_id)![n]!.comment ?? ''"
+                      ></i>
+                    </td>
+                  </template>
+                  <td v-else colspan="2" class="py-2">&nbsp;</td>
                 </template>
-                <td v-else colspan="2" class="py-2">&nbsp;</td>
-              </template>
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
