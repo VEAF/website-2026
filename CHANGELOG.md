@@ -8,3 +8,4 @@
 - ADDED roster - display module popularity (progress bar) for each module
 - ADDED admin - track files sizes
 - ADDED login/logout notifications
+- FIXED system - customer deploy stack name
