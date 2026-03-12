@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import {
   getAdminMenuItems,
+  getAdminMenuTypes,
   createAdminMenuItem,
   updateAdminMenuItem,
   deleteAdminMenuItem,
@@ -15,22 +16,10 @@ import { useToast } from '@/composables/useToast'
 const { confirm } = useConfirm()
 const toast = useToast()
 
-// Type constants
-const typeOptions = [
-  { value: 1, label: 'Menu' },
-  { value: 2, label: 'Url personnalisée' },
-  { value: 3, label: 'Url (redirection)' },
-  { value: 4, label: 'Page' },
-  { value: 5, label: 'Séparateur' },
-  { value: 6, label: 'Bureau' },
-  { value: 7, label: 'Serveurs' },
-  { value: 8, label: 'Roster' },
-  { value: 9, label: 'Calendrier' },
-  { value: 10, label: 'Mission Maker' },
-  { value: 11, label: 'Team Speak' },
-]
+// Type constants (loaded from backend)
+const typeOptions = ref<{ value: number; label: string }[]>([])
 
-const typeLabels: Record<number, string> = Object.fromEntries(typeOptions.map((t) => [t.value, t.label]))
+const typeLabels = computed(() => Object.fromEntries(typeOptions.value.map((t) => [t.value, t.label])))
 
 const restrictionOptions = [
   { value: 0, label: 'Tout le monde' },
@@ -115,14 +104,16 @@ async function loadItems() {
 
 async function loadReferenceData() {
   try {
-    const [menuResult, urlResult, pageResult] = await Promise.all([
+    const [menuResult, urlResult, pageResult, types] = await Promise.all([
       getAdminMenuItems({ type: 1, limit: 100 }),
       getAdminUrls({ limit: 100 }),
       getAdminPages({ limit: 100 }),
+      getAdminMenuTypes(),
     ])
     parentMenuItems.value = menuResult.items
     availableUrls.value = urlResult.items
     availablePages.value = pageResult.items
+    typeOptions.value = types
   } catch (e) {
     toast.error(e)
   }

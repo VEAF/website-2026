@@ -77,6 +77,11 @@ class PageBlockUpdate(BaseModel):
     enabled: bool
 
 
+class MenuTypeOut(BaseModel):
+    value: int
+    label: str
+
+
 class MenuItemOut(BaseModel):
     id: int
     label: str | None = None

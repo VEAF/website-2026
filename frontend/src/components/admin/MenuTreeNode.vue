@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, inject, onMounted, onUnmounted, nextTick } from 'vue'
 import { dragAndDrop } from '@formkit/drag-and-drop/vue'
 import { tearDown } from '@formkit/drag-and-drop'
 import type { AdminMenuItemTree } from '@/types/api'
@@ -15,19 +15,7 @@ const emit = defineEmits<{
 
 const TYPE_MENU = 1
 
-const typeLabels: Record<number, string> = {
-  1: 'Menu',
-  2: 'Lien',
-  3: 'Url',
-  4: 'Page',
-  5: 'Séparateur',
-  6: 'Bureau',
-  7: 'Serveurs',
-  8: 'Roster',
-  9: 'Calendrier',
-  10: 'Mission Maker',
-  11: 'Team Speak',
-}
+const typeLabels = inject<import('vue').Ref<Record<number, string>>>('menuTypeLabels', ref({}))
 
 const restrictionLabels: Record<number, string> = {
   1: 'Invité+',
