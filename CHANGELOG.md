@@ -9,4 +9,5 @@
 - ADDED admin - track files sizes
 - ADDED login/logout notifications
 - FIXED system - customer deploy stack name
-- ADDED calandar - planning view (default for mobile)
+- ADDED calendar - planning view (default for mobile)
+- CHANGED system - optimize docker image size
