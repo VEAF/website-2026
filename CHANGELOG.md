@@ -1,6 +1,7 @@
 ## 2.1.1
 
 - FIXED system - HTML and JS frontend caches causing failures
+- FIXED system - cleanup old docker images on registry
 
 ## 2.1.0
 
