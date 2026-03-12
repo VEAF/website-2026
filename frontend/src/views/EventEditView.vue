@@ -205,7 +205,7 @@ async function handleSubmit() {
 
     <form @submit.prevent="handleSubmit" class="card space-y-4">
       <!-- Dates -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="label">Début <span class="text-xs text-gray-400 font-normal">(heure locale)</span></label>
           <input v-model="form.start_date" type="datetime-local" class="input" required />
@@ -233,7 +233,7 @@ async function handleSubmit() {
       </div>
 
       <!-- Sim / ATO checkboxes -->
-      <div class="flex space-x-6">
+      <div class="flex flex-wrap gap-x-6 gap-y-2">
         <label class="flex items-center space-x-2">
           <input v-model="form.sim_dcs" type="checkbox" class="rounded" />
           <span class="text-sm">Simulateur DCS</span>
@@ -264,7 +264,7 @@ async function handleSubmit() {
       <div>
         <label class="label">Réservé aux</label>
         <p class="text-xs text-gray-500 mb-1">Ne rien cocher si ouvert à tout le monde</p>
-        <div class="flex space-x-6">
+        <div class="flex flex-wrap gap-x-6 gap-y-2">
           <label class="flex items-center space-x-2">
             <input type="checkbox" :value="1" v-model="form.restrictions" class="rounded" />
             <span class="text-sm">Cadets</span>

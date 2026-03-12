@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
+import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
 import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventClickArg, DatesSetArg } from '@fullcalendar/core'
@@ -38,15 +39,15 @@ const calendarEvents = computed(() =>
   }))
 )
 
+const isMobile = window.innerWidth < 640
+
 const calendarOptions = computed(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth' as const,
+  plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+  initialView: isMobile ? 'listWeek' : 'dayGridMonth',
   locale: frLocale,
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-  },
+  headerToolbar: isMobile
+    ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
+    : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
   eventTimeFormat: {
     hour: '2-digit' as const,
     minute: '2-digit' as const,
@@ -121,7 +122,7 @@ onMounted(() => {
     <AppBreadcrumb :show-title="false">
       <template v-if="auth.isMember" #after>
         <RouterLink to="/calendar/new" class="btn-primary ml-auto">
-          <i class="fa-solid fa-plus mr-1"></i>Créer un événement
+          <i class="fa-solid fa-plus mr-1"></i><span class="hidden sm:inline">Créer un événement</span><span class="sm:hidden">Créer</span>
         </RouterLink>
       </template>
     </AppBreadcrumb>
