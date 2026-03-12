@@ -10,3 +10,4 @@
 - ADDED login/logout notifications
 - FIXED system - customer deploy stack name
 - ADDED calandar - planning view (default for mobile)
+- CHANGED system - optimize docker image size

@@ -1,4 +1,4 @@
-# ---- Base: shared setup ----
+# ---- Base: shared setup (used by dev + build) ----
 FROM python:3.12-slim AS base
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -19,22 +19,30 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-# ---- Prod: deps + source ----
-FROM base AS prod
-
-ARG APP_VERSION=dev
-
-LABEL org.opencontainers.image.source="https://github.com/VEAF/website-2026"
-LABEL org.opencontainers.image.description="VEAF Website 2026 - Backend API"
+# ---- Build: install deps + source (intermediate stage) ----
+FROM base AS build
 
 COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 COPY . .
-RUN echo "$APP_VERSION" > VERSION
-RUN uv sync --frozen --no-dev
 
-RUN chown -R worker:worker /app
+ARG APP_VERSION=dev
+RUN echo "$APP_VERSION" > VERSION && uv sync --frozen --no-dev
+
+# ---- Prod: clean runtime image without uv ----
+FROM python:3.12-slim AS prod
+
+LABEL org.opencontainers.image.source="https://github.com/VEAF/website-2026"
+LABEL org.opencontainers.image.description="VEAF Website 2026 - Backend API"
+
+RUN groupadd --gid 1000 worker && useradd --uid 1000 --gid worker --create-home worker
+
+WORKDIR /app
+ENV PATH="/app/.venv/bin:$PATH"
+
+COPY --from=build --chown=worker:worker /app /app
+
 USER worker
 EXPOSE 8000
 
