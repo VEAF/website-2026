@@ -22,6 +22,7 @@ async function handleLogin() {
   loading.value = true
   try {
     await auth.login(email.value, password.value)
+    toast.success('Connexion réussie')
     const redirect = route.query.redirect as string
     router.push(redirect || '/')
   } catch (e: unknown) {

@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import apiClient from '@/api/client'
 import { useDiscordSupport } from '@/composables/useDiscordSupport'
+import { useToast } from '@/composables/useToast'
 import NavMenu from './NavMenu.vue'
 
 const auth = useAuthStore()
@@ -12,6 +13,7 @@ const menu = useMenuStore()
 const frontendVersion = __APP_SEMVER__
 const backendVersion = ref('')
 const { discordUrl, setUrl: setDiscordUrl, open: openDiscordSupport } = useDiscordSupport()
+const toast = useToast()
 
 async function fetchBackendVersion() {
   try {
@@ -61,6 +63,7 @@ watch(() => route.fullPath, () => {
 async function handleLogout() {
   closeUserDropdown()
   await auth.logout()
+  toast.success('Déconnexion réussie')
   router.push('/')
 }
 </script>
