@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, provide, nextTick, onMounted } from 'vue'
 import { useDragAndDrop } from '@formkit/drag-and-drop/vue'
-import { getAdminMenuTree, reorderAdminMenuItems } from '@/api/menu'
+import { getAdminMenuTree, getAdminMenuTypes, reorderAdminMenuItems } from '@/api/menu'
 import type { AdminMenuItemTree, MenuItemReorderEntry } from '@/types/api'
 import { useToast } from '@/composables/useToast'
 import { useMenuStore } from '@/stores/menu'
@@ -13,6 +13,9 @@ const menuStore = useMenuStore()
 const loading = ref(false)
 const saving = ref(false)
 const hasChanges = ref(false)
+
+const typeLabels = ref<Record<number, string>>({})
+provide('menuTypeLabels', typeLabels)
 
 function onChanged() {
   hasChanges.value = true
@@ -82,7 +85,13 @@ async function saveOrder() {
   }
 }
 
-onMounted(loadTree)
+onMounted(async () => {
+  const [, types] = await Promise.all([
+    loadTree(),
+    getAdminMenuTypes(),
+  ])
+  typeLabels.value = Object.fromEntries(types.map((t) => [t.value, t.label]))
+})
 </script>
 
 <template>

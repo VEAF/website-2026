@@ -21,6 +21,11 @@ export async function getAdminMenuItems(params?: {
   return data
 }
 
+export async function getAdminMenuTypes(): Promise<{ value: number; label: string }[]> {
+  const { data } = await apiClient.get<{ value: number; label: string }[]>('/admin/menu/types')
+  return data
+}
+
 export async function getAdminMenuTree(): Promise<AdminMenuItemTree[]> {
   const { data } = await apiClient.get<AdminMenuItemTree[]>('/admin/menu/tree')
   return data

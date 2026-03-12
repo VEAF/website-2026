@@ -19,6 +19,11 @@ from app.schemas.content import (
 router = APIRouter(prefix="/admin/menu", tags=["admin-menu"])
 
 
+@router.get("/types")
+async def get_menu_types(user: User = Depends(require_admin)):
+    return [{"value": k, "label": v} for k, v in MenuItem.TYPES.items()]
+
+
 def _build_admin_item_out(item: MenuItem) -> AdminMenuItemOut:
     return AdminMenuItemOut(
         id=item.id,
