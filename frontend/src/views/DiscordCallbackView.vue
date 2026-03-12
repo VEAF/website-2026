@@ -25,6 +25,7 @@ onMounted(async () => {
 
   try {
     await auth.loginWithDiscord(code, state)
+    toast.success('Connexion réussie')
     const redirect = sessionStorage.getItem('discord_redirect') || '/'
     sessionStorage.removeItem('discord_redirect')
     router.push(redirect)
