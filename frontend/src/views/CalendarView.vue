@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -39,13 +39,19 @@ const calendarEvents = computed(() =>
   }))
 )
 
-const isMobile = window.innerWidth < 640
+const isMobile = ref(window.innerWidth < 640)
+
+function onResize() {
+  isMobile.value = window.innerWidth < 640
+}
+window.addEventListener('resize', onResize)
+onUnmounted(() => window.removeEventListener('resize', onResize))
 
 const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-  initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+  initialView: isMobile.value ? 'listWeek' : 'dayGridMonth',
   locale: frLocale,
-  headerToolbar: isMobile
+  headerToolbar: isMobile.value
     ? { left: 'prev,next', center: 'title', right: 'listWeek,dayGridMonth' }
     : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
   eventTimeFormat: {
