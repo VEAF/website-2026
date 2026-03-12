@@ -9,7 +9,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     permissions:
-      packages: delete
+      packages: write
     strategy:
       matrix:
         package:
