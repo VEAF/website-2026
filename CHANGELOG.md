@@ -1,6 +1,6 @@
 ## 2.1.1
 
-- FIXED system - html and js frontend cache cause failures
+- FIXED system - HTML and JS frontend caches causing failures
 
 ## 2.1.0
 
