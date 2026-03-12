@@ -1,0 +1,25 @@
+name: Cleanup untagged Docker images
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # Sunday 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package:
+          - website-2026-backend
+          - website-2026-frontend
+    steps:
+      - name: Delete untagged versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          delete-only-untagged-versions: true
+          min-versions-to-keep: 5
