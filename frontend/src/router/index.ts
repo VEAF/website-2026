@@ -133,6 +133,14 @@ const router = createRouter({
       },
     },
     {
+      path: '/discord',
+      name: 'discord-voice',
+      component: () => import('@/views/DiscordVoiceView.vue'),
+      meta: {
+        breadcrumb: [{ label: 'Discord', icon: 'fa-brands fa-discord' }],
+      },
+    },
+    {
       path: '/office',
       name: 'office',
       component: () => import('@/views/OfficeView.vue'),

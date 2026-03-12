@@ -13,6 +13,7 @@ export const useHeaderStore = defineStore('header', () => {
   const connectedPlayers = computed(() => headerData.value?.connected_players ?? 0)
   const nextEventsCount = computed(() => headerData.value?.next_events_count ?? 0)
   const tsClientCount = computed(() => headerData.value?.ts_client_count ?? 0)
+  const discordVoiceCount = computed(() => headerData.value?.discord_voice_count ?? 0)
 
   async function fetchServers() {
     servers.value = await getServers()
@@ -45,6 +46,7 @@ export const useHeaderStore = defineStore('header', () => {
     connectedPlayers,
     nextEventsCount,
     tsClientCount,
+    discordVoiceCount,
     fetchServers,
     fetchHeaderData,
     startPolling,

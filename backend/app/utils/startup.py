@@ -65,6 +65,8 @@ def log_startup_banner() -> None:
         "",
         f"{BOLD}{CYAN}🤖 Discord{RESET}",
         f"   SUPPORT_URL          {_val(settings.DISCORD_SUPPORT_URL)}",
+        f"   VOICE_BOT            {_val('enabled' if settings.DISCORD_BOT_TOKEN and settings.DISCORD_GUILD_ID else '')}",
+        f"   GUILD_ID             {_val(settings.DISCORD_GUILD_ID)}",
         "",
         f"{SEPARATOR}",
         "",

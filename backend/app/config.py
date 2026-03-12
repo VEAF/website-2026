@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     DISCORD_REDIRECT_URI: str = "http://localhost/auth/discord/callback"
     DISCORD_SUPPORT_URL: str = ""
 
+    # Discord Bot (voice channels)
+    DISCORD_BOT_TOKEN: str = ""
+    DISCORD_GUILD_ID: str = ""
+
     # reCAPTCHA
     RECAPTCHA_SECRET_KEY: SecretStr = ""
 

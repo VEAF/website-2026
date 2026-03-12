@@ -123,6 +123,7 @@ class MenuItem(Base):
     TYPE_CALENDAR = 9
     TYPE_MISSION_MAKER = 10
     TYPE_TEAMSPEAK = 11
+    TYPE_DISCORD_VOICE = 12
 
     TYPES = {
         TYPE_MENU: "Menu",
@@ -136,6 +137,7 @@ class MenuItem(Base):
         TYPE_CALENDAR: "Calendrier",
         TYPE_MISSION_MAKER: "Mission Maker",
         TYPE_TEAMSPEAK: "Team Speak",
+        TYPE_DISCORD_VOICE: "Discord (vocal)",
     }
 
     # Restriction levels

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api import admin_events, admin_files, admin_menu, admin_modules, admin_pages, admin_recruitment, admin_servers, admin_stats, admin_urls, admin_users, auth, calendar, dcsbot, files, header, map, menu, metrics, mission_maker, modules, opengraph, pages, recruitment, roster, servers, teamspeak, urls, users
+from app.api import admin_events, admin_files, admin_menu, admin_modules, admin_pages, admin_recruitment, admin_servers, admin_stats, admin_urls, admin_users, auth, calendar, dcsbot, discord_voice, files, header, map, menu, metrics, mission_maker, modules, opengraph, pages, recruitment, roster, servers, teamspeak, urls, users
 
 api_router = APIRouter(prefix="/api")
 
@@ -26,6 +26,7 @@ api_router.include_router(servers.router)
 api_router.include_router(urls.router)
 api_router.include_router(recruitment.router)
 api_router.include_router(teamspeak.router)
+api_router.include_router(discord_voice.router)
 api_router.include_router(dcsbot.router)
 api_router.include_router(map.router)
 api_router.include_router(mission_maker.router)

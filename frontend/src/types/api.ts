@@ -334,6 +334,7 @@ export interface HeaderData {
   connected_players: number
   next_events_count: number
   ts_client_count: number
+  discord_voice_count: number
   next_events: {
     id: number
     title: string

@@ -44,6 +44,14 @@ function isExternalLink(link: string | null): boolean {
   return !!link && link.includes('://')
 }
 
+// Badge config for menu items that show a count indicator
+const badgeItems: Record<number, { to: string; count: () => number; label: string; tooltip: string }> = {
+  7: { to: '/servers', count: () => headerStore.connectedPlayers, label: 'joueur(s)', tooltip: 'joueur(s) connecté(s)' },
+  9: { to: '/calendar', count: () => headerStore.nextEventsCount, label: 'événement(s)', tooltip: 'événement(s) dans les 7 prochains jours' },
+  11: { to: '/teamspeak', count: () => headerStore.tsClientCount, label: 'client(s)', tooltip: 'client(s) connecté(s) sur TeamSpeak' },
+  12: { to: '/discord', count: () => headerStore.discordVoiceCount, label: 'en vocal', tooltip: 'utilisateur(s) en vocal sur Discord' },
+}
+
 function getItemLink(item: MenuItem): string | null {
   // Type-based routing
   switch (item.type) {
@@ -65,6 +73,8 @@ function getItemLink(item: MenuItem): string | null {
       return '/mission-maker'
     case 11: // TYPE_TEAMSPEAK
       return '/teamspeak'
+    case 12: // TYPE_DISCORD_VOICE
+      return '/discord'
     default:
       return null
   }
@@ -165,60 +175,20 @@ function getItemLink(item: MenuItem): string | null {
         </div>
       </div>
 
-      <!-- Servers link with player count badge -->
+      <!-- Badge link (servers, calendar, teamspeak, discord) -->
       <RouterLink
-        v-else-if="item.type === 7"
-        to="/servers"
+        v-else-if="badgeItems[item.type]"
+        :to="badgeItems[item.type].to"
         class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
         :class="item.theme_classes"
-        :title="headerStore.connectedPlayers > 0 ? `${headerStore.connectedPlayers} joueur(s) connecté(s)` : undefined"
+        :title="badgeItems[item.type].count() > 0 ? `${badgeItems[item.type].count()} ${badgeItems[item.type].tooltip}` : undefined"
       >
         <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
-        <template v-if="headerStore.connectedPlayers > 0">
+        <template v-if="badgeItems[item.type].count() > 0">
           <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
-            {{ headerStore.connectedPlayers }}
+            {{ badgeItems[item.type].count() }}
           </span>
-          <span class="ml-1">joueur(s)</span>
-        </template>
-        <template v-else>
-          {{ item.label }}
-        </template>
-      </RouterLink>
-
-      <!-- Calendar link with events count badge -->
-      <RouterLink
-        v-else-if="item.type === 9"
-        to="/calendar"
-        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
-        :class="item.theme_classes"
-        :title="headerStore.nextEventsCount > 0 ? `${headerStore.nextEventsCount} événement(s) dans les 7 prochains jours` : undefined"
-      >
-        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
-        <template v-if="headerStore.nextEventsCount > 0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
-            {{ headerStore.nextEventsCount }}
-          </span>
-          <span class="ml-1">événement(s)</span>
-        </template>
-        <template v-else>
-          {{ item.label }}
-        </template>
-      </RouterLink>
-
-      <!-- TeamSpeak link with client count badge -->
-      <RouterLink
-        v-else-if="item.type === 11"
-        to="/teamspeak"
-        class="px-3 py-2 text-sm text-white hover:text-white hover:bg-white/10 rounded-md"
-        :class="item.theme_classes"
-        :title="headerStore.tsClientCount > 0 ? `${headerStore.tsClientCount} client(s) connecté(s) sur TeamSpeak` : undefined"
-      >
-        <span v-if="item.icon" class="mr-1"><i :class="item.icon" /></span>
-        <template v-if="headerStore.tsClientCount > 0">
-          <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
-            {{ headerStore.tsClientCount }}
-          </span>
-          <span class="ml-1">client(s)</span>
+          <span class="ml-1">{{ badgeItems[item.type].label }}</span>
         </template>
         <template v-else>
           {{ item.label }}
