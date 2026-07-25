@@ -61,11 +61,12 @@ async def list_players(
     user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(Player, User).outerjoin(User, User.player_id == Player.id)
-
+    # The linked user is joined in (rather than lazy-loaded) so that the search can
+    # also match on their nickname. Filters are shared between count and page query.
+    filters = []
     if search:
         pattern = f"%{search}%"
-        query = query.where(
+        filters.append(
             or_(
                 Player.nickname.ilike(pattern),
                 Player.ucid.ilike(pattern),
@@ -73,10 +74,17 @@ async def list_players(
             )
         )
 
-    count_query = select(func.count()).select_from(query.subquery())
+    count_query = select(func.count(Player.id)).outerjoin(User, User.player_id == Player.id).where(*filters)
     total = (await db.execute(count_query)).scalar_one()
 
-    query = query.order_by(Player.nickname.asc()).offset(skip).limit(limit)
+    query = (
+        select(Player, User)
+        .outerjoin(User, User.player_id == Player.id)
+        .where(*filters)
+        .order_by(Player.nickname.asc())
+        .offset(skip)
+        .limit(limit)
+    )
     result = await db.execute(query)
 
     return AdminPlayerListOut(

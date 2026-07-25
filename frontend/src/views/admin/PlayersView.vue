@@ -5,6 +5,7 @@ import { getAdminUsers } from '@/api/users'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 import type { Player } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
+import { useDebounce } from '@/composables/useDebounce'
 import { useToast } from '@/composables/useToast'
 
 const { confirm } = useConfirm()
@@ -18,7 +19,9 @@ const loading = ref(false)
 // Search
 const searchInput = ref('')
 const search = ref('')
-let searchTimeout: ReturnType<typeof setTimeout> | null = null
+const applySearch = useDebounce((value: string) => {
+  search.value = value
+})
 
 // Pagination
 const currentPage = ref(1)
@@ -41,15 +44,11 @@ const userResults = ref<{ id: number; nickname: string }[]>([])
 const userDropdownOpen = ref(false)
 const userSearching = ref(false)
 const userPickerRef = ref<HTMLElement | null>(null)
-let userSearchTimeout: ReturnType<typeof setTimeout> | null = null
 
 function onSearchInput(event: Event) {
   const value = (event.target as HTMLInputElement).value
   searchInput.value = value
-  if (searchTimeout) clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    search.value = value
-  }, 300)
+  applySearch(value)
 }
 
 async function loadPlayers() {
@@ -84,16 +83,20 @@ function goToPage(page: number) {
 
 // --- User autocomplete ---
 
+const debouncedSearchUsers = useDebounce(() => {
+  searchUsers()
+})
+
 function onUserSearchInput(event: Event) {
   const value = (event.target as HTMLInputElement).value
   userSearch.value = value
-  if (userSearchTimeout) clearTimeout(userSearchTimeout)
   if (value.trim().length < 2) {
+    debouncedSearchUsers.cancel()
     userResults.value = []
     userDropdownOpen.value = false
     return
   }
-  userSearchTimeout = setTimeout(searchUsers, 300)
+  debouncedSearchUsers()
 }
 
 async function searchUsers() {
@@ -109,12 +112,18 @@ async function searchUsers() {
   }
 }
 
-function selectUser(user: { id: number; nickname: string }) {
-  linkedUserId.value = user.id
-  linkedUserNickname.value = user.nickname
+/** Clear the picker input and drop any search still pending. */
+function resetUserSearch() {
+  debouncedSearchUsers.cancel()
   userSearch.value = ''
   userResults.value = []
   userDropdownOpen.value = false
+}
+
+function selectUser(user: { id: number; nickname: string }) {
+  linkedUserId.value = user.id
+  linkedUserNickname.value = user.nickname
+  resetUserSearch()
 }
 
 function unlinkUser() {
@@ -134,8 +143,7 @@ function openNew() {
   editingPlayerId.value = null
   playerForm.value = { ucid: '', nickname: '' }
   unlinkUser()
-  userSearch.value = ''
-  userResults.value = []
+  resetUserSearch()
   showForm.value = true
 }
 
@@ -147,8 +155,7 @@ function openEdit(p: Player) {
   }
   linkedUserId.value = p.user_id
   linkedUserNickname.value = p.user_nickname
-  userSearch.value = ''
-  userResults.value = []
+  resetUserSearch()
   showForm.value = true
 }
 
