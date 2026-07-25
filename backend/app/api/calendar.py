@@ -123,7 +123,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
             selectinload(CalendarEvent.flights).selectinload(Flight.aircraft),
             selectinload(CalendarEvent.flights).selectinload(Flight.slots).selectinload(Slot.user),
             selectinload(CalendarEvent.modules),
-            selectinload(CalendarEvent.map),
+            selectinload(CalendarEvent.map).selectinload(Module.image_header),
             selectinload(CalendarEvent.image),
             selectinload(CalendarEvent.server),
         )
@@ -152,6 +152,7 @@ async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
         deleted=event.deleted,
         map_id=event.map_id,
         map_name=event.map.name if event.map else None,
+        map_image_header_uuid=event.map.image_header.uuid if event.map and event.map.image_header else None,
         server_id=event.server_id,
         server_name=event.server.name if event.server else None,
         image_id=event.image_id,

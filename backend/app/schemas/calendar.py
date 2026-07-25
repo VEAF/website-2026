@@ -81,6 +81,7 @@ class EventDetailOut(EventListOut):
     deleted: bool
     map_id: int | None = None
     map_name: str | None = None
+    map_image_header_uuid: str | None = None
     server_id: int | None = None
     server_name: str | None = None
     image_id: int | None = None

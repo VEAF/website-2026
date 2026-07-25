@@ -116,8 +116,8 @@ const usersChoicesMap = computed(() => {
 })
 
 const imageUrl = computed(() => {
-  if (!event.value?.image_uuid) return null
-  return `/api/files/${event.value.image_uuid}`
+  const uuid = event.value?.image_uuid ?? event.value?.map_image_header_uuid
+  return uuid ? `/api/files/${uuid}` : null
 })
 
 async function handleVote(vote: boolean | null) {
