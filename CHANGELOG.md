@@ -1,8 +1,9 @@
-## next release
+## 2.2.0
 
+- ADDED calendar - display the terrain header image on events without a custom image
+- ADDED admin - manage DCS players UCID
 - CHANGED calendar - event badge now refreshes on its own (30s tick), closing votes on time
 - FIXED calendar - time remaining before event start rounded up to whole days ("dans 1j" for an event 1 hour away), now shown as days, hours or minutes
-- ADDED calendar - display the terrain header image on events without a custom image
 
 
 ## 2.1.1
