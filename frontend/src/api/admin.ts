@@ -10,6 +10,7 @@ export interface AdminStats {
   urls: number
   menu_items: number
   servers: number
+  players: number
   cadets_ready_to_promote: number
   recruitment_events: number
 }

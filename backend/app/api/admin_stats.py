@@ -7,7 +7,7 @@ from app.auth.dependencies import require_admin
 from app.database import get_db
 from app.models.calendar import CalendarEvent
 from app.models.content import File, MenuItem, Page, Url
-from app.models.dcs import Server
+from app.models.dcs import Player, Server
 from app.models.module import Module
 from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
@@ -25,6 +25,7 @@ class AdminStats(BaseModel):
     urls: int = 0
     menu_items: int = 0
     servers: int = 0
+    players: int = 0
     cadets_ready_to_promote: int = 0
     recruitment_events: int = 0
 
@@ -61,6 +62,9 @@ async def get_stats(
     result = await db.execute(select(func.count()).select_from(Server))
     servers_count = result.scalar_one()
 
+    result = await db.execute(select(func.count()).select_from(Player))
+    players_count = result.scalar_one()
+
     result = await db.execute(
         select(func.count())
         .select_from(User)
@@ -86,6 +90,7 @@ async def get_stats(
         urls=urls_count,
         menu_items=menu_items_count,
         servers=servers_count,
+        players=players_count,
         cadets_ready_to_promote=cadets_ready_count,
         recruitment_events=recruitment_events_count,
     )

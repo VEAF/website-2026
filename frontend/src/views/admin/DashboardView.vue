@@ -72,6 +72,11 @@ onMounted(async () => {
         <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.servers ?? '-' }}</div>
         <div class="text-sm text-gray-900">Serveurs</div>
       </RouterLink>
+      <RouterLink to="/admin/players" class="card text-center hover:shadow-md transition-shadow">
+        <div class="text-veaf-400 mb-2"><i class="fa-solid fa-id-card text-2xl"></i></div>
+        <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.players ?? '-' }}</div>
+        <div class="text-sm text-gray-900">Joueurs DCS</div>
+      </RouterLink>
       <RouterLink to="/admin/urls" class="card text-center hover:shadow-md transition-shadow">
         <div class="text-veaf-400 mb-2"><i class="fa-solid fa-link text-2xl"></i></div>
         <div class="text-3xl font-bold text-veaf-500 mb-2">{{ stats?.urls ?? '-' }}</div>

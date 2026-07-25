@@ -75,6 +75,14 @@ class ServerFactory(factory.Factory):
     code = factory.Sequence(lambda n: f"srv{n}")
 
 
+class PlayerFactory(factory.Factory):
+    class Meta:
+        model = Player
+
+    ucid = factory.Sequence(lambda n: f"ucid{n:028d}")
+    nickname = factory.Sequence(lambda n: f"DcsPilot{n}")
+
+
 class PageFactory(factory.Factory):
     class Meta:
         model = Page
