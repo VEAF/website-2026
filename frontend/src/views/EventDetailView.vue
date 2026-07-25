@@ -7,6 +7,8 @@ import { getEvent, voteEvent, deleteEvent, copyEvent, addChoice, updateChoice, d
 import type { EventDetail, Choice } from '@/types/calendar'
 import { useConfirm } from '@/composables/useConfirm'
 import { renderMarkdown } from '@/composables/useMarkdown'
+import { useNow } from '@/composables/useNow'
+import { eventTimeBadge } from '@/utils/date'
 import ChoiceModal from '@/components/ui/ChoiceModal.vue'
 import { moduleTypeIcon } from '@/constants/modules'
 
@@ -14,6 +16,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const calendar = useCalendarStore()
+const now = useNow()
 const event = ref<EventDetail | null>(null)
 const loading = ref(true)
 const activeTab = ref<'description' | 'debrief'>('description')
@@ -48,23 +51,12 @@ const userVote = computed(() => {
 
 const eventStatus = computed(() => {
   if (!event.value) return null
-  const now = Date.now()
-  const start = new Date(event.value.start_date).getTime()
-  const end = new Date(event.value.end_date).getTime()
-
-  if (now < start) {
-    const days = Math.ceil((start - now) / (1000 * 60 * 60 * 24))
-    return { text: `dans ${days}j`, class: 'bg-green-100 text-green-800' }
-  } else if (now < end) {
-    return { text: 'en cours !', class: 'bg-yellow-100 text-yellow-800' }
-  } else {
-    return { text: 'terminé', class: 'bg-red-100 text-red-800' }
-  }
+  return eventTimeBadge(event.value.start_date, event.value.end_date, now.value)
 })
 
 const isFinished = computed(() => {
   if (!event.value) return false
-  return new Date(event.value.end_date).getTime() < Date.now()
+  return new Date(event.value.end_date).getTime() < now.value
 })
 
 const canVote = computed(() => {
@@ -207,7 +199,7 @@ function formatShortDate(d: string) {
             <span
               v-if="eventStatus"
               class="text-xs font-medium px-2 py-0.5 rounded-full ml-2"
-              :class="eventStatus.class"
+              :class="eventStatus.cssClass"
             >
               {{ eventStatus.text }}
             </span>

@@ -1,3 +1,9 @@
+## next release
+
+- CHANGED calendar - event badge now refreshes on its own (30s tick), closing votes on time
+- FIXED calendar - time remaining before event start rounded up to whole days ("dans 1j" for an event 1 hour away), now shown as days, hours or minutes
+
+
 ## 2.1.1
 
 - FIXED system - HTML and JS frontend caches causing failures

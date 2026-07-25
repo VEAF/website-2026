@@ -11,12 +11,15 @@ import type { EventClickArg, DatesSetArg } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarStore } from '@/stores/calendar'
 import { useAuthStore } from '@/stores/auth'
+import { useNow } from '@/composables/useNow'
+import { eventTimeBadge } from '@/utils/date'
 import type { EventListItem } from '@/types/calendar'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 const router = useRouter()
 const calendar = useCalendarStore()
 const auth = useAuthStore()
+const now = useNow()
 
 const eventTypes = [
   { label: 'Training', color: '#27AE60' },
@@ -101,20 +104,12 @@ function formatDate(d: string) {
   })
 }
 
-function eventTimeBadge(event: EventListItem): { text: string; cssClass: string } {
-  const now = Date.now()
-  const start = new Date(event.start_date).getTime()
-  const end = new Date(event.end_date).getTime()
-
-  if (now < start) {
-    const days = Math.ceil((start - now) / (1000 * 60 * 60 * 24))
-    return { text: `dans ${days}j`, cssClass: 'bg-green-100 text-green-800' }
-  } else if (now < end) {
-    return { text: 'en cours !', cssClass: 'bg-yellow-100 text-yellow-800' }
-  } else {
-    return { text: 'terminé', cssClass: 'bg-red-100 text-red-800' }
-  }
-}
+const eventBadges = computed(
+  () =>
+    new Map(
+      calendar.myEvents.map((e: EventListItem) => [e.id, eventTimeBadge(e.start_date, e.end_date, now.value)])
+    )
+)
 
 onMounted(() => {
   if (auth.isAuthenticated) {
@@ -162,9 +157,9 @@ onMounted(() => {
             <span class="text-gray-600">{{ formatDate(event.start_date) }}</span>
             <span
               class="text-xs font-medium px-2 py-0.5 rounded-full"
-              :class="eventTimeBadge(event).cssClass"
+              :class="eventBadges.get(event.id)?.cssClass"
             >
-              {{ eventTimeBadge(event).text }}
+              {{ eventBadges.get(event.id)?.text }}
             </span>
             <RouterLink
               :to="`/calendar/${event.id}`"
