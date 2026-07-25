@@ -271,6 +271,19 @@ const router = createRouter({
       },
     },
     {
+      path: '/admin/players',
+      name: 'admin-players',
+      component: () => import('@/views/admin/PlayersView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        breadcrumb: [
+          { label: 'Administration', to: 'admin', icon: 'fa-solid fa-screwdriver-wrench' },
+          { label: 'Joueurs DCS' },
+        ],
+      },
+    },
+    {
       path: '/admin/urls',
       name: 'admin-urls',
       component: () => import('@/views/admin/UrlsView.vue'),

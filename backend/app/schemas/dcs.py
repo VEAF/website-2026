@@ -162,6 +162,24 @@ class PlayerOut(BaseModel):
     nickname: str | None = None
     join_at: datetime | None = None
     last_join_at: datetime | None = None
+    user_id: int | None = None
     user_nickname: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class PlayerCreate(BaseModel):
+    ucid: str
+    nickname: str | None = None
+    user_id: int | None = None
+
+
+class PlayerUpdate(BaseModel):
+    ucid: str
+    nickname: str | None = None
+    user_id: int | None = None
+
+
+class AdminPlayerListOut(BaseModel):
+    items: list[PlayerOut]
+    total: int

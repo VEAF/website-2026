@@ -7,6 +7,7 @@ async def load_all() -> None:
 
     from fixtures.calendar import load_calendar_events
     from fixtures.content import load_content
+    from fixtures.dcs import load_players
     from fixtures.modules import load_modules
     from fixtures.reference import load_reference_data
     from fixtures.user_modules import load_user_modules
@@ -24,6 +25,7 @@ async def load_all() -> None:
         await load_content(session)
 
         # Level 4: Cross-references
+        await load_players(session, users)
         await load_user_modules(session, users, modules)
         await load_calendar_events(session, users, modules, servers)
 

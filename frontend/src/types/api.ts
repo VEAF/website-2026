@@ -174,6 +174,36 @@ export interface AdminServerListResponse {
   total: number
 }
 
+// DCS players (database entity — not to be confused with PlayerEntry, the live
+// player list coming from DCSServerBot)
+
+export interface Player {
+  id: number
+  ucid: string
+  nickname: string | null
+  join_at: string | null
+  last_join_at: string | null
+  user_id: number | null
+  user_nickname: string | null
+}
+
+export interface PlayerCreate {
+  ucid: string
+  nickname: string | null
+  user_id: number | null
+}
+
+export interface PlayerUpdate {
+  ucid: string
+  nickname: string | null
+  user_id: number | null
+}
+
+export interface AdminPlayerListResponse {
+  items: Player[]
+  total: number
+}
+
 // DCSServerBot types
 
 export interface SunState {
