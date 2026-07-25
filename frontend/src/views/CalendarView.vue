@@ -12,7 +12,7 @@ import type { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarStore } from '@/stores/calendar'
 import { useAuthStore } from '@/stores/auth'
 import { useNow } from '@/composables/useNow'
-import { eventTimeBadge } from '@/utils/date'
+import { eventTimeBadge, type EventTimeBadge } from '@/utils/date'
 import type { EventListItem } from '@/types/calendar'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
@@ -106,7 +106,7 @@ function formatDate(d: string) {
 
 const eventBadges = computed(
   () =>
-    new Map(
+    new Map<number, EventTimeBadge>(
       calendar.myEvents.map((e: EventListItem) => [e.id, eventTimeBadge(e.start_date, e.end_date, now.value)])
     )
 )
