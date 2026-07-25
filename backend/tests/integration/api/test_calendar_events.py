@@ -7,7 +7,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.calendar import CalendarEvent
-from tests.factories import EventFactory, UserFactory
+from app.models.content import File
+from app.models.module import Module
+from tests.factories import EventFactory, FileFactory, ModuleFactory, UserFactory
 
 
 async def _create_user(db: AsyncSession):
@@ -26,6 +28,24 @@ async def _create_event(db: AsyncSession, owner_id: int, **kwargs) -> CalendarEv
     await db.commit()
     await db.refresh(event)
     return event
+
+
+async def _create_file(db: AsyncSession) -> File:
+    """Create an image File and return it."""
+    file = FileFactory.build()
+    db.add(file)
+    await db.commit()
+    await db.refresh(file)
+    return file
+
+
+async def _create_map(db: AsyncSession, image_header_id: int | None = None) -> Module:
+    """Create a map module, optionally with a header image."""
+    module = ModuleFactory.build(type=Module.TYPE_MAP, image_header_id=image_header_id)
+    db.add(module)
+    await db.commit()
+    await db.refresh(module)
+    return module
 
 
 @pytest.mark.asyncio
@@ -159,3 +179,52 @@ async def test_list_events_invalid_date_returns_422(client: AsyncClient):
 
     # THEN
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_get_event_exposes_map_image_header_uuid(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN an event without its own image, linked to a map having a header image
+    user = await _create_user(db_session)
+    image_header = await _create_file(db_session)
+    map_module = await _create_map(db_session, image_header_id=image_header.id)
+    event = await _create_event(db_session, owner_id=user.id, map_id=map_module.id, image_id=None)
+
+    # WHEN
+    response = await client.get(f"/api/calendar/events/{event.id}")
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["image_uuid"] is None
+    assert data["map_image_header_uuid"] == image_header.uuid
+
+
+@pytest.mark.asyncio
+async def test_get_event_map_without_image_header(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN an event linked to a map that has no header image
+    user = await _create_user(db_session)
+    map_module = await _create_map(db_session)
+    event = await _create_event(db_session, owner_id=user.id, map_id=map_module.id, image_id=None)
+
+    # WHEN
+    response = await client.get(f"/api/calendar/events/{event.id}")
+
+    # THEN
+    assert response.status_code == 200
+    assert response.json()["map_image_header_uuid"] is None
+
+
+@pytest.mark.asyncio
+async def test_get_event_without_map(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN an event with neither map nor image
+    user = await _create_user(db_session)
+    event = await _create_event(db_session, owner_id=user.id, map_id=None, image_id=None)
+
+    # WHEN
+    response = await client.get(f"/api/calendar/events/{event.id}")
+
+    # THEN
+    assert response.status_code == 200
+    data = response.json()
+    assert data["map_image_header_uuid"] is None
+    assert data["image_uuid"] is None

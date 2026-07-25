@@ -66,6 +66,7 @@ export interface EventDetail extends EventListItem {
   deleted: boolean
   map_id: number | null
   map_name: string | null
+  map_image_header_uuid: string | null
   server_id: number | null
   server_name: string | null
   image_id: number | null
