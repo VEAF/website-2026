@@ -1,12 +1,15 @@
 from datetime import datetime
+from urllib.parse import urlparse
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class ServerOut(BaseModel):
     id: int
     name: str
     code: str
+    dcsbot_name: str | None = None
+    sitac_url: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -14,11 +17,27 @@ class ServerOut(BaseModel):
 class ServerCreate(BaseModel):
     name: str
     code: str
+    dcsbot_name: str | None = None
+    sitac_url: str | None = None
+
+    @field_validator("dcsbot_name", "sitac_url", mode="before")
+    @classmethod
+    def _blank_to_none(cls, value: str | None) -> str | None:
+        if isinstance(value, str):
+            value = value.strip()
+        return value or None
+
+    @field_validator("sitac_url")
+    @classmethod
+    def _http_url_only(cls, value: str | None) -> str | None:
+        # Rendered as a link: only web addresses, never javascript: or data: URLs
+        if value is not None and urlparse(value).scheme not in ("http", "https"):
+            raise ValueError("L'URL de la SITAC doit commencer par http:// ou https://")
+        return value
 
 
-class ServerUpdate(BaseModel):
-    name: str
-    code: str
+class ServerUpdate(ServerCreate):
+    pass
 
 
 class AdminServerListOut(BaseModel):
@@ -61,6 +80,7 @@ class DcsBotServerOut(BaseModel):
     name: str
     status: str
     num_players: int
+    sitac_url: str | None = None
     mission: MissionInfoOut | None = None
     players: list[PlayerEntryOut] = Field(default_factory=list)
 
@@ -103,6 +123,7 @@ class DcsBotServerDetailOut(BaseModel):
     name: str
     status: str
     num_players: int
+    sitac_url: str | None = None
     address: str | None = None
     password: str | None = None
     restart_time: str | None = None

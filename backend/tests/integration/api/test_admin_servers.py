@@ -343,3 +343,63 @@ async def test_delete_server_not_found(client: AsyncClient, db_session: AsyncSes
 
     # THEN
     assert response.status_code == 404
+
+
+# =============================================================================
+# Foothold SITAC link
+# =============================================================================
+
+
+@pytest.mark.asyncio
+async def test_create_server_with_sitac(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    payload = {
+        "name": "Foothold",
+        "code": "foothold2",
+        "dcsbot_name": "VEAF - Private Foothold 2",
+        "sitac_url": "http://dcs.example.org:8080",
+    }
+
+    # WHEN
+    response = await client.post("/api/admin/servers", json=payload, headers=headers)
+
+    # THEN
+    assert response.status_code == 201
+    data = response.json()
+    assert data["dcsbot_name"] == "VEAF - Private Foothold 2"
+    assert data["sitac_url"] == "http://dcs.example.org:8080"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("url", ["javascript:alert(1)", "data:text/html,x", "dcs.example.org:8080"])
+async def test_create_server_rejects_non_web_sitac_url(client: AsyncClient, db_session: AsyncSession, url: str):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+
+    # WHEN
+    response = await client.post(
+        "/api/admin/servers", json={"name": "X", "code": "x-sitac", "sitac_url": url}, headers=headers
+    )
+
+    # THEN
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_server_blank_sitac_cleared(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    _, headers = await _create_admin(db_session)
+    server = await _create_server(db_session, sitac_url="https://sitac.example.org", dcsbot_name="Bot name")
+
+    # WHEN
+    response = await client.put(
+        f"/api/admin/servers/{server.id}",
+        json={"name": server.name, "code": server.code, "dcsbot_name": "  ", "sitac_url": ""},
+        headers=headers,
+    )
+
+    # THEN
+    assert response.status_code == 200
+    assert response.json()["sitac_url"] is None
+    assert response.json()["dcsbot_name"] is None

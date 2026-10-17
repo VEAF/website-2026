@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_optional_user
+from app.database import get_db
+from app.models.dcs import Server
 from app.models.user import User
 from app.schemas.dcs import (
     DcsBotAttendanceOut,
@@ -39,8 +43,16 @@ def _enrich_mission(mission_raw: dict | None) -> MissionInfoOut | None:
     return mission
 
 
+async def _sitac_urls(db: AsyncSession) -> dict[str, str]:
+    """SITAC URL configured in admin, keyed by the DCSServerBot server name."""
+    result = await db.execute(
+        select(Server.dcsbot_name, Server.sitac_url).where(Server.dcsbot_name.is_not(None), Server.sitac_url.is_not(None))
+    )
+    return {name: url for name, url in result.all()}
+
+
 @router.get("/servers", response_model=DcsBotPageOut)
-async def get_dcsbot_servers(force_refresh: bool = False):
+async def get_dcsbot_servers(force_refresh: bool = False, db: AsyncSession = Depends(get_db)):
     if force_refresh:
         dcsbot_service.get_servers.invalidate_if_older(10)
         dcsbot_service.get_server_stats.invalidate_if_older(10)
@@ -51,6 +63,7 @@ async def get_dcsbot_servers(force_refresh: bool = False):
     if servers_data is None:
         return DcsBotPageOut(servers=[], stats=None)
 
+    sitac_urls = await _sitac_urls(db)
     items = []
     for s in servers_data:
         players_raw = s.get("players") or []
@@ -59,6 +72,7 @@ async def get_dcsbot_servers(force_refresh: bool = False):
                 name=s.get("name", ""),
                 status=s.get("status", "Unknown"),
                 num_players=len(players_raw),
+                sitac_url=sitac_urls.get(s.get("name", "")),
                 mission=_enrich_mission(s.get("mission")),
                 players=[PlayerEntryOut(**p) for p in players_raw],
             )
@@ -98,6 +112,7 @@ def _build_stats(stats_data: dict) -> DcsBotStatsOut:
 async def get_dcsbot_server(
     server_name: str,
     user: User | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
 ):
     servers_data = await dcsbot_service.get_server(server_name)
     if not servers_data:
@@ -116,6 +131,7 @@ async def get_dcsbot_server(
         name=s.get("name", ""),
         status=s.get("status", "Unknown"),
         num_players=len(players_raw),
+        sitac_url=(await _sitac_urls(db)).get(s.get("name", "")),
         address=s.get("address"),
         password=password,
         restart_time=str(s["restart_time"]) if s.get("restart_time") else None,
