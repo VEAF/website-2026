@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth.dependencies import get_current_user
-from app.auth.permissions import can_add_activity, can_mark_presentation, can_access_recruitment
+from app.auth.permissions import can_access_recruitment, can_add_activity, can_mark_presentation
 from app.database import get_db
 from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
