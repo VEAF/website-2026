@@ -11,7 +11,6 @@ from app.database import get_db
 from app.models.module import Module
 from app.models.user import User, UserModule
 from app.schemas.dcs import DcsPlayerModuleKillsOut, DcsPlayerStatsOut, UserDcsStatsOut
-from app.services import dcsbot as dcsbot_service
 from app.schemas.user import (
     UserMe,
     UserModuleActiveUpdate,
@@ -22,6 +21,7 @@ from app.schemas.user import (
     UserPublic,
     UserUpdate,
 )
+from app.services import dcsbot as dcsbot_service
 
 router = APIRouter(prefix="/users", tags=["users"])
 
