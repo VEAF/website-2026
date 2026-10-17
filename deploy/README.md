@@ -73,7 +73,7 @@ All backend configuration is in `backend.env`. See `backend.env.dist` for the fu
 | `APP_URL` | Yes | Public URL of the application |
 | `MAIL_SERVER` | No | SMTP server for outgoing emails |
 | `API_DCSSERVERBOT_URL` | No | DCSServerBot REST API URL (DCS servers page) |
-| `API_DCSSERVERBOT_KEY` | No | DCSServerBot REST API key, sent as `X-API-Key` |
+| `API_DCSSERVERBOT_KEY` | No | DCSServerBot REST API key, sent as `X-API-Key`, only over `https` or to a private address |
 | `DISCORD_CLIENT_ID` | No | Discord OAuth2 client ID |
 | `DISCORD_CLIENT_SECRET` | No | Discord OAuth2 client secret |
 | `DISCORD_BOT_TOKEN` | No | Discord bot token — enables voice channel display (see below) |
