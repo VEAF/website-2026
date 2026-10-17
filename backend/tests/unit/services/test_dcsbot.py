@@ -30,6 +30,7 @@ def captured(monkeypatch: pytest.MonkeyPatch) -> list[httpx.Request]:
 @pytest.mark.asyncio
 async def test_sends_api_key_header_when_configured(monkeypatch: pytest.MonkeyPatch, captured: list[httpx.Request]):
     # GIVEN
+    monkeypatch.setattr(settings, "API_DCSSERVERBOT_URL", "https://dcs.example.org")
     monkeypatch.setattr(settings, "API_DCSSERVERBOT_KEY", SecretStr("test-key"))
 
     # WHEN
@@ -52,3 +53,37 @@ async def test_no_api_key_header_when_not_configured(monkeypatch: pytest.MonkeyP
     # THEN
     assert len(captured) == 1
     assert "X-API-Key" not in captured[0].headers
+
+
+@pytest.mark.asyncio
+async def test_api_key_not_sent_over_plain_http(monkeypatch: pytest.MonkeyPatch, captured: list[httpx.Request]):
+    # GIVEN
+    monkeypatch.setattr(settings, "API_DCSSERVERBOT_URL", "http://dcs.example.org:9876")
+    monkeypatch.setattr(settings, "API_DCSSERVERBOT_KEY", SecretStr("test-key"))
+
+    # WHEN
+    await dcsbot.get_servers()
+
+    # THEN
+    assert len(captured) == 1
+    assert "X-API-Key" not in captured[0].headers
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("https://dcs.example.org", True),
+        ("http://127.0.0.1:9876", True),
+        ("http://localhost:9876", True),
+        ("http://192.168.1.10:9876", True),
+        ("http://10.0.0.5:9876", True),
+        ("http://dcs.example.org:9876", False),
+        ("http://8.8.8.8:9876", False),
+    ],
+)
+def test_can_send_api_key(url: str, expected: bool):
+    # WHEN
+    result = dcsbot.can_send_api_key(url)
+
+    # THEN
+    assert result is expected

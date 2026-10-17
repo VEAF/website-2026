@@ -1,6 +1,7 @@
 from urllib.parse import urlparse, urlunparse
 
 from app.config import settings
+from app.services.dcsbot import can_send_api_key
 from app.version import APP_VERSION
 
 # ANSI color codes
@@ -27,6 +28,14 @@ def _val(value: str) -> str:
     if not value:
         return f"{YELLOW}(not set){RESET}"
     return f"{GREEN}{value}{RESET}"
+
+
+def _dcsbot_key_status() -> str:
+    if not settings.API_DCSSERVERBOT_KEY.get_secret_value():
+        return ""
+    if not can_send_api_key(settings.API_DCSSERVERBOT_URL):
+        return f"{YELLOW}set, NOT SENT (URL is not https){RESET}"
+    return "set"
 
 
 def log_startup_banner() -> None:
@@ -60,7 +69,7 @@ def log_startup_banner() -> None:
         "",
         f"{BOLD}{CYAN}🔗 External APIs{RESET}",
         f"   DCSSERVERBOT_URL     {_val(settings.API_DCSSERVERBOT_URL)}",
-        f"   DCSSERVERBOT_KEY     {_val('set' if settings.API_DCSSERVERBOT_KEY.get_secret_value() else '')}",
+        f"   DCSSERVERBOT_KEY     {_val(_dcsbot_key_status())}",
         f"   TEAMSPEAK_URL        {_val(settings.API_TEAMSPEAK_URL)}",
         "",
         f"{BOLD}{CYAN}🤖 Discord{RESET}",

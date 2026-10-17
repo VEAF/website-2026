@@ -1,4 +1,6 @@
+import ipaddress
 import logging
+from urllib.parse import urlparse
 
 import httpx
 
@@ -10,10 +12,29 @@ logger = logging.getLogger(__name__)
 TIMEOUT = 10.0  # seconds
 
 
+def can_send_api_key(url: str) -> bool:
+    """The API key may only travel over HTTPS, or to a loopback or private address."""
+    parsed = urlparse(url)
+    if parsed.scheme == "https":
+        return True
+    if parsed.hostname == "localhost":
+        return True
+    try:
+        address = ipaddress.ip_address(parsed.hostname or "")
+    except ValueError:
+        return False
+    return address.is_loopback or address.is_private
+
+
 def _client() -> httpx.AsyncClient:
     """HTTP client for the bot REST API, sending the API key when one is configured."""
     api_key = settings.API_DCSSERVERBOT_KEY.get_secret_value()
-    headers = {"X-API-Key": api_key} if api_key else {}
+    headers = {}
+    if api_key:
+        if can_send_api_key(settings.API_DCSSERVERBOT_URL):
+            headers["X-API-Key"] = api_key
+        else:
+            logger.warning("API_DCSSERVERBOT_KEY is set but not sent: API_DCSSERVERBOT_URL is not https")
     return httpx.AsyncClient(timeout=TIMEOUT, headers=headers)
 
 
