@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth.dependencies import get_current_user
-from app.auth.permissions import can_add_activity, can_mark_presentation
+from app.auth.permissions import can_add_activity, can_mark_presentation, can_access_recruitment
 from app.database import get_db
 from app.models.recruitment import RecruitmentEvent
 from app.models.user import User
@@ -14,8 +14,22 @@ from app.models.user import User
 router = APIRouter(prefix="/recruitment", tags=["recruitment"])
 
 
+# Event types only an admin may record by hand. Presentation and activity are logged by members.
+ADMIN_ONLY_TYPES = {
+    RecruitmentEvent.TYPE_TO_APPLY,
+    RecruitmentEvent.TYPE_PROMOTE,
+    RecruitmentEvent.TYPE_GUEST,
+    RecruitmentEvent.TYPE_DISABLED,
+}
+
+
 @router.get("/{user_id}")
-async def get_recruitment_history(user_id: int, db: AsyncSession = Depends(get_db)):
+async def get_recruitment_history(
+    user_id: int, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db),
+):
+    if not can_access_recruitment(user):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     result = await db.execute(
         select(RecruitmentEvent)
         .where(RecruitmentEvent.user_id == user_id)
@@ -43,6 +57,13 @@ async def add_recruitment_event(
     user_id: int, type: int, comment: str | None = None,
     user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db),
 ):
+    if type not in RecruitmentEvent.TYPES:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Type d'événement invalide")
+    if not can_access_recruitment(user):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    if type in ADMIN_ONLY_TYPES and not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     target = await db.get(User, user_id)
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
