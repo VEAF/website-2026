@@ -60,6 +60,7 @@ def log_startup_banner() -> None:
         "",
         f"{BOLD}{CYAN}🔗 External APIs{RESET}",
         f"   DCSSERVERBOT_URL     {_val(settings.API_DCSSERVERBOT_URL)}",
+        f"   DCSSERVERBOT_KEY     {_val('set' if settings.API_DCSSERVERBOT_KEY.get_secret_value() else '')}",
         f"   TEAMSPEAK_URL        {_val(settings.API_TEAMSPEAK_URL)}",
         "",
         f"{BOLD}{CYAN}🤖 Discord{RESET}",
