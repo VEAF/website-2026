@@ -7,6 +7,7 @@ import type { RecruitmentEvent } from '@/api/recruitment'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
 import AddActivityModal from '@/components/recruitment/AddActivityModal.vue'
+import DcsStatsCard from '@/components/profile/DcsStatsCard.vue'
 import type { UserProfile } from '@/types/user'
 import type { UserModule } from '@/types/user'
 import { TYPES_WITH_LEVEL, MODULE_TYPE_AIRCRAFT, MODULE_TYPE_ORDER } from '@/constants/modules'
@@ -336,6 +337,8 @@ onMounted(async () => {
         </div>
       </Transition>
     </Teleport>
+
+    <DcsStatsCard :key="user.id" :user-id="user.id" />
 
     <!-- Modules section -->
     <div v-if="groupedModules.length > 0" class="card">

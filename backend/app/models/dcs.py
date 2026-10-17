@@ -12,6 +12,10 @@ class Server(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     code: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    # Server name as reported by DCSServerBot, to attach site data to a live server
+    dcsbot_name: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
+    # Foothold SITAC (situation map) of the campaign hosted on this server
+    sitac_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
 class Player(Base):

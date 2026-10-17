@@ -59,6 +59,25 @@ async def test_login_wrong_password(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "stored",
+    ["$argon2id$v=19$m=65536,t=4,p=1$c2FsdHNhbHQ$aGFzaGhhc2g", ""],
+    ids=["legacy-argon2", "empty"],
+)
+async def test_login_with_non_bcrypt_hash_rejected(client: AsyncClient, db_session: AsyncSession, stored: str):
+    # GIVEN
+    user = UserFactory.build(email="legacy@test.com", password=stored)
+    db_session.add(user)
+    await db_session.commit()
+
+    # WHEN
+    response = await client.post("/api/auth/login", json={"email": "legacy@test.com", "password": "whatever"})
+
+    # THEN
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_health(client: AsyncClient):
     response = await client.get("/api/health")
     assert response.status_code == 200

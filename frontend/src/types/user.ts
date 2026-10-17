@@ -93,3 +93,33 @@ export interface AdminUserListResponse {
   items: AdminUser[]
   total: number
 }
+
+export interface DcsPlayerModuleKills {
+  module: string
+  kills: number | null
+}
+
+export interface DcsPlayerStats {
+  playtime: number
+  kills: number
+  deaths: number
+  kdr: number
+  kills_pvp: number
+  deaths_pvp: number
+  kills_planes: number
+  kills_helicopters: number
+  kills_ships: number
+  kills_sams: number
+  kills_ground: number
+  takeoffs: number
+  landings: number
+  ejections: number
+  crashes: number
+  teamkills: number
+  kills_by_module: DcsPlayerModuleKills[]
+}
+
+export interface UserDcsStats {
+  has_player: boolean
+  stats: DcsPlayerStats | null
+}

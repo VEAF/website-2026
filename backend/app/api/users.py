@@ -10,6 +10,7 @@ from app.auth.dependencies import get_current_user, get_optional_user
 from app.database import get_db
 from app.models.module import Module
 from app.models.user import User, UserModule
+from app.schemas.dcs import DcsPlayerModuleKillsOut, DcsPlayerStatsOut, UserDcsStatsOut
 from app.schemas.user import (
     UserMe,
     UserModuleActiveUpdate,
@@ -20,6 +21,7 @@ from app.schemas.user import (
     UserPublic,
     UserUpdate,
 )
+from app.services import dcsbot as dcsbot_service
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -207,3 +209,26 @@ async def get_user(
     viewer: User | None = Depends(get_optional_user),
 ):
     return _build_user_profile_out(user, viewer)
+
+
+@router.get("/{user_id}/dcs-stats", response_model=UserDcsStatsOut)
+async def get_user_dcs_stats(user_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.id == user_id).options(selectinload(User.player)))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if user.player is None:
+        return UserDcsStatsOut(has_player=False)
+
+    nicknames = tuple(dict.fromkeys(n for n in (user.player.nickname, user.nickname) if n))
+    raw = await dcsbot_service.get_player_stats(user.player.ucid, user.discord_id, nicknames)
+    if raw is None:
+        return UserDcsStatsOut(has_player=True)
+
+    fields = {k: raw[k] for k in DcsPlayerStatsOut.model_fields if k != "kills_by_module" and raw.get(k) is not None}
+    kills_by_module = [
+        DcsPlayerModuleKillsOut(module=m["module"], kills=m.get("kills"))
+        for m in raw.get("killsByModule") or []
+        if m.get("module")
+    ]
+    return UserDcsStatsOut(has_player=True, stats=DcsPlayerStatsOut(**fields, kills_by_module=kills_by_module))

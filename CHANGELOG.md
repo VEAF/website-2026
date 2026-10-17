@@ -1,5 +1,11 @@
 ## next release
 
+- ADDED profile - DCS game statistics of the pilot, from DCSServerBot (#181)
+- ADDED servers - link to the Foothold SITAC of a server, configured in admin (#182)
+- FIXED calendar - cadets could not register to events open to cadets and members (#199)
+- FIXED calendar - copying an event dropped its image (#190)
+- FIXED auth - login failed with a server error when the stored password was not a bcrypt hash (#183)
+- FIXED system - frontend container always reported unhealthy (healthcheck reached localhost over IPv6)
 - ADDED system - send an API key to DCSServerBot (`API_DCSSERVERBOT_KEY`)
 - ADDED system - per-IP rate limit on sign-up and password reset (nginx)
 - CHANGED recruitment - history and events restricted to members, admin-only event types reserved to admins

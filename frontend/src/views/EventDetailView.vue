@@ -70,11 +70,16 @@ const canVote = computed(() => {
   const isMember = (u.status >= 2 && u.status <= 8) || isAdmin
   const isCadet = u.status === 1
 
-  if (e.restrictions.includes(2) && !isMember) {
-    return { allowed: false, reason: 'Cet événement est réservé aux membres.' }
-  }
-  if (e.restrictions.includes(1) && !(isCadet || isMember)) {
-    return { allowed: false, reason: 'Cet événement est réservé aux cadets et membres.' }
+  // Restrictions list the groups allowed to register: belonging to any one of them is enough
+  if (e.restrictions.length > 0 && !isAdmin) {
+    const cadetsAllowed = e.restrictions.includes(1)
+    const allowed = (e.restrictions.includes(2) && isMember) || (cadetsAllowed && (isCadet || isMember))
+    if (!allowed) {
+      const reason = cadetsAllowed
+        ? 'Cet événement est réservé aux cadets et membres.'
+        : 'Cet événement est réservé aux membres.'
+      return { allowed: false, reason }
+    }
   }
   if (e.sim_dcs && !u.sim_dcs) {
     return { allowed: false, reason: 'Vous devez posséder le simulateur DCS pour participer.' }

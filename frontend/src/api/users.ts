@@ -5,6 +5,7 @@ import type {
   AdminUserUpdate,
   UserMe,
   UserModuleUpdateResponse,
+  UserDcsStats,
   UserProfile,
   UserPublic,
   UserUpdate,
@@ -71,5 +72,10 @@ export async function updateAdminUser(userId: number, payload: AdminUserUpdate):
 
 export async function disableAdminUser(userId: number): Promise<AdminUser> {
   const { data } = await apiClient.post<AdminUser>(`/admin/users/${userId}/disable`)
+  return data
+}
+
+export async function getUserDcsStats(userId: number): Promise<UserDcsStats> {
+  const { data } = await apiClient.get<UserDcsStats>(`/users/${userId}/dcs-stats`)
   return data
 }

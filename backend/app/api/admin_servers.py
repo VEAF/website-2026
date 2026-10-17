@@ -48,6 +48,8 @@ async def create_server(
     server = Server(
         name=data.name,
         code=data.code,
+        dcsbot_name=data.dcsbot_name,
+        sitac_url=data.sitac_url,
     )
 
     try:
@@ -89,6 +91,8 @@ async def update_server(
 
     server.name = data.name
     server.code = data.code
+    server.dcsbot_name = data.dcsbot_name
+    server.sitac_url = data.sitac_url
 
     try:
         await db.commit()

@@ -25,11 +25,13 @@ def can_vote_event(user: User, event: CalendarEvent) -> bool:
         return False
     if event.is_finished:
         return False
-    # Check restrictions
-    if event.has_restriction(CalendarEvent.RESTRICTION_MEMBER) and not (user.is_member or user.is_admin):
-        return False
-    if event.has_restriction(CalendarEvent.RESTRICTION_CADET) and not (user.is_cadet or user.is_member or user.is_admin):
-        return False
+    # Restrictions list the groups allowed to register: belonging to any one of them is enough
+    if event.restrictions and not user.is_admin:
+        allowed = (event.has_restriction(CalendarEvent.RESTRICTION_MEMBER) and user.is_member) or (
+            event.has_restriction(CalendarEvent.RESTRICTION_CADET) and (user.is_cadet or user.is_member)
+        )
+        if not allowed:
+            return False
     # Check simulators
     if event.sim_dcs and not user.sim_dcs:
         return False

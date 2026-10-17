@@ -2,7 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { getAdminServers, createAdminServer, updateAdminServer, deleteAdminServer } from '@/api/servers'
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
-import type { Server } from '@/types/api'
+import type { Server, ServerCreate } from '@/types/api'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 
@@ -28,9 +28,11 @@ const totalPages = ref(1)
 const showForm = ref(false)
 const editingServerId = ref<number | null>(null)
 const codeManuallyEdited = ref(false)
-const serverForm = ref({
+const serverForm = ref<ServerCreate>({
   name: '',
   code: '',
+  dcsbot_name: null,
+  sitac_url: null,
 })
 
 function slugify(text: string): string {
@@ -94,7 +96,7 @@ function goToPage(page: number) {
 function openNew() {
   editingServerId.value = null
   codeManuallyEdited.value = false
-  serverForm.value = { name: '', code: '' }
+  serverForm.value = { name: '', code: '', dcsbot_name: null, sitac_url: null }
   showForm.value = true
 }
 
@@ -104,6 +106,8 @@ function openEdit(s: Server) {
   serverForm.value = {
     name: s.name,
     code: s.code,
+    dcsbot_name: s.dcsbot_name,
+    sitac_url: s.sitac_url,
   }
   showForm.value = true
 }
@@ -181,6 +185,16 @@ onMounted(loadServers)
             <label class="label">Code</label>
             <input v-model="serverForm.code" @input="onCodeInput" type="text" class="input" maxlength="64" required />
             <p class="text-xs text-gray-500 mt-1">Identifiant technique (auto-généré depuis le nom)</p>
+          </div>
+          <div>
+            <label class="label">Nom côté DCSServerBot</label>
+            <input v-model="serverForm.dcsbot_name" type="text" class="input" maxlength="255" />
+            <p class="text-xs text-gray-500 mt-1">Nom exact affiché par le bot (page Serveurs DCS), pour relier ce serveur au serveur en ligne</p>
+          </div>
+          <div>
+            <label class="label">URL de la SITAC Foothold</label>
+            <input v-model="serverForm.sitac_url" type="url" class="input" maxlength="255" placeholder="http://dcs.veaf.org:8080" />
+            <p class="text-xs text-gray-500 mt-1">Laisser vide si le serveur n'héberge pas de campagne Foothold</p>
           </div>
         </div>
 

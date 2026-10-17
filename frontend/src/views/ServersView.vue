@@ -133,6 +133,16 @@ function formatAvgPlaytime(seconds: number): string {
                 >
                   {{ shortName(server.name) }}
                 </RouterLink>
+                <a
+                  v-if="server.sitac_url"
+                  :href="server.sitac_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="ml-2 text-gray-500 hover:text-veaf-600"
+                  title="SITAC Foothold"
+                >
+                  <i class="fa-solid fa-map-location-dot"></i>
+                </a>
               </td>
               <td class="py-2 px-3">
                 <span

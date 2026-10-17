@@ -1,5 +1,7 @@
 """Tests for permission checks."""
 
+import pytest
+
 from app.auth.permissions import (
     can_add_event,
     can_control_server,
@@ -54,6 +56,43 @@ def test_can_vote_finished():
         end_date=datetime.now(UTC) - timedelta(hours=1),
     )
     assert can_vote_event(user, event) is False
+
+
+@pytest.mark.parametrize(
+    "restrictions,status,expected",
+    [
+        ("1,2", User.STATUS_CADET, True),
+        ("1,2", User.STATUS_MEMBER, True),
+        ("1,2", User.STATUS_UNKNOWN, False),
+        ("1,2", User.STATUS_GUEST, False),
+        ("2", User.STATUS_CADET, False),
+        ("2", User.STATUS_MEMBER, True),
+        ("1", User.STATUS_CADET, True),
+        ("1", User.STATUS_MEMBER, True),
+        ("1", User.STATUS_UNKNOWN, False),
+        (None, User.STATUS_UNKNOWN, True),
+        ("", User.STATUS_GUEST, True),
+    ],
+)
+def test_can_vote_restrictions_allow_any_listed_group(restrictions, status: int, expected: bool):
+    # GIVEN
+    user = UserFactory.build(status=status, sim_dcs=True, sim_bms=True)
+    event = EventFactory.build(registration=True, restrictions=restrictions, end_date=datetime.now(UTC) + timedelta(days=1))
+
+    # WHEN
+    result = can_vote_event(user, event)
+
+    # THEN
+    assert result is expected
+
+
+def test_can_vote_restricted_event_admin_allowed():
+    # GIVEN
+    user = UserFactory.build(status=User.STATUS_UNKNOWN, roles="ROLE_USER,ROLE_ADMIN", sim_dcs=True, sim_bms=True)
+    event = EventFactory.build(registration=True, restrictions="2", end_date=datetime.now(UTC) + timedelta(days=1))
+
+    # WHEN / THEN
+    assert can_vote_event(user, event) is True
 
 
 def test_can_control_server_member():
