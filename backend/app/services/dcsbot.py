@@ -110,3 +110,32 @@ async def get_server_attendance(server_name: str) -> dict | None:
     except Exception:
         logger.exception("Failed to fetch DCSServerBot attendance for %s", server_name)
         return None
+
+
+@cached(dcsbot_cache)
+async def get_player_stats(ucid: str, discord_id: str | None, nicknames: tuple[str, ...]) -> dict | None:
+    """Fetch the game statistics of one DCS account from DCSServerBot API.
+
+    The bot's /stats only takes a (nick, date) pair, which it resolves to the account last seen under that
+    name at that second. That pair is read from /getuser (by Discord id first, then by nickname), keeping
+    only the row of this ucid, so a player using someone else's name never gets their statistics.
+    """
+    lookups = ([{"discord_id": discord_id}] if discord_id else []) + [{"nick": n} for n in nicknames if n]
+    try:
+        async with _client() as client:
+            for form in lookups:
+                resp = await client.post(f"{settings.API_DCSSERVERBOT_URL}/serverapi/getuser", data=form)
+                resp.raise_for_status()
+                entry = next((e for e in resp.json() if e.get("ucid") == ucid), None)
+                if entry is None:
+                    continue
+                resp = await client.post(
+                    f"{settings.API_DCSSERVERBOT_URL}/serverapi/stats",
+                    data={"nick": entry["nick"], "date": entry["date"]},
+                )
+                resp.raise_for_status()
+                return resp.json()
+        return None
+    except Exception:
+        logger.exception("Failed to fetch DCSServerBot stats for player %s", ucid)
+        return None

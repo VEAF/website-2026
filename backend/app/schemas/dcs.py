@@ -204,3 +204,36 @@ class PlayerUpdate(BaseModel):
 class AdminPlayerListOut(BaseModel):
     items: list[PlayerOut]
     total: int
+
+
+# --- Player game statistics (user profile) ---
+
+
+class DcsPlayerModuleKillsOut(BaseModel):
+    module: str
+    kills: int | None = None
+
+
+class DcsPlayerStatsOut(BaseModel):
+    playtime: int = 0
+    kills: int = 0
+    deaths: int = 0
+    kdr: float = 0
+    kills_pvp: int = 0
+    deaths_pvp: int = 0
+    kills_planes: int = 0
+    kills_helicopters: int = 0
+    kills_ships: int = 0
+    kills_sams: int = 0
+    kills_ground: int = 0
+    takeoffs: int = 0
+    landings: int = 0
+    ejections: int = 0
+    crashes: int = 0
+    teamkills: int = 0
+    kills_by_module: list[DcsPlayerModuleKillsOut] = Field(default_factory=list)
+
+
+class UserDcsStatsOut(BaseModel):
+    has_player: bool
+    stats: DcsPlayerStatsOut | None = None
