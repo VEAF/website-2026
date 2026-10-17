@@ -292,3 +292,25 @@ async def test_vote_event_open_to_cadets_and_members(
 
     # THEN
     assert response.status_code == expected
+
+
+@pytest.mark.asyncio
+async def test_copy_event_keeps_image(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    owner = await _create_user(db_session)
+    headers = {"Authorization": f"Bearer {create_access_token(owner.id, owner.get_roles_list())}"}
+    image = await _create_file(db_session)
+    event = await _create_event(
+        db_session, owner_id=owner.id, title="Illustrated", image_id=image.id,
+        start_date=datetime(2026, 3, 1, 20, 0), end_date=datetime(2026, 3, 1, 23, 0),
+    )
+
+    # WHEN
+    response = await client.post(f"/api/calendar/events/{event.id}/copy", headers=headers)
+
+    # THEN
+    assert response.status_code == 201
+    data = response.json()
+    assert data["id"] != event.id
+    assert data["title"] == "Illustrated"
+    assert data["image_uuid"] == image.uuid

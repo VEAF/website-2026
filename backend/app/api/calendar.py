@@ -25,6 +25,7 @@ from app.schemas.calendar import (
     VoteCreate,
     VoteOut,
 )
+from app.services.calendar import clone_event
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 
@@ -293,27 +294,13 @@ async def copy_event(event_id: int, user: User = Depends(get_current_user), db: 
     if source is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    now = datetime.now(UTC)
-    new_event = CalendarEvent(
-        title=source.title,
+    new_event = clone_event(
+        source,
         start_date=source.start_date,
         end_date=source.end_date,
-        type=source.type,
-        sim_dcs=source.sim_dcs,
-        sim_bms=source.sim_bms,
-        description=source.description,
-        restrictions=source.restrictions,
-        registration=source.registration,
-        ato=source.ato,
-        repeat_event=CalendarEvent.REPEAT_NONE,
-        map_id=source.map_id,
-        server_id=source.server_id,
         owner_id=user.id,
-        created_at=now,
-        updated_at=now,
+        repeat_event=CalendarEvent.REPEAT_NONE,
     )
-    for m in source.modules:
-        new_event.modules.append(m)
 
     db.add(new_event)
     await db.commit()

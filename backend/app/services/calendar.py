@@ -14,6 +14,55 @@ logger = logging.getLogger(__name__)
 
 AUTO_CREATE_EVENT_DAYS = 32
 
+# Columns a clone takes from its source. Everything else is either set by the caller (dates, owner,
+# repeat) or starts fresh (id, timestamps, debrief, deletion). A new column must be added to one side.
+CLONED_FIELDS = (
+    "title",
+    "type",
+    "sim_dcs",
+    "sim_bms",
+    "description",
+    "restrictions",
+    "registration",
+    "ato",
+    "map_id",
+    "server_id",
+    "image_id",
+)
+NOT_CLONED_FIELDS = (
+    "id",
+    "created_at",
+    "updated_at",
+    "start_date",
+    "end_date",
+    "owner_id",
+    "repeat_event",
+    "debrief",
+    "deleted",
+    "deleted_at",
+)
+
+
+def clone_event(
+    source: CalendarEvent, *, start_date: datetime, end_date: datetime, owner_id: int | None, repeat_event: int
+) -> CalendarEvent:
+    """Build a new event carrying the content of `source`; votes, choices, flights and debrief are not copied.
+
+    Expects source.modules to be loaded.
+    """
+    now = datetime.now(UTC)
+    new_event = CalendarEvent(
+        **{field: getattr(source, field) for field in CLONED_FIELDS},
+        start_date=start_date,
+        end_date=end_date,
+        owner_id=owner_id,
+        repeat_event=repeat_event,
+        created_at=now,
+        updated_at=now,
+    )
+    new_event.modules.extend(source.modules)
+    return new_event
+
 
 def get_next_event_datetime(event: CalendarEvent) -> datetime | None:
     """Calculate the next occurrence datetime based on the event's repeat type."""
@@ -80,41 +129,25 @@ async def create_next_event(db: AsyncSession, original: CalendarEvent) -> Calend
         raise ValueError("Cannot calculate next event date")
 
     duration = original.end_date - original.start_date
-    now = datetime.now(UTC)
 
-    new_event = CalendarEvent(
-        title=original.title,
-        start_date=next_start,
-        end_date=next_start + duration,
-        type=original.type,
-        sim_dcs=original.sim_dcs,
-        sim_bms=original.sim_bms,
-        description=original.description,
-        restrictions=original.restrictions,
-        registration=original.registration,
-        ato=original.ato,
-        repeat_event=original.repeat_event,
-        map_id=original.map_id,
-        server_id=original.server_id,
-        image_id=original.image_id,
-        owner_id=original.owner_id,
-        debrief=None,
-        created_at=now,
-        updated_at=now,
-    )
     # Eagerly load modules via explicit query to avoid lazy-load issues
     result = await db.execute(
         select(CalendarEvent).where(CalendarEvent.id == original.id).options(selectinload(CalendarEvent.modules))
     )
     loaded = result.scalar_one()
-    for m in loaded.modules:
-        new_event.modules.append(m)
+    new_event = clone_event(
+        loaded,
+        start_date=next_start,
+        end_date=next_start + duration,
+        owner_id=original.owner_id,
+        repeat_event=original.repeat_event,
+    )
 
     db.add(new_event)
     await db.flush()
 
     original.repeat_event = CalendarEvent.REPEAT_NONE
-    original.updated_at = now
+    original.updated_at = datetime.now(UTC)
 
     return new_event
 

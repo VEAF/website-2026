@@ -3,7 +3,15 @@
 from datetime import UTC, datetime, timedelta
 
 from app.models.calendar import CalendarEvent
-from app.services.calendar import AUTO_CREATE_EVENT_DAYS, get_next_event_datetime, is_needed_to_create_next_event
+from app.services.calendar import (
+    AUTO_CREATE_EVENT_DAYS,
+    CLONED_FIELDS,
+    NOT_CLONED_FIELDS,
+    clone_event,
+    get_next_event_datetime,
+    is_needed_to_create_next_event,
+)
+from tests.factories import EventFactory
 
 
 def _make_event(start_date: datetime, repeat_event: int) -> CalendarEvent:
@@ -160,3 +168,42 @@ class TestIsNeededToCreateNextEvent:
 
         # WHEN / THEN
         assert is_needed_to_create_next_event(event) is False
+
+
+class TestCloneEvent:
+    def test_every_column_is_either_cloned_or_not(self):
+        # GIVEN
+        columns = {c.name for c in CalendarEvent.__table__.columns}
+
+        # WHEN
+        cloned, not_cloned = set(CLONED_FIELDS), set(NOT_CLONED_FIELDS)
+
+        # THEN
+        assert cloned.isdisjoint(not_cloned)
+        assert cloned | not_cloned == columns
+
+    def test_clone_carries_content_and_not_history(self):
+        # GIVEN
+        source = EventFactory.build(
+            title="Mission", type=CalendarEvent.EVENT_TYPE_MISSION, sim_dcs=True, sim_bms=True, description="desc",
+            restrictions="1,2", registration=True, ato="ato", map_id=3, server_id=4, image_id=5,
+            debrief="debrief", owner_id=1, repeat_event=CalendarEvent.REPEAT_DAY_OF_WEEK, deleted=True,
+        )
+        source.modules = []
+        start = datetime(2026, 11, 1, 20, 0, tzinfo=UTC)
+
+        # WHEN
+        clone = clone_event(
+            source, start_date=start, end_date=start + timedelta(hours=2), owner_id=2,
+            repeat_event=CalendarEvent.REPEAT_NONE,
+        )
+
+        # THEN
+        for field in CLONED_FIELDS:
+            assert getattr(clone, field) == getattr(source, field), field
+        assert clone.image_id == 5
+        assert clone.debrief is None
+        assert not clone.deleted
+        assert clone.owner_id == 2
+        assert clone.repeat_event == CalendarEvent.REPEAT_NONE
+        assert clone.start_date == start
