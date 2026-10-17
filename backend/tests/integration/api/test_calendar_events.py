@@ -1,14 +1,16 @@
 """Integration tests for public calendar events endpoint."""
 
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.jwt import create_access_token
 from app.models.calendar import CalendarEvent
 from app.models.content import File
 from app.models.module import Module
+from app.models.user import User
 from tests.factories import EventFactory, FileFactory, ModuleFactory, UserFactory
 
 
@@ -261,3 +263,32 @@ async def test_get_event_without_map(client: AsyncClient, db_session: AsyncSessi
     data = response.json()
     assert data["map_image_header_uuid"] is None
     assert data["image_uuid"] is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status,expected", [(User.STATUS_CADET, 200), (User.STATUS_MEMBER, 200), (User.STATUS_UNKNOWN, 403)])
+async def test_vote_event_open_to_cadets_and_members(
+    client: AsyncClient, db_session: AsyncSession, status: int, expected: int
+):
+    # GIVEN
+    owner = await _create_user(db_session)
+    voter = UserFactory.build(status=status, sim_dcs=True)
+    db_session.add(voter)
+    await db_session.commit()
+    await db_session.refresh(voter)
+    headers = {"Authorization": f"Bearer {create_access_token(voter.id, voter.get_roles_list())}"}
+    start = datetime.now(UTC) + timedelta(days=2)
+    # Not refreshed: SQLite would hand the dates back without their time zone
+    event = EventFactory.build(
+        owner_id=owner.id, registration=True, sim_dcs=True, sim_bms=False,
+        restrictions=f"{CalendarEvent.RESTRICTION_CADET},{CalendarEvent.RESTRICTION_MEMBER}",
+        start_date=start, end_date=start + timedelta(hours=3),
+    )
+    db_session.add(event)
+    await db_session.commit()
+
+    # WHEN
+    response = await client.post(f"/api/calendar/events/{event.id}/vote", json={"vote": True}, headers=headers)
+
+    # THEN
+    assert response.status_code == expected
