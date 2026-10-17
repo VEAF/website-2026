@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from PIL import Image, ImageOps
 from sqlalchemy import select
@@ -21,6 +22,31 @@ router = APIRouter(prefix="/files", tags=["files"])
 ALLOWED_UPLOAD_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"}
 CONVERTIBLE_IMAGE_TYPES = {"image/jpeg", "image/jpg", "image/png"}
 MAX_UPLOAD_SIZE = 20 * 1024 * 1024  # 20 MB
+MAX_IMAGE_PIXELS = 50_000_000  # decoded size cap: a small compressed file can expand to gigabytes
+
+# Backstop for any other decoding path: Pillow refuses images past twice this value
+Image.MAX_IMAGE_PIXELS = MAX_IMAGE_PIXELS
+
+
+class ImageTooLargeError(Exception):
+    pass
+
+
+def _to_webp(raw: bytes) -> bytes:
+    """Decode an image and re-encode it as WebP. CPU-bound: run it in a worker thread."""
+    img = Image.open(io.BytesIO(raw))
+    if img.width * img.height > MAX_IMAGE_PIXELS:
+        raise ImageTooLargeError
+    img = ImageOps.exif_transpose(img)
+    buf = io.BytesIO()
+    img.save(buf, format="WEBP", quality=85, method=4)
+    return buf.getvalue()
+
+
+def _write_file(dir_path: str, file_path: str, content: bytes) -> None:
+    os.makedirs(dir_path, exist_ok=True)
+    with open(file_path, "wb") as f:
+        f.write(content)
 
 
 def _replace_extension(filename: str | None, new_ext: str) -> str | None:
@@ -44,10 +70,14 @@ async def upload_file(file: UploadFile, user: User = Depends(get_current_user), 
 
     # Convert JPEG/PNG to WebP; keep PDF and native WebP as-is
     if content_type in CONVERTIBLE_IMAGE_TYPES:
-        img = ImageOps.exif_transpose(Image.open(io.BytesIO(content)))
-        buf = io.BytesIO()
-        img.save(buf, format="WEBP", quality=85, method=6)
-        content = buf.getvalue()
+        try:
+            content = await run_in_threadpool(_to_webp, content)
+        except (ImageTooLargeError, Image.DecompressionBombError):
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Image trop grande (max 50 mégapixels)"
+            )
+        except (OSError, SyntaxError, ValueError):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image illisible ou corrompue")
         extension = "webp"
         stored_mime = "image/webp"
         original_name = _replace_extension(file.filename, "webp")
@@ -62,11 +92,8 @@ async def upload_file(file: UploadFile, user: User = Depends(get_current_user), 
 
     file_uuid = str(uuid4())
     dir_path = os.path.join(settings.UPLOAD_DIR, file_uuid[0], file_uuid[1])
-    os.makedirs(dir_path, exist_ok=True)
     file_path = os.path.join(dir_path, f"{file_uuid}.{extension}")
-
-    with open(file_path, "wb") as f:
-        f.write(content)
+    await run_in_threadpool(_write_file, dir_path, file_path, content)
 
     db_file = File(
         uuid=file_uuid,

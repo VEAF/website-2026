@@ -1,3 +1,14 @@
+## next release
+
+- ADDED system - send an API key to DCSServerBot (`API_DCSSERVERBOT_KEY`)
+- ADDED system - per-IP rate limit on sign-up and password reset (nginx)
+- CHANGED recruitment - history and events restricted to members, admin-only event types reserved to admins
+- CHANGED system - image conversion on upload no longer blocks the server
+- FIXED calendar - a deleted event is no longer served by its detail page
+- FIXED files - an unreadable or oversized image upload is rejected with a clear error
+- REMOVED system - reCAPTCHA setting, which was never checked
+
+
 ## 2.2.0
 
 - ADDED calendar - display the terrain header image on events without a custom image

@@ -72,11 +72,12 @@ All backend configuration is in `backend.env`. See `backend.env.dist` for the fu
 | `JWT_SECRET` | Yes | Secret key for JWT tokens — use a long random string |
 | `APP_URL` | Yes | Public URL of the application |
 | `MAIL_SERVER` | No | SMTP server for outgoing emails |
+| `API_DCSSERVERBOT_URL` | No | DCSServerBot REST API URL (DCS servers page) |
+| `API_DCSSERVERBOT_KEY` | No | DCSServerBot REST API key, sent as `X-API-Key`, only over `https` or to a private address |
 | `DISCORD_CLIENT_ID` | No | Discord OAuth2 client ID |
 | `DISCORD_CLIENT_SECRET` | No | Discord OAuth2 client secret |
 | `DISCORD_BOT_TOKEN` | No | Discord bot token — enables voice channel display (see below) |
 | `DISCORD_GUILD_ID` | No | Discord server (guild) ID — required with `DISCORD_BOT_TOKEN` |
-| `RECAPTCHA_SECRET_KEY` | No | Google reCAPTCHA v3 secret |
 
 ### Compose Variables
 
@@ -102,6 +103,12 @@ DISCORD_GUILD_ID=123456789012345678
 ```
 
 The backend runs a Discord Gateway bot that receives voice state updates in real-time. If these variables are not set, the feature is simply disabled.
+
+### Rate limiting
+
+`nginx.conf` limits `POST /api/auth/register` and `POST /api/auth/reset-password` per client IP (a burst of 6, then 1 per minute; beyond that, `429`).
+The client IP is read from `X-Forwarded-For`, trusted only when the request comes from a private address (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), which is the case of a reverse proxy on the `webproxy` Docker network.
+If your reverse proxy reaches nginx from a public address, add it with `set_real_ip_from` in `nginx.conf`, otherwise all clients share the same limit.
 
 ## Updating
 

@@ -48,6 +48,11 @@ def can_control_server(user: User) -> bool:
     return user.is_member or user.is_admin
 
 
+def can_access_recruitment(user: User) -> bool:
+    """Members can read and write cadet recruitment records."""
+    return user.is_member or user.is_admin
+
+
 def can_mark_presentation(user: User) -> bool:
     """Members can mark cadet as presented."""
     return user.is_member or user.is_admin

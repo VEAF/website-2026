@@ -2,6 +2,7 @@
 
 import io
 import os
+import threading
 
 import pytest
 from httpx import AsyncClient
@@ -9,6 +10,7 @@ from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api import files as files_api
 from app.auth.jwt import create_access_token
 from app.config import settings
 from app.models.content import File
@@ -150,6 +152,73 @@ async def test_upload_unsupported_type_rejected(client: AsyncClient, db_session:
 
     # THEN
     assert response.status_code == 415
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "content",
+    [b"not an image at all", _make_image_bytes("PNG", size=(64, 64))[:60]],
+    ids=["garbage", "truncated"],
+)
+async def test_upload_unreadable_image_rejected(client: AsyncClient, db_session: AsyncSession, content: bytes):
+    """A file announced as an image that cannot be decoded is a client error, not a server error."""
+    # GIVEN
+    user, headers = await _create_user(db_session)
+
+    # WHEN
+    response = await client.post("/api/files", headers=headers, files={"file": ("image.png", content, "image/png")})
+
+    # THEN
+    assert response.status_code == 400
+    result = await db_session.execute(select(File).where(File.owner_id == user.id))
+    assert result.scalars().all() == []
+
+
+@pytest.mark.asyncio
+async def test_upload_image_over_pixel_limit_rejected(
+    client: AsyncClient, db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+):
+    """An image whose decoded size exceeds the pixel cap is refused before decoding."""
+    # GIVEN
+    user, headers = await _create_user(db_session)
+    monkeypatch.setattr(files_api, "MAX_IMAGE_PIXELS", 100)
+    content = _make_image_bytes("PNG", size=(20, 20))
+
+    # WHEN
+    response = await client.post("/api/files", headers=headers, files={"file": ("big.png", content, "image/png")})
+
+    # THEN
+    assert response.status_code == 413
+    result = await db_session.execute(select(File).where(File.owner_id == user.id))
+    assert result.scalars().all() == []
+
+
+@pytest.mark.asyncio
+async def test_upload_conversion_runs_off_event_loop(
+    client: AsyncClient, db_session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+):
+    """The WebP conversion must not run on the event loop thread (single worker: it would block the site)."""
+    # GIVEN
+    user, headers = await _create_user(db_session)
+    loop_thread = threading.get_ident()
+    seen_threads: list[int] = []
+    original = files_api._to_webp
+
+    def spy(raw: bytes) -> bytes:
+        seen_threads.append(threading.get_ident())
+        return original(raw)
+
+    monkeypatch.setattr(files_api, "_to_webp", spy)
+
+    # WHEN
+    response = await client.post(
+        "/api/files", headers=headers, files={"file": ("photo.jpg", _make_image_bytes("JPEG"), "image/jpeg")}
+    )
+
+    # THEN
+    assert response.status_code == 201
+    assert len(seen_threads) == 1
+    assert seen_threads[0] != loop_thread
 
 
 @pytest.mark.asyncio

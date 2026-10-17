@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     # External APIs
     API_DCSSERVERBOT_URL: str = "http://dcs.veaf.org:9876"
+    API_DCSSERVERBOT_KEY: SecretStr = ""
     API_TEAMSPEAK_URL: str = "serverquery://ts.veaf.org:10011/?server_port=9987"
 
     # Discord OAuth2
@@ -35,15 +36,13 @@ class Settings(BaseSettings):
     DISCORD_BOT_TOKEN: str = ""
     DISCORD_GUILD_ID: str = ""
 
-    # reCAPTCHA
-    RECAPTCHA_SECRET_KEY: SecretStr = ""
-
     # App
     APP_URL: str = "http://localhost"
     UPLOAD_DIR: str = "./uploads"
     RUN_MIGRATIONS: bool = False
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    # Ignore unknown keys so an existing .env keeping a removed variable still starts.
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
 settings = Settings()
