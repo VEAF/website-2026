@@ -186,6 +186,21 @@ function visNm(m: number): string {
                   <span>{{ showPassword ? pageData.server.password : '******' }}</span>
                 </td>
               </tr>
+              <tr v-if="pageData.server.sitac_url">
+                <th class="text-left py-1.5 pr-4 text-gray-600 w-40">
+                  <i class="fa-solid fa-map-location-dot mr-1"></i> SITAC
+                </th>
+                <td>
+                  <a
+                    :href="pageData.server.sitac_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-veaf-600 hover:text-veaf-800 hover:underline"
+                  >
+                    Carte de situation Foothold<i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i>
+                  </a>
+                </td>
+              </tr>
               <tr v-if="pageData.server.restart_time">
                 <th class="text-left py-1.5 pr-4 text-gray-600 w-40">
                   <i class="fa-solid fa-arrows-rotate mr-1"></i> Prochain redémarrage

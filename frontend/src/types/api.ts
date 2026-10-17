@@ -157,17 +157,18 @@ export interface Server {
   id: number
   name: string
   code: string
+  dcsbot_name: string | null
+  sitac_url: string | null
 }
 
 export interface ServerCreate {
   name: string
   code: string
+  dcsbot_name: string | null
+  sitac_url: string | null
 }
 
-export interface ServerUpdate {
-  name: string
-  code: string
-}
+export type ServerUpdate = ServerCreate
 
 export interface AdminServerListResponse {
   items: Server[]
@@ -238,6 +239,7 @@ export interface DcsBotServer {
   name: string
   status: string
   num_players: number
+  sitac_url: string | null
   mission: MissionInfo | null
   players: PlayerEntry[]
 }
@@ -279,6 +281,7 @@ export interface DcsBotServerDetail {
   name: string
   status: string
   num_players: number
+  sitac_url: string | null
   address: string | null
   password: string | null
   restart_time: string | null
