@@ -57,7 +57,6 @@ def log_startup_banner() -> None:
         f"   JWT_REFRESH_EXP      {_val(f'{settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS} days')}",
         f"   DISCORD_CLIENT_ID    {_val(settings.DISCORD_CLIENT_ID)}",
         f"   DISCORD_REDIRECT     {_val(settings.DISCORD_REDIRECT_URI)}",
-        f"   RECAPTCHA            {_val('enabled' if settings.RECAPTCHA_SECRET_KEY.get_secret_value() else '')}",
         "",
         f"{BOLD}{CYAN}🔗 External APIs{RESET}",
         f"   DCSSERVERBOT_URL     {_val(settings.API_DCSSERVERBOT_URL)}",
