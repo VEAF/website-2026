@@ -114,7 +114,7 @@ async def my_events(user: User = Depends(get_current_user), db: AsyncSession = D
 async def get_event(event_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(CalendarEvent)
-        .where(CalendarEvent.id == event_id)
+        .where(CalendarEvent.id == event_id, CalendarEvent.deleted == False)  # noqa: E712
         .options(
             selectinload(CalendarEvent.owner),
             selectinload(CalendarEvent.votes).selectinload(Vote.user),

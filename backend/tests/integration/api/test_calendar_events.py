@@ -125,6 +125,39 @@ async def test_list_events_excludes_deleted(client: AsyncClient, db_session: Asy
 
 
 @pytest.mark.asyncio
+async def test_get_event_deleted_not_found(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    user = await _create_user(db_session)
+    event = await _create_event(
+        db_session, owner_id=user.id, title="Deleted", deleted=True,
+        start_date=datetime(2026, 2, 11, 20, 0), end_date=datetime(2026, 2, 11, 23, 0),
+    )
+
+    # WHEN
+    response = await client.get(f"/api/calendar/events/{event.id}")
+
+    # THEN
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_event_member_restricted_stays_public(client: AsyncClient, db_session: AsyncSession):
+    # GIVEN
+    user = await _create_user(db_session)
+    event = await _create_event(
+        db_session, owner_id=user.id, title="Members only", restrictions=str(CalendarEvent.RESTRICTION_MEMBER),
+        start_date=datetime(2026, 2, 12, 20, 0), end_date=datetime(2026, 2, 12, 23, 0),
+    )
+
+    # WHEN
+    response = await client.get(f"/api/calendar/events/{event.id}")
+
+    # THEN
+    assert response.status_code == 200
+    assert response.json()["title"] == "Members only"
+
+
+@pytest.mark.asyncio
 async def test_list_events_from_date_only(client: AsyncClient, db_session: AsyncSession):
     # GIVEN
     user = await _create_user(db_session)
