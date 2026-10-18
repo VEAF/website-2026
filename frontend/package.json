@@ -19,7 +19,7 @@
     "@fullcalendar/list": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
     "@fullcalendar/vue3": "^6.1.20",
-    "axios": "^1.7.0",
+    "axios": "^1.20.0",
     "dompurify": "^3.3.1",
     "marked": "^17.0.3",
     "pinia": "^2.2.0",
