@@ -20,7 +20,6 @@ PAGES_DATA = [
 URLS_DATA = [
     {"key": "facebook", "slug": "facebook", "target": "https://www.veaf.org/facebook", "delay": 0, "status": True, "created_at": _TS1, "updated_at": _TS1},
     {"key": "discord", "slug": "discord", "target": "https://discord.com/invite/6AV2bBATUY", "delay": 5, "status": True, "created_at": _TS1, "updated_at": _TS1},
-    {"key": "teamspeak-server", "slug": "teamspeak-server", "target": "ts3server://ts.veaf.org?port=9987", "delay": 5, "status": True, "created_at": _TS1, "updated_at": _TS1},
     {"key": "youtube", "slug": "youtube", "target": "https://www.youtube.com/channel/UCEF1A_q8Cnw9JLW_Rlig3OQ/featured", "delay": 0, "status": True, "created_at": _TS1, "updated_at": _TS1},
 ]
 
@@ -107,8 +106,7 @@ async def load_content(session: AsyncSession) -> tuple[dict[str, Page], dict[str
         {"key": "servers", "label": "Serveurs", "icon": "fa fa-server", "type": MenuItem.TYPE_SERVERS, "enabled": True, "position": 4},
         {"key": "roster", "label": "Pilotes", "icon": "fa fa-plane", "type": MenuItem.TYPE_ROSTER, "enabled": True, "position": 5},
         {"key": "calendar", "label": "Calendrier", "icon": "fa fa-calendar", "type": MenuItem.TYPE_CALENDAR, "enabled": True, "position": 6},
-        {"key": "teamspeak", "label": "Teamspeak", "icon": "fab fa-teamspeak", "type": MenuItem.TYPE_TEAMSPEAK, "enabled": True, "position": 7},
-        {"key": "discord-voice", "label": "Discord", "icon": "fab fa-discord", "type": MenuItem.TYPE_DISCORD_VOICE, "enabled": True, "position": 8},
+        {"key": "discord-voice", "label": "Discord", "icon": "fab fa-discord", "type": MenuItem.TYPE_DISCORD_VOICE, "enabled": True, "position": 7},
     ]
     for item in top_menu_data:
         key = item.pop("key")

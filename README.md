@@ -116,7 +116,7 @@ The required scopes (`identify` and `email`) are requested automatically by the 
 
 ## Discord Bot (Voice Channels)
 
-Display active users in Discord voice channels on the website (similar to the TeamSpeak feature).
+Display active users in Discord voice channels on the website.
 
 ### Setup
 

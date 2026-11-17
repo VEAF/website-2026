@@ -125,12 +125,9 @@ const router = createRouter({
       component: () => import('@/views/MissionMakerView.vue'),
     },
     {
+      // TeamSpeak is no longer used: voice goes through Discord (and SRS in flight)
       path: '/teamspeak',
-      name: 'teamspeak',
-      component: () => import('@/views/TeamSpeakView.vue'),
-      meta: {
-        breadcrumb: [{ label: 'TeamSpeak', icon: 'fa-brands fa-teamspeak' }],
-      },
+      redirect: '/discord',
     },
     {
       path: '/discord',

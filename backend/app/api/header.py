@@ -9,7 +9,6 @@ from app.models.calendar import CalendarEvent
 from app.schemas.header import HeaderDataOut, NextEventOut
 from app.services import dcsbot as dcsbot_service
 from app.services import discord_voice as dv_service
-from app.services import teamspeak as ts_service
 
 router = APIRouter(prefix="/header", tags=["header"])
 
@@ -49,7 +48,6 @@ async def get_header_data(db: AsyncSession = Depends(get_db)):
     return HeaderDataOut(
         connected_players=connected_players,
         next_events_count=next_events_count,
-        ts_client_count=ts_service.get_client_count(),
         discord_voice_count=dv_service.get_user_count(),
         next_events=[
             NextEventOut(

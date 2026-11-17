@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     # External APIs
     API_DCSSERVERBOT_URL: str = "http://dcs.veaf.org:9876"
     API_DCSSERVERBOT_KEY: SecretStr = ""
-    API_TEAMSPEAK_URL: str = "serverquery://ts.veaf.org:10011/?server_port=9987"
 
     # Discord OAuth2
     DISCORD_CLIENT_ID: str = ""

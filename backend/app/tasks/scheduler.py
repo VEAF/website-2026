@@ -1,7 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from app.config import settings
-
 scheduler = AsyncIOScheduler()
 
 
@@ -13,10 +11,5 @@ def start_scheduler():
 
     scheduler.add_job(process_recurring_events, "interval", hours=1, id="calendar_auto")
     # scheduler.add_job(import_dcsbot_stats, "interval", minutes=2, id="dcsbot_import")
-
-    if settings.API_TEAMSPEAK_URL:
-        from app.tasks.teamspeak_scan import scan_teamspeak
-
-        scheduler.add_job(scan_teamspeak, "interval", minutes=5, id="teamspeak_scan")
 
     scheduler.start()

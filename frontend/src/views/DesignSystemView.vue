@@ -595,7 +595,7 @@ async function showConfirm() {
         <h3 class="text-sm font-medium text-gray-600 mb-3">Brands (fa-brands)</h3>
         <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mb-6">
           <div v-for="icon in [
-            'fa-discord', 'fa-teamspeak', 'fa-github', 'fa-youtube',
+            'fa-discord', 'fa-github', 'fa-youtube',
           ]" :key="icon" class="flex flex-col items-center text-center gap-1">
             <i :class="`fa-brands ${icon} text-xl text-gray-700`"></i>
             <span class="text-xs text-gray-500 truncate w-full">{{ icon }}</span>
