@@ -64,10 +64,10 @@ async def test_get_url_by_slug_disabled(client: AsyncClient, db_session: AsyncSe
 @pytest.mark.asyncio
 async def test_get_url_by_slug_includes_delay(client: AsyncClient, db_session: AsyncSession):
     # GIVEN
-    await _create_url(db_session, slug="teamspeak", target="ts3server://ts.veaf.org", delay=5)
+    await _create_url(db_session, slug="discord", target="https://discord.com/invite/example", delay=5)
 
     # WHEN
-    response = await client.get("/api/urls/teamspeak")
+    response = await client.get("/api/urls/discord")
 
     # THEN
     assert response.status_code == 200

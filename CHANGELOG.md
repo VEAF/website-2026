@@ -1,3 +1,8 @@
+## next release
+
+- REMOVED teamspeak - TeamSpeak page, menu item type and server scan: VEAF no longer uses TeamSpeak (voice goes through Discord, and SRS in flight); `/teamspeak` now redirects to `/discord`
+
+
 ## 2.3.0
 
 - ADDED profile - DCS game statistics of the pilot, from DCSServerBot (#181)

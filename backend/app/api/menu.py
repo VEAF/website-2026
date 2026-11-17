@@ -16,7 +16,7 @@ router = APIRouter(prefix="/menu", tags=["menu"])
 def build_menu_tree(items: list[MenuItem], user: User | None) -> list[MenuItemOut]:
     result = []
     for item in items:
-        if not item.enabled:
+        if not item.enabled or item.type in MenuItem.RETIRED_TYPES:
             continue
         if not is_granted_to_level(user, item.restriction):
             continue

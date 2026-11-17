@@ -31,12 +31,6 @@ async def lifespan(app: FastAPI):
 
     start_scheduler()
 
-    # Run initial TeamSpeak scan so cache is populated immediately
-    if settings.API_TEAMSPEAK_URL:
-        from app.services.teamspeak import scan_and_cache
-
-        await scan_and_cache()
-
     # Start Discord voice Gateway bot (populates cache in real time)
     if settings.DISCORD_BOT_TOKEN and settings.DISCORD_GUILD_ID:
         from app.services.discord_voice import start_monitor

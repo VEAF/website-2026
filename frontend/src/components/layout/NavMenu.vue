@@ -48,7 +48,6 @@ function isExternalLink(link: string | null): boolean {
 const badgeItems: Record<number, { to: string; count: () => number; label: string; tooltip: string }> = {
   7: { to: '/servers', count: () => headerStore.connectedPlayers, label: 'joueur(s)', tooltip: 'joueur(s) connecté(s)' },
   9: { to: '/calendar', count: () => headerStore.nextEventsCount, label: 'événement(s)', tooltip: 'événement(s) dans les 7 prochains jours' },
-  11: { to: '/teamspeak', count: () => headerStore.tsClientCount, label: 'client(s)', tooltip: 'client(s) connecté(s) sur TeamSpeak' },
   12: { to: '/discord', count: () => headerStore.discordVoiceCount, label: 'en vocal', tooltip: 'utilisateur(s) en vocal sur Discord' },
 }
 
@@ -71,8 +70,6 @@ function getItemLink(item: MenuItem): string | null {
       return '/calendar'
     case 10: // TYPE_MISSION_MAKER
       return '/mission-maker'
-    case 11: // TYPE_TEAMSPEAK
-      return '/teamspeak'
     case 12: // TYPE_DISCORD_VOICE
       return '/discord'
     default:
@@ -175,7 +172,7 @@ function getItemLink(item: MenuItem): string | null {
         </div>
       </div>
 
-      <!-- Badge link (servers, calendar, teamspeak, discord) -->
+      <!-- Badge link (servers, calendar, discord) -->
       <RouterLink
         v-else-if="badgeItems[item.type]"
         :to="badgeItems[item.type].to"

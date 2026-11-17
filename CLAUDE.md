@@ -52,10 +52,10 @@ VEAF Website 2026 — community web app for the Virtual European Air Force (DCS 
 │   │   │   └── recruitment.py        # RecruitmentEvent
 │   │   ├── schemas/                   # Pydantic v2 DTOs
 │   │   │   ├── auth.py, user.py, calendar.py, content.py, dcs.py, ...
-│   │   │   └── header.py, module.py, roster.py, teamspeak.py
+│   │   │   └── header.py, module.py, roster.py
 │   │   ├── services/                  # Business logic
 │   │   │   ├── dcsbot.py             # DCS bot integration
-│   │   │   ├── teamspeak.py          # TeamSpeak queries
+│   │   │   ├── discord_voice.py      # Discord voice channels (Gateway bot)
 │   │   │   └── sun_position.py       # Sun position calculations
 │   │   ├── commands/                  # CLI commands (Typer)
 │   │   │   ├── database.py           # create, fixtures
@@ -63,7 +63,7 @@ VEAF Website 2026 — community web app for the Virtual European Air Force (DCS 
 │   │   │   └── maintenance.py        # Maintenance tasks
 │   │   ├── tasks/                     # Background tasks
 │   │   │   ├── scheduler.py          # Task scheduler
-│   │   │   └── teamspeak_scan.py     # Periodic TS scan
+│   │   │   └── calendar_auto.py      # Recurring calendar events
 │   │   └── utils/
 │   │       └── cache.py              # In-memory TTLCache
 │   ├── fixtures/                      # YAML seed data
@@ -74,10 +74,10 @@ VEAF Website 2026 — community web app for the Virtual European Air Force (DCS 
 │   │   ├── factories.py              # factory-boy model factories
 │   │   ├── unit/                     # Unit tests
 │   │   │   ├── test_permissions.py, test_sun_position.py, test_user_model.py
-│   │   │   └── services/test_teamspeak.py
+│   │   │   └── services/test_dcsbot.py, test_email.py
 │   │   ├── integration/api/          # Integration tests (HTTP)
 │   │   │   ├── test_auth.py, test_admin_users.py, test_admin_events.py, ...
-│   │   │   └── test_calendar_events.py, test_teamspeak.py, ...
+│   │   │   └── test_calendar_events.py, test_urls.py, ...
 │   │   └── functional/              # Functional tests (empty for now)
 │   ├── uploads/                      # User-uploaded files
 │   └── var/                          # Runtime data (logs, etc.)
@@ -115,7 +115,7 @@ VEAF Website 2026 — community web app for the Virtual European Air Force (DCS 
 │       │   └── admin/                # DashboardView, UsersView, ModulesView, PagesView, ...
 │       ├── router/                   # Vue Router (index.ts)
 │       ├── types/                    # TypeScript interfaces
-│       │   ├── api.ts, user.ts, calendar.ts, module.ts, teamspeak.ts
+│       │   ├── api.ts, user.ts, calendar.ts, module.ts
 │       ├── constants/                # Shared constants (modules.ts)
 │       ├── utils/                    # Utilities (format.ts)
 │       └── assets/css/               # Tailwind layers + custom components

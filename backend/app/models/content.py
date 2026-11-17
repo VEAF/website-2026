@@ -122,8 +122,11 @@ class MenuItem(Base):
     TYPE_ROSTER = 8
     TYPE_CALENDAR = 9
     TYPE_MISSION_MAKER = 10
-    TYPE_TEAMSPEAK = 11
+    TYPE_TEAMSPEAK = 11  # retired: VEAF no longer uses TeamSpeak; value kept so it is never reused
     TYPE_DISCORD_VOICE = 12
+
+    # Types whose feature was removed: existing rows stay in the database but are no longer shown
+    RETIRED_TYPES = frozenset({TYPE_TEAMSPEAK})
 
     TYPES = {
         TYPE_MENU: "Menu",
@@ -136,7 +139,6 @@ class MenuItem(Base):
         TYPE_ROSTER: "Roster",
         TYPE_CALENDAR: "Calendrier",
         TYPE_MISSION_MAKER: "Mission Maker",
-        TYPE_TEAMSPEAK: "Team Speak",
         TYPE_DISCORD_VOICE: "Discord (vocal)",
     }
 
